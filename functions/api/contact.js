@@ -1,14 +1,15 @@
-export async function onRequestPost(context) {
-  try {
-    const { request, env } = context;
+export async function onRequestPost({ request, env }) {
+  const json = (obj, status = 200) =>
+    new Response(JSON.stringify(obj), { status, headers: { "content-type": "application/json" } });
 
+  try {
     const origin = request.headers.get("Origin") || "";
     const allowed = (env.ALLOWED_ORIGIN || "")
       .split(",")
-      .map(s => s.trim())
+      .map((s) => s.trim())
       .filter(Boolean);
 
-    if (allowed.length && !allowed.includes(origin)) {
+    if (allowed.length && origin && !allowed.includes(origin)) {
       return new Response("Forbidden", { status: 403 });
     }
 
@@ -21,26 +22,13 @@ export async function onRequestPost(context) {
     const focus = String(data.focus || "").trim();
     const message = String(data.message || "").trim();
 
-    if (!name || !email) {
-      return new Response(JSON.stringify({ ok: false, error: "Name and email are required." }), {
-        status: 400,
-        headers: { "content-type": "application/json" },
-      });
-    }
+    if (!name || !email) return json({ ok: false, error: "Name and email are required." }, 400);
 
     const toEmail = env.TO_EMAIL;
     const fromEmail = env.FROM_EMAIL;
-
-    if (!toEmail || !fromEmail) {
-      return new Response(JSON.stringify({ ok: false, error: "Missing TO_EMAIL/FROM_EMAIL environment variables." }), {
-        status: 500,
-        headers: { "content-type": "application/json" },
-      });
-    }
+    if (!toEmail || !fromEmail) return json({ ok: false, error: "Missing TO_EMAIL/FROM_EMAIL." }, 500);
 
     const subject = "New Entra Consulting Lead: " + (focus || "General");
-
-    // Avoid backticks entirely so copy/paste can't break strings
     const body =
       "New website inquiry\n\n" +
       "Name: " + name + "\n" +
@@ -50,7 +38,7 @@ export async function onRequestPost(context) {
       "Primary focus: " + (focus || "N/A") + "\n\n" +
       "Details:\n" + (message || "N/A") + "\n";
 
-    const sendResp = await fetch("https://api.mailchannels.net/tx/v1/send", {
+    const resp = await fetch("https://api.mailchannels.net/tx/v1/send", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
@@ -62,17 +50,13 @@ export async function onRequestPost(context) {
       }),
     });
 
-    if (!sendResp.ok) {
-      const errText = await sendResp.text();
-      return new Response(JSON.stringify({ ok: false, error: "Email send failed", details: errText }), {
-        status: 502,
-        headers: { "content-type": "application/json" },
-      });
+    if (!resp.ok) {
+      const details = await resp.text();
+      return json({ ok: false, error: "Email send failed", details }, 502);
     }
 
-    return new Response(JSON.stringify({ ok: true }), {
-      status: 200,
-      headers: { "content-type": "application/json" },
-    });
-  } catch (e) {
-    return new Response(JSON.stringify({ ok: false, error: "
+    return json({ ok: true }, 200);
+  } catch (err) {
+    return json({ ok: false, error: "Server error" }, 500);
+  }
+}
