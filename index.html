@@ -1,0 +1,970 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Microsoft Entra ID & Microsoft 365 security consulting for small businesses. Conditional Access, MFA, identity hardening, admin role cleanup, hybrid identity (Entra Connect), and Azure subscription guardrails." />
+  <title>Entra Tenant Security Consulting | Microsoft 365 Identity Hardening</title>
+
+  <style>
+    :root{
+      --bg:#ffffff;
+      --text:#0b1220;
+      --muted:#4b5563;
+      --muted2:#6b7280;
+      --border:#e5e7eb;
+      --soft:#f8fafc;
+      --soft2:#f3f6ff;
+      --blue:#2563eb;
+      --blue2:#1d4ed8;
+      --blue-weak:#dbeafe;
+      --ok:#0f766e;
+      --shadow: 0 14px 40px rgba(15, 23, 42, 0.08);
+      --shadow2: 0 10px 24px rgba(15, 23, 42, 0.06);
+      --radius:16px;
+      --radius2:22px;
+      --max:1120px;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+      color:var(--text);
+      background:var(--bg);
+      line-height:1.5;
+    }
+
+    a{ color:inherit; text-decoration:none; }
+    a:focus, button:focus, input:focus, textarea:focus, select:focus{
+      outline:3px solid var(--blue-weak);
+      outline-offset:3px;
+      border-radius:12px;
+    }
+
+    .container{
+      width:min(var(--max), 100% - 40px);
+      margin-inline:auto;
+    }
+
+    /* Typography */
+    h1,h2,h3{ margin:0 0 12px; line-height:1.15; letter-spacing:-0.02em; }
+    h1{ font-size:clamp(34px, 4vw, 52px); }
+    h2{ font-size:clamp(22px, 2.4vw, 34px); }
+    h3{ font-size:18px; letter-spacing:-0.01em; }
+    p{ margin:0 0 14px; color:var(--muted); }
+    .lead{ font-size:18px; color:var(--muted); max-width:68ch; }
+
+    /* Nav */
+    .topbar{
+      position:sticky;
+      top:0;
+      background:rgba(255,255,255,0.90);
+      backdrop-filter:saturate(150%) blur(10px);
+      border-bottom:1px solid var(--border);
+      z-index:10;
+    }
+    .nav{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:12px 0;
+      gap:14px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width: 250px;
+    }
+    .logo{
+      width:36px;height:36px;border-radius:12px;
+      border:1px solid rgba(37,99,235,0.18);
+      background:
+        radial-gradient(14px 14px at 30% 30%, rgba(37,99,235,0.18), transparent 60%),
+        radial-gradient(18px 18px at 72% 70%, rgba(37,99,235,0.14), transparent 60%),
+        linear-gradient(180deg, #fff, #f7fbff);
+      box-shadow:0 8px 18px rgba(37,99,235,0.10);
+    }
+    .brand-title{
+      display:flex; flex-direction:column;
+      line-height:1.05;
+    }
+    .brand-title strong{ font-size:14px; }
+    .brand-title span{ font-size:12px; color:var(--muted2); margin-top:2px; }
+
+    .navlinks{
+      display:flex;
+      gap:16px;
+      align-items:center;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .navlinks a{
+      font-size:13px;
+      color:var(--muted);
+      padding:8px 10px;
+      border-radius:12px;
+    }
+    .navlinks a:hover{
+      background:var(--soft);
+      color:var(--text);
+    }
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding:12px 16px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background:#fff;
+      font-weight:700;
+      font-size:14px;
+      cursor:pointer;
+      box-shadow:0 10px 18px rgba(15,23,42,0.05);
+      white-space:nowrap;
+    }
+    .btn.primary{
+      background:linear-gradient(180deg, rgba(37,99,235,0.12), rgba(37,99,235,0.06));
+      border-color:rgba(37,99,235,0.35);
+    }
+    .btn.primary:hover{
+      border-color:rgba(37,99,235,0.55);
+    }
+    .btn:active{ transform:translateY(1px); }
+
+    /* Sections */
+    .section{ padding:52px 0; }
+    .section.alt{
+      background:linear-gradient(180deg, #ffffff, #f8fbff);
+      border-top:1px solid var(--border);
+      border-bottom:1px solid var(--border);
+    }
+
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      font-size:12px;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      color:var(--muted2);
+      font-weight:700;
+    }
+    .dot{
+      width:9px;height:9px;border-radius:999px;background:var(--blue);
+      box-shadow:0 0 0 6px rgba(37,99,235,0.12);
+    }
+
+    /* Hero */
+    .hero{
+      padding:50px 0 38px;
+      background:
+        radial-gradient(720px 320px at 14% 8%, rgba(37,99,235,0.12), transparent 55%),
+        radial-gradient(620px 260px at 86% 10%, rgba(37,99,235,0.10), transparent 55%),
+        linear-gradient(180deg, #ffffff, #ffffff);
+      border-bottom:1px solid var(--border);
+    }
+    .hero-grid{
+      display:grid;
+      grid-template-columns: 1.25fr 0.75fr;
+      gap:18px;
+      align-items:stretch;
+    }
+
+    .hero-highlights{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:14px;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:#fff;
+      color:var(--muted);
+      font-size:13px;
+    }
+    .pill i{
+      width:8px;height:8px;border-radius:999px;background:var(--blue);
+      display:inline-block;
+    }
+
+    .hero-box{
+      border:1px solid var(--border);
+      border-radius:var(--radius2);
+      background:#fff;
+      box-shadow:var(--shadow);
+      padding:20px;
+    }
+
+    .hero-actions{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top:18px;
+    }
+    .microcopy{
+      margin-top:10px;
+      font-size:13px;
+      color:var(--muted2);
+    }
+
+    .checklist{
+      margin-top:14px;
+      padding:0;
+      list-style:none;
+      display:grid;
+      gap:10px;
+    }
+    .check{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      padding:10px 12px;
+      border:1px solid var(--border);
+      border-radius:14px;
+      background:linear-gradient(180deg, #fff, var(--soft));
+      box-shadow:var(--shadow2);
+    }
+    .check b{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:22px;height:22px;
+      border-radius:999px;
+      border:1px solid rgba(15,118,110,0.25);
+      background:rgba(15,118,110,0.08);
+      color:var(--ok);
+      font-size:13px;
+      flex:0 0 auto;
+      margin-top:1px;
+    }
+    .check span{
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    /* Trust strip */
+    .trust-strip{
+      margin-top:18px;
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap:12px;
+    }
+    .trust-item{
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:12px 12px;
+      background:linear-gradient(180deg, #fff, var(--soft2));
+    }
+    .trust-item strong{ display:block; font-size:13px; }
+    .trust-item span{ display:block; font-size:12px; color:var(--muted2); margin-top:4px; }
+
+    /* Problem + Why you */
+    .grid-2{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:16px;
+      margin-top:16px;
+    }
+    .panel{
+      border:1px solid var(--border);
+      border-radius:var(--radius2);
+      background:#fff;
+      padding:18px;
+      box-shadow:var(--shadow2);
+    }
+    ul{
+      margin:10px 0 0;
+      padding:0 0 0 18px;
+      color:var(--muted);
+    }
+    li{ margin:10px 0; }
+
+    /* Services */
+    .cards{
+      margin-top:16px;
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:14px;
+    }
+    .card{
+      border:1px solid var(--border);
+      border-radius:var(--radius2);
+      background:#fff;
+      padding:16px;
+      box-shadow:var(--shadow2);
+    }
+    .card-top{
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+      margin-bottom:10px;
+    }
+    .icon{
+      width:40px;height:40px;
+      border-radius:14px;
+      border:1px solid rgba(37,99,235,0.22);
+      background:linear-gradient(180deg, rgba(37,99,235,0.14), rgba(37,99,235,0.04));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:var(--blue2);
+      font-weight:900;
+      font-size:13px;
+      flex:0 0 auto;
+    }
+    .card p{ margin:0; font-size:14px; }
+    .tags{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+    .tag{
+      font-size:12px;
+      color:var(--muted2);
+      border:1px solid var(--border);
+      border-radius:999px;
+      padding:6px 10px;
+      background:var(--soft);
+    }
+
+    /* Packages */
+    .packages{
+      margin-top:16px;
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:14px;
+    }
+    .package{
+      border:1px solid var(--border);
+      border-radius:var(--radius2);
+      background:#fff;
+      padding:16px;
+      box-shadow:var(--shadow2);
+      position:relative;
+    }
+    .package.recommended{
+      border-color:rgba(37,99,235,0.35);
+      background:
+        radial-gradient(500px 180px at 20% 0%, rgba(37,99,235,0.10), transparent 60%),
+        #fff;
+    }
+    .badge{
+      position:absolute;
+      top:14px; right:14px;
+      font-size:12px;
+      font-weight:800;
+      color:var(--blue2);
+      border:1px solid rgba(37,99,235,0.28);
+      background:rgba(37,99,235,0.08);
+      padding:6px 10px;
+      border-radius:999px;
+    }
+    .package h3{ margin-bottom:6px; }
+    .price{
+      margin:8px 0 10px;
+      font-weight:900;
+      font-size:22px;
+      letter-spacing:-0.02em;
+    }
+    .price span{
+      font-size:12px;
+      color:var(--muted2);
+      font-weight:700;
+      margin-left:6px;
+    }
+    .package ul{ margin-top:8px; }
+    .package .btn{ width:100%; margin-top:12px; }
+
+    /* Process */
+    .steps{
+      margin-top:16px;
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:14px;
+    }
+    .step{
+      border:1px solid var(--border);
+      border-radius:var(--radius2);
+      background:#fff;
+      padding:16px;
+      box-shadow:var(--shadow2);
+    }
+    .step-head{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-bottom:8px;
+    }
+    .num{
+      width:34px;height:34px;
+      border-radius:14px;
+      border:1px solid rgba(37,99,235,0.24);
+      background:linear-gradient(180deg, rgba(37,99,235,0.14), rgba(37,99,235,0.04));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:900;
+      color:var(--blue2);
+    }
+    .step p{ margin:0; font-size:14px; color:var(--muted); }
+
+    /* Contact */
+    .contact-grid{
+      margin-top:16px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:14px;
+      align-items:start;
+    }
+    .form{
+      border:1px solid var(--border);
+      border-radius:var(--radius2);
+      background:#fff;
+      padding:18px;
+      box-shadow:var(--shadow2);
+    }
+    label{
+      display:block;
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:var(--muted2);
+      margin:12px 0 6px;
+    }
+    input, textarea, select{
+      width:100%;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background:#fff;
+      font-size:14px;
+      color:var(--text);
+    }
+    textarea{ min-height:120px; resize:vertical; }
+    .form-row{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+    }
+    .note{
+      font-size:13px;
+      color:var(--muted2);
+      margin-top:10px;
+    }
+
+    /* Footer */
+    footer{
+      padding:22px 0;
+      color:var(--muted2);
+      font-size:13px;
+      border-top:1px solid var(--border);
+      background:#fff;
+    }
+    .footer-row{
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .footer-links{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .footer-links a{
+      color:var(--muted2);
+      padding:8px 10px;
+      border-radius:12px;
+    }
+    .footer-links a:hover{
+      background:var(--soft);
+      color:var(--text);
+    }
+
+    /* Responsive */
+    @media (max-width: 980px){
+      .navlinks{ display:none; }
+      .hero-grid{ grid-template-columns:1fr; }
+      .trust-strip{ grid-template-columns:1fr 1fr; }
+      .grid-2{ grid-template-columns:1fr; }
+      .cards{ grid-template-columns:1fr; }
+      .packages{ grid-template-columns:1fr; }
+      .steps{ grid-template-columns:1fr; }
+      .contact-grid{ grid-template-columns:1fr; }
+      .form-row{ grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- NAV -->
+  <div class="topbar">
+    <div class="container">
+      <div class="nav">
+        <a class="brand" href="#top" aria-label="Go to top">
+          <div class="logo" aria-hidden="true"></div>
+          <div class="brand-title">
+            <strong>Entra Tenant Consulting</strong>
+            <span>Microsoft 365 identity security for SMBs</span>
+          </div>
+        </a>
+
+        <div class="navlinks" aria-label="Navigation links">
+          <a href="#services">Services</a>
+          <a href="#packages">Packages</a>
+          <a href="#process">Process</a>
+          <a href="#contact">Contact</a>
+        </div>
+
+        <a class="btn primary" href="#contact">Get a Quick Assessment</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <header id="top" class="hero">
+    <div class="container">
+      <div class="hero-grid">
+        <section class="hero-box" aria-label="Hero content">
+          <div class="eyebrow"><span class="dot" aria-hidden="true"></span> Microsoft Entra ID + M365 Security</div>
+          <h1>Secure your Entra tenant without breaking user productivity.</h1>
+          <p class="lead">
+            I help small businesses clean up identity risk with Conditional Access, MFA, admin role hygiene, and hybrid identity best practices.
+            Practical work, documented changes, and a roadmap your team can maintain.
+          </p>
+
+          <div class="hero-highlights" aria-label="Highlights">
+            <span class="pill"><i aria-hidden="true"></i> Conditional Access</span>
+            <span class="pill"><i aria-hidden="true"></i> MFA & auth methods</span>
+            <span class="pill"><i aria-hidden="true"></i> Admin roles cleanup</span>
+            <span class="pill"><i aria-hidden="true"></i> Entra Connect / AD sync</span>
+            <span class="pill"><i aria-hidden="true"></i> License optimization</span>
+            <span class="pill"><i aria-hidden="true"></i> Azure guardrails</span>
+          </div>
+
+          <div class="hero-actions">
+            <a class="btn primary" href="#contact">Request a Quote</a>
+            <a class="btn" href="#packages">See Packages</a>
+          </div>
+
+          <div class="microcopy">
+            Typical engagement: 1 to 3 weeks. Ideal for 10 to 500 users. Remote friendly.
+          </div>
+
+          <div class="trust-strip" aria-label="Trust markers">
+            <div class="trust-item">
+              <strong>Identity-first</strong>
+              <span>Stop account takeovers</span>
+            </div>
+            <div class="trust-item">
+              <strong>Audit-ready</strong>
+              <span>Documented controls</span>
+            </div>
+            <div class="trust-item">
+              <strong>Low disruption</strong>
+              <span>Staged rollout plan</span>
+            </div>
+            <div class="trust-item">
+              <strong>Practical fixes</strong>
+              <span>No vague reports</span>
+            </div>
+          </div>
+        </section>
+
+        <aside class="hero-box" aria-label="What you get">
+          <h3>What you get (deliverables)</h3>
+          <p style="color:var(--muted); margin-bottom:10px;">
+            You get improvements you can actually run with, not a “security PDF” that nobody reads.
+          </p>
+
+          <ul class="checklist">
+            <li class="check"><b aria-hidden="true">✓</b><span><strong>Tenant hardening checklist</strong> with applied settings and rationale.</span></li>
+            <li class="check"><b aria-hidden="true">✓</b><span><strong>Conditional Access baseline</strong> with exception controls and staged rollout.</span></li>
+            <li class="check"><b aria-hidden="true">✓</b><span><strong>MFA + auth methods review</strong> (including external auth methods and legacy auth risks).</span></li>
+            <li class="check"><b aria-hidden="true">✓</b><span><strong>Admin roles cleanup</strong> and break-glass guidance.</span></li>
+            <li class="check"><b aria-hidden="true">✓</b><span><strong>Hybrid identity notes</strong> for Entra Connect / AD sync health.</span></li>
+            <li class="check"><b aria-hidden="true">✓</b><span><strong>Roadmap</strong> for next 30/60/90 days.</span></li>
+          </ul>
+
+          <div style="margin-top:14px;">
+            <a class="btn primary" href="#contact" style="width:100%;">Book a Call</a>
+          </div>
+          <div class="note">No spam, no sales circus. Just a short call and a clear plan.</div>
+        </aside>
+      </div>
+    </div>
+  </header>
+
+  <!-- PROBLEM / WHY -->
+  <section class="section" aria-label="Problems and outcomes">
+    <div class="container">
+      <div class="eyebrow"><span class="dot" aria-hidden="true"></span> Why SMB tenants get risky</div>
+      <h2>Most Entra tenants “work”… until they become the attack path.</h2>
+      <p class="lead">Small businesses usually have strong intent and weak time. That’s why identity hygiene slips, policies sprawl, and exceptions pile up.</p>
+
+      <div class="grid-2">
+        <div class="panel">
+          <h3>Common problems I fix</h3>
+          <ul>
+            <li>Conditional Access is incomplete, inconsistent, or full of “temporary” exclusions.</li>
+            <li>MFA is enabled but not enforced properly (legacy auth, weak methods, gaps in coverage).</li>
+            <li>Too many admins, standing privilege, and unclear break-glass accounts.</li>
+            <li>Hybrid identity drift (Entra Connect/AD Connect sync issues, stale objects, attribute confusion).</li>
+            <li>Licenses are overspent while security features are underused.</li>
+          </ul>
+        </div>
+        <div class="panel">
+          <h3>What “good” looks like</h3>
+          <ul>
+            <li>Clear Conditional Access baseline: MFA, device controls, risky sign-ins, and safe exceptions.</li>
+            <li>Authentication methods aligned with your risk level and user reality.</li>
+            <li>Admin role cleanup, least privilege, and reliable emergency access design.</li>
+            <li>Hybrid identity verified: correct sync scope, clean objects, predictable login behavior.</li>
+            <li>Logging + guardrails in place so changes don’t become outages.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section id="services" class="section alt" aria-label="Services">
+    <div class="container">
+      <div class="eyebrow"><span class="dot" aria-hidden="true"></span> Services</div>
+      <h2>Entra-focused consulting that’s actually deployable.</h2>
+      <p class="lead">Designed for small business tenants, but with enterprise discipline: baselines, staging, documentation, and ownership.</p>
+
+      <div class="cards" role="list">
+        <div class="card" role="listitem">
+          <div class="card-top">
+            <div class="icon" aria-hidden="true">CA</div>
+            <div>
+              <h3>Conditional Access Baseline</h3>
+              <p>Design or clean up policies with staged rollout, exception control, and predictable user experience.</p>
+            </div>
+          </div>
+          <div class="tags">
+            <span class="tag">MFA enforcement</span>
+            <span class="tag">Risk-based access</span>
+            <span class="tag">Device requirements</span>
+          </div>
+        </div>
+
+        <div class="card" role="listitem">
+          <div class="card-top">
+            <div class="icon" aria-hidden="true">MFA</div>
+            <div>
+              <h3>MFA & Auth Methods</h3>
+              <p>Review and harden authentication methods, including external authentication methods and legacy auth exposure.</p>
+            </div>
+          </div>
+          <div class="tags">
+            <span class="tag">Auth method policy</span>
+            <span class="tag">Legacy auth blocks</span>
+            <span class="tag">Privileged MFA</span>
+          </div>
+        </div>
+
+        <div class="card" role="listitem">
+          <div class="card-top">
+            <div class="icon" aria-hidden="true">ADM</div>
+            <div>
+              <h3>Admin Role Cleanup</h3>
+              <p>Reduce standing privilege, fix risky role assignments, and implement a sane admin boundary model.</p>
+            </div>
+          </div>
+          <div class="tags">
+            <span class="tag">Least privilege</span>
+            <span class="tag">Break-glass</span>
+            <span class="tag">Role governance</span>
+          </div>
+        </div>
+
+        <div class="card" role="listitem">
+          <div class="card-top">
+            <div class="icon" aria-hidden="true">SYNC</div>
+            <div>
+              <h3>Hybrid Identity (Entra Connect / AD Sync)</h3>
+              <p>Validate sync scope, object hygiene, attribute correctness, and predictable sign-in behavior.</p>
+            </div>
+          </div>
+          <div class="tags">
+            <span class="tag">AD Connect review</span>
+            <span class="tag">Object cleanup</span>
+            <span class="tag">Sync health</span>
+          </div>
+        </div>
+
+        <div class="card" role="listitem">
+          <div class="card-top">
+            <div class="icon" aria-hidden="true">LIC</div>
+            <div>
+              <h3>License Optimization</h3>
+              <p>Reduce spend while increasing security value by aligning SKUs to real usage and controls.</p>
+            </div>
+          </div>
+          <div class="tags">
+            <span class="tag">SKU alignment</span>
+            <span class="tag">Cost control</span>
+            <span class="tag">Security ROI</span>
+          </div>
+        </div>
+
+        <div class="card" role="listitem">
+          <div class="card-top">
+            <div class="icon" aria-hidden="true">AZ</div>
+            <div>
+              <h3>Azure Subscription + Arc Guardrails</h3>
+              <p>Subscription hygiene: RBAC, policies, logging baseline, and Azure Arc configuration standards.</p>
+            </div>
+          </div>
+          <div class="tags">
+            <span class="tag">RBAC</span>
+            <span class="tag">Policy baseline</span>
+            <span class="tag">Logging</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PACKAGES -->
+  <section id="packages" class="section" aria-label="Packages">
+    <div class="container">
+      <div class="eyebrow"><span class="dot" aria-hidden="true"></span> Packages for small businesses</div>
+      <h2>Clear scope. Clear deliverables. No mystery invoices.</h2>
+      <p class="lead">Use these as starting points. Final pricing depends on tenant complexity, user count, and hybrid identity footprint.</p>
+
+      <div class="packages">
+        <div class="package">
+          <h3>Quick Tenant Review</h3>
+          <p class="price">$299<span>starting</span></p>
+          <p>Fast clarity on your biggest identity risks and quick wins.</p>
+          <ul>
+            <li>Tenant snapshot review</li>
+            <li>Top 10 risk findings</li>
+            <li>Quick-win action list</li>
+            <li>30-min walkthrough call</li>
+          </ul>
+          <a class="btn" href="#contact">Get a quote</a>
+        </div>
+
+        <div class="package recommended">
+          <div class="badge">Most popular</div>
+          <h3>Entra Hardening Sprint</h3>
+          <p class="price">$1,499<span>typical</span></p>
+          <p>Hands-on fixes across Conditional Access, MFA, and admin roles.</p>
+          <ul>
+            <li>Conditional Access baseline (staged)</li>
+            <li>MFA & auth methods cleanup</li>
+            <li>Admin roles review + cleanup</li>
+            <li>Documentation + 30/60/90 roadmap</li>
+          </ul>
+          <a class="btn primary" href="#contact">Request availability</a>
+        </div>
+
+        <div class="package">
+          <h3>Hybrid Identity Stabilization</h3>
+          <p class="price">$2,499<span>typical</span></p>
+          <p>For environments with on-prem AD sync and confusing sign-in behavior.</p>
+          <ul>
+            <li>Entra Connect / AD Connect assessment</li>
+            <li>Sync scope + object hygiene</li>
+            <li>Attribute and auth alignment</li>
+            <li>Stability plan + runbook</li>
+          </ul>
+          <a class="btn" href="#contact">Talk to me</a>
+        </div>
+      </div>
+
+      <p class="note" style="margin-top:12px;">
+        Want monthly help? I also do lightweight retainer support for change reviews, policy tuning, and tenant hygiene.
+      </p>
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section id="process" class="section alt" aria-label="Process">
+    <div class="container">
+      <div class="eyebrow"><span class="dot" aria-hidden="true"></span> How it works</div>
+      <h2>Simple process, low disruption.</h2>
+      <p class="lead">You get clarity, then controlled execution, then documentation so you are not dependent on external help.</p>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-head">
+            <div class="num" aria-hidden="true">1</div>
+            <h3 style="margin:0;">Assess</h3>
+          </div>
+          <p>Review tenant posture, identity flows, policies, and privileged access. Identify risks and quick wins.</p>
+        </div>
+
+        <div class="step">
+          <div class="step-head">
+            <div class="num" aria-hidden="true">2</div>
+            <h3 style="margin:0;">Implement</h3>
+          </div>
+          <p>Apply changes using staged rollout: pilot, validate, expand. Keep users working while security improves.</p>
+        </div>
+
+        <div class="step">
+          <div class="step-head">
+            <div class="num" aria-hidden="true">3</div>
+            <h3 style="margin:0;">Handover</h3>
+          </div>
+          <p>Deliver runbooks, baselines, and a roadmap. Your team owns it after, without guesswork.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="section" aria-label="Contact">
+    <div class="container">
+      <div class="eyebrow"><span class="dot" aria-hidden="true"></span> Contact</div>
+      <h2>Tell me what you need. I’ll reply with a clear plan.</h2>
+      <p class="lead">No pressure. If I’m not the right fit, I’ll tell you quickly instead of wasting your time.</p>
+
+      <div class="contact-grid">
+        <div class="panel">
+          <h3>Good fit if you:</h3>
+          <ul>
+            <li>Have 10 to 500 users and need Entra tenant security tightened.</li>
+            <li>Want Conditional Access that is secure but not annoying.</li>
+            <li>Need MFA and authentication methods cleaned up properly.</li>
+            <li>Have too many admins and no clear privileged access model.</li>
+            <li>Use AD Connect / hybrid sync and want it stable and predictable.</li>
+          </ul>
+          <div style="margin-top:14px;">
+            <div class="eyebrow" style="text-transform:none; letter-spacing:0; font-weight:800;">
+              Quick response time: <span style="color:var(--ok);">within 24 to 48 hours</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form">
+          <form id="leadForm">
+            <div class="form-row">
+              <div>
+                <label for="name">Name</label>
+                <input id="name" name="name" autocomplete="name" placeholder="Your name" required />
+              </div>
+              <div>
+                <label for="email">Email</label>
+                <input id="email" name="email" type="email" autocomplete="email" placeholder="you@company.com" required />
+              </div>
+            </div>
+
+            <label for="company">Company</label>
+            <input id="company" name="company" autocomplete="organization" placeholder="Company name" />
+
+            <div class="form-row">
+              <div>
+                <label for="users">User count</label>
+                <select id="users" name="users">
+                  <option>1–10</option>
+                  <option selected>10–50</option>
+                  <option>50–200</option>
+                  <option>200–500</option>
+                  <option>500+</option>
+                </select>
+              </div>
+              <div>
+                <label for="focus">Primary focus</label>
+                <select id="focus" name="focus">
+                  <option selected>Conditional Access + MFA</option>
+                  <option>Admin role cleanup</option>
+                  <option>Hybrid identity / Entra Connect</option>
+                  <option>License optimization</option>
+                  <option>Azure subscription / Arc</option>
+                </select>
+              </div>
+            </div>
+
+            <label for="message">What are you trying to fix?</label>
+            <textarea id="message" name="message" placeholder="Example: We want to enforce MFA properly, remove legacy auth, and clean up admin roles."></textarea>
+
+            <button class="btn primary" type="submit" style="width:100%; margin-top:14px;">
+              Send Request
+            </button>
+
+            <p class="note">
+              This form opens your email client. Replace <strong>contact@example.com</strong> in the code with your real email.
+            </p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-row">
+        <div>
+          <strong style="color:var(--text);">Entra Tenant Consulting</strong>
+          <div style="margin-top:6px;">Entra ID • Conditional Access • MFA • Admin roles • Hybrid identity • Azure guardrails</div>
+        </div>
+        <div class="footer-links">
+          <a href="#services">Services</a>
+          <a href="#packages">Packages</a>
+          <a href="#process">Process</a>
+          <a href="#contact">Contact</a>
+        </div>
+      </div>
+      <div style="margin-top:12px;">
+        © <span id="year"></span> Your Name / Company Name. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // No animations. Just functional mailto so SMBs can contact you without backend setup.
+    (function(){
+      document.getElementById("year").textContent = new Date().getFullYear();
+
+      var form = document.getElementById("leadForm");
+      form.addEventListener("submit", function(e){
+        e.preventDefault();
+
+        var name = document.getElementById("name").value.trim();
+        var email = document.getElementById("email").value.trim();
+        var company = document.getElementById("company").value.trim();
+        var users = document.getElementById("users").value;
+        var focus = document.getElementById("focus").value;
+        var message = document.getElementById("message").value.trim();
+
+        var subject = "Entra Tenant Consulting Request (" + focus + ")";
+        var body =
+          "Name: " + name + "\n" +
+          "Email: " + email + "\n" +
+          "Company: " + (company || "N/A") + "\n" +
+          "User count: " + users + "\n" +
+          "Primary focus: " + focus + "\n\n" +
+          "Details:\n" + (message || "N/A") + "\n";
+
+        // Replace with your real email:
+        var to = "contact@example.com";
+        var mailto = "mailto:" + encodeURIComponent(to) +
+          "?subject=" + encodeURIComponent(subject) +
+          "&body=" + encodeURIComponent(body);
+
+        window.location.href = mailto;
+      });
+    })();
+  </script>
+</body>
+</html>
