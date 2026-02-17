@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Blog | Entra + Microsoft 365 Security</title>
+  <meta name="description" content="Articles on Microsoft Entra ID, Conditional Access, MFA, tenant hardening, hybrid identity, and Azure governance for small businesses." />
+
+  <style>
+    :root{
+      --bg:#ffffff;
+      --text:#0b1220;
+      --muted:#51607a;
+      --border:#e2e8f0;
+      --soft:#f7fafc;
+      --blue:#2b6cff;
+      --blue2:#1d4ed8;
+      --shadow: 0 18px 45px rgba(2,6,23,.10);
+      --r16:16px;
+      --r20:20px;
+      --max:1140px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    }
+    *{ box-sizing:border-box; }
+    body{ margin:0; font-family:var(--sans); color:var(--text); background:#fff; line-height:1.6; }
+    a{ color:inherit; text-decoration:none; }
+    .wrap{ max-width:var(--max); margin:0 auto; padding:0 20px; }
+
+    .nav{
+      position:sticky; top:0; z-index:20;
+      background:rgba(255,255,255,.92);
+      backdrop-filter:saturate(180%) blur(10px);
+      border-bottom:1px solid var(--border);
+    }
+    .nav-inner{
+      height:72px; display:flex; align-items:center; justify-content:space-between; gap:14px;
+    }
+    .brand{ display:flex; align-items:center; gap:12px; font-weight:900; }
+    .mark{
+      width:36px; height:36px; border-radius:12px;
+      border:1px solid rgba(43,108,255,.25);
+      background:linear-gradient(180deg, rgba(239,246,255,.9), rgba(255,255,255,1));
+      display:grid; place-items:center;
+      box-shadow: 0 10px 28px rgba(43,108,255,.10);
+    }
+    .mark span{ width:10px; height:10px; border-radius:999px; background:var(--blue); box-shadow:0 0 0 6px rgba(43,108,255,.14); display:block; }
+    .links{ display:flex; gap:10px; align-items:center; color:var(--muted); font-weight:800; font-size:14px; }
+    .links a{ padding:10px 10px; border-radius:12px; }
+    .links a:hover{ background:var(--soft); }
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:12px 16px; border-radius:14px;
+      font-weight:950; border:1px solid var(--border);
+      background:#fff; cursor:pointer;
+    }
+    .btn-primary{ background:var(--blue); border-color:var(--blue); color:#fff; }
+    .btn-primary:hover{ background:var(--blue2); border-color:var(--blue2); }
+
+    .hero{
+      padding:52px 0 22px;
+      background:
+        radial-gradient(1100px 520px at 70% 0%, rgba(43,108,255,.12), transparent 60%),
+        linear-gradient(180deg, rgba(248,250,252,.9), #fff);
+      border-bottom:1px solid var(--border);
+    }
+    h1{
+      margin:0 0 8px;
+      font-size:clamp(28px, 3vw, 40px);
+      letter-spacing:-.02em;
+      line-height:1.12;
+    }
+    .sub{ margin:0; color:var(--muted); max-width:75ch; }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:16px;
+      padding:22px 0 52px;
+    }
+
+    .card{
+      border:1px solid var(--border);
+      border-radius:var(--r20);
+      background:#fff;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .card-h{
+      padding:16px 16px 12px;
+      border-bottom:1px solid var(--border);
+      background:linear-gradient(180deg, rgba(239,246,255,.7), rgba(255,255,255,.85));
+    }
+    .card-h h2{ margin:0; font-size:16px; }
+    .card-b{ padding:14px 16px 16px; }
+
+    .post{
+      padding:14px 0;
+      border-bottom:1px solid var(--border);
+    }
+    .post:last-child{ border-bottom:none; padding-bottom:0; }
+    .meta{ color:var(--muted); font-size:12px; font-family:var(--mono); }
+    .title{ margin:6px 0 6px; font-weight:950; }
+    .excerpt{ margin:0; color:var(--muted); font-size:14px; }
+
+    .side{
+      display:grid; gap:12px;
+      align-content:start;
+    }
+    .box{
+      border:1px solid var(--border);
+      border-radius:var(--r20);
+      background:linear-gradient(180deg, rgba(248,250,252,.9), #fff);
+      padding:16px;
+    }
+    .box h3{ margin:0 0 8px; font-size:14px; }
+    .box p{ margin:0; color:var(--muted); font-size:13px; }
+
+    footer{ padding:28px 0; color:#64748b; font-size:13px; }
+    .foot{ border-top:1px solid var(--border); padding-top:18px; display:flex; justify-content:space-between; gap:14px; flex-wrap:wrap; }
+
+    @media (max-width: 980px){
+      .grid{ grid-template-columns:1fr; }
+      .links{ display:none; }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <a class="brand" href="index.html">
+        <div class="mark"><span></span></div>
+        <div>
+          <div style="font-size:15px;">Entra + M365 Security</div>
+          <div style="font-size:12px;color:var(--muted);font-weight:800;margin-top:-2px;">Articles and admin notes</div>
+        </div>
+      </a>
+
+      <nav class="links" aria-label="Primary">
+        <a href="index.html#coverage">Coverage</a>
+        <a href="index.html#services">Services</a>
+        <a href="blog.html">Blog</a>
+        <a href="index.html#contact">Contact</a>
+      </nav>
+
+      <a class="btn btn-primary" href="index.html#contact">Request an Assessment</a>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="wrap">
+      <h1>Blog: Entra ID, Conditional Access, MFA, and tenant hardening</h1>
+      <p class="sub">Short, practical write-ups for admins who want a clean, secure tenant and fewer surprise incidents.</p>
+    </div>
+  </section>
+
+  <main class="wrap">
+    <div class="grid">
+      <div class="card">
+        <div class="card-h">
+          <h2>Latest articles</h2>
+        </div>
+        <div class="card-b">
+          <!-- Replace these with real posts later -->
+          <article class="post">
+            <div class="meta">2026-02-16 · Entra ID · Conditional Access</div>
+            <div class="title">A practical Conditional Access baseline for small businesses</div>
+            <p class="excerpt">What to enforce first, what to stage, and how to avoid locking yourself out while still blocking risky sign-ins.</p>
+          </article>
+
+          <article class="post">
+            <div class="meta">2026-02-16 · Authentication Methods · MFA</div>
+            <div class="title">MFA that actually protects: methods cleanup checklist</div>
+            <p class="excerpt">Weak methods and legacy pathways quietly undermine MFA. Here is a cleanup plan that won’t wreck your users.</p>
+          </article>
+
+          <article class="post">
+            <div class="meta">2026-02-16 · Privileged Access · Roles</div>
+            <div class="title">Admin role cleanup: least privilege without slowing IT down</div>
+            <p class="excerpt">How to reduce standing admin access, build break-glass correctly, and keep accountability clear.</p>
+          </article>
+
+          <article class="post">
+            <div class="meta">2026-02-16 · Hybrid Identity · Entra Connect</div>
+            <div class="title">Hybrid identity sanity: Entra Connect issues that cause real incidents</div>
+            <p class="excerpt">The common sync and sign-in issues that trigger outages and how to stabilize the identity pipeline.</p>
+          </article>
+        </div>
+      </div>
+
+      <aside class="side">
+        <div class="box">
+          <h3>What this blog covers</h3>
+          <p>Entra ID posture, Conditional Access, MFA and authentication methods, admin role governance, B2B external access, hybrid identity (Entra Connect), and Azure security guardrails.</p>
+        </div>
+
+        <div class="box">
+          <h3>Want a tenant review?</h3>
+          <p>Use the assessment form on the main page. You’ll get a clear plan and priorities.</p>
+          <div style="margin-top:12px;">
+            <a class="btn btn-primary" href="index.html#contact">Request an Assessment</a>
+          </div>
+        </div>
+
+        <div class="box">
+          <h3>Production tip</h3>
+          <p>Later, you can turn each post into its own HTML file (e.g. <span style="font-family:var(--mono);">/blog/conditional-access-baseline.html</span>) and link it from this list.</p>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap foot">
+      <div>© <span id="year"></span> Entra + M365 Security</div>
+      <div><a href="index.html" style="font-weight:900;color:#0f172a;">Home</a></div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
