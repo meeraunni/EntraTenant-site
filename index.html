@@ -4,1855 +4,1696 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sentinel Identity | Entra ID & Microsoft 365 Consulting</title>
-  <meta name="description" content="Sentinel Identity provides Microsoft Entra ID and Microsoft 365 consulting and technical support for small businesses and healthcare teams. Entra ID, Exchange, Teams, SharePoint, MFA, Conditional Access, and Entra Connect sync support." />
-  <meta name="theme-color" content="#0b1020" />
-
+  <meta
+    name="description"
+    content="Sentinel Identity helps small businesses secure Microsoft Entra ID and Microsoft 365 with practical consulting for MFA, Conditional Access, admin roles, Exchange, Teams, SharePoint, and hybrid identity."
+  />
   <style>
-    :root{
-      --bg: #070b16;
-      --bg-2: #0b1227;
-      --surface: rgba(255,255,255,0.06);
-      --surface-2: rgba(255,255,255,0.08);
-      --border: rgba(255,255,255,0.14);
-      --text: #eaf1ff;
-      --muted: #b9c6e4;
-      --dark-text: #0e1324;
-      --blue: #2d6bff;
-      --cyan: #24c4ff;
-      --violet: #7a4dff;
-      --lime: #c6f23a;
-      --accent: linear-gradient(90deg, #7a4dff 0%, #2d6bff 50%, #24c4ff 100%);
-      --shadow: 0 20px 50px rgba(0,0,0,0.25);
-      --radius: 20px;
-      --radius-sm: 14px;
-      --max: 1200px;
+    :root {
+      --bg: #071029;
+      --bg-2: #0b1635;
+      --panel: rgba(255, 255, 255, 0.06);
+      --panel-2: rgba(255, 255, 255, 0.08);
+      --border: rgba(255, 255, 255, 0.12);
+      --text: #eef4ff;
+      --muted: #b6c3e3;
+      --soft: #8ea4d6;
+      --blue: #3b82f6;
+      --blue-2: #2563eb;
+      --cyan: #22d3ee;
+      --violet: #8b5cf6;
+      --green: #34d399;
+      --danger: #fca5a5;
+      --warning: #fde68a;
+      --shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+      --radius: 18px;
+      --maxw: 1180px;
     }
 
     * { box-sizing: border-box; }
-    html, body { margin:0; padding:0; }
-    body{
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: radial-gradient(circle at 15% 10%, #10255d 0%, #071029 40%, #060d22 100%);
       color: var(--text);
-      background:
-        radial-gradient(1200px 700px at 8% -5%, rgba(122,77,255,.22), transparent 60%),
-        radial-gradient(900px 600px at 90% 8%, rgba(36,196,255,.14), transparent 60%),
-        linear-gradient(180deg, #070b16 0%, #091126 45%, #0b1328 100%);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       line-height: 1.5;
+      scroll-behavior: smooth;
     }
 
-    img { max-width: 100%; display: block; }
-    a { color: inherit; text-decoration: none; }
-
-    .container{
-      width: min(var(--max), calc(100% - 32px));
-      margin-inline: auto;
+    a {
+      color: inherit;
+      text-decoration: none;
     }
 
-    /* Header */
-    .header{
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    .container {
+      width: min(var(--maxw), calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    /* Top Nav */
+    .site-header {
       position: sticky;
       top: 0;
       z-index: 50;
-      backdrop-filter: blur(12px);
-      background: rgba(7, 11, 22, 0.72);
-      border-bottom: 1px solid rgba(255,255,255,0.06);
+      backdrop-filter: blur(10px);
+      background: rgba(6, 13, 34, 0.65);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
     }
 
-    .nav{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      min-height: 78px;
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       gap: 16px;
+      min-height: 78px;
     }
 
-    .brand{
-      display:flex;
-      align-items:center;
+    .brand {
+      display: flex;
+      align-items: center;
       gap: 12px;
       min-width: 0;
     }
 
-    .brand-badge{
-      width: 38px;
-      height: 38px;
+    .brand-badge {
+      width: 40px;
+      height: 40px;
       border-radius: 12px;
       background:
-        radial-gradient(circle at 25% 25%, rgba(255,255,255,0.7), rgba(255,255,255,0.1) 40%),
-        linear-gradient(135deg, #24c4ff 0%, #2d6bff 45%, #7a4dff 100%);
+        radial-gradient(circle at 25% 25%, #8df0ff, #3b82f6 45%, #1d4ed8 70%, #0f172a 100%);
       box-shadow:
-        0 0 0 1px rgba(255,255,255,0.12) inset,
-        0 10px 25px rgba(45,107,255,.35);
+        inset 0 1px 1px rgba(255,255,255,0.35),
+        0 8px 24px rgba(59,130,246,0.35);
+      border: 1px solid rgba(255,255,255,0.2);
       flex: 0 0 auto;
     }
 
-    .brand-text{
+    .brand-text {
       min-width: 0;
     }
 
-    .brand-text strong{
-      display:block;
-      font-size: 1rem;
+    .brand-title {
+      margin: 0;
+      font-size: 1.05rem;
+      font-weight: 800;
       line-height: 1.1;
-      letter-spacing: .01em;
-      white-space: nowrap;
+      letter-spacing: -0.02em;
     }
 
-    .brand-text span{
-      display:block;
+    .brand-sub {
+      margin: 2px 0 0;
       color: var(--muted);
-      font-size: .82rem;
+      font-size: 0.82rem;
       white-space: nowrap;
-      overflow:hidden;
+      overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 420px;
     }
 
-    .nav-links{
-      display:flex;
-      align-items:center;
-      gap: 10px;
-      flex-wrap: wrap;
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .nav-links a:hover {
+      color: #fff;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
       justify-content: center;
-    }
-
-    .nav-links a{
-      color: #d9e4ff;
-      font-weight: 600;
-      font-size: .95rem;
-      padding: 10px 12px;
-      border-radius: 12px;
-      transition: .2s ease;
-    }
-
-    .nav-links a:hover{
-      background: rgba(255,255,255,0.06);
-    }
-
-    .nav-cta{
-      display:flex;
-      align-items:center;
-      gap: 10px;
-    }
-
-    .btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
       gap: 8px;
-      border: 0;
+      border: 1px solid transparent;
       border-radius: 14px;
-      padding: 12px 18px;
+      padding: 12px 16px;
       font-weight: 700;
-      font-size: .95rem;
+      font-size: 0.95rem;
       cursor: pointer;
-      transition: transform .18s ease, box-shadow .18s ease, opacity .18s ease, background .18s ease;
-      text-align:center;
+      transition: 0.2s ease;
+      white-space: nowrap;
     }
 
-    .btn:hover{
+    .btn-primary {
+      background: linear-gradient(90deg, var(--violet), var(--blue), var(--cyan));
+      color: white;
+      box-shadow: 0 10px 30px rgba(59,130,246,0.35);
+    }
+
+    .btn-primary:hover {
       transform: translateY(-1px);
+      box-shadow: 0 14px 36px rgba(59,130,246,0.45);
     }
 
-    .btn-primary{
-      color: white;
-      background: var(--accent);
-      box-shadow: 0 12px 28px rgba(45,107,255,.35);
+    .btn-secondary {
+      background: rgba(255,255,255,0.04);
+      border-color: var(--border);
+      color: #fff;
     }
 
-    .btn-secondary{
-      color: white;
+    .btn-secondary:hover {
       background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.14);
     }
 
-    .btn-light{
-      color: var(--dark-text);
-      background: white;
-      box-shadow: 0 10px 20px rgba(0,0,0,.08);
-    }
-
-    .btn-outline-dark{
-      color: #0c1324;
-      background: rgba(255,255,255,.88);
-      border: 1px solid rgba(0,0,0,.06);
-    }
-
-    .mobile-menu-btn{
-      display:none;
+    /* Mobile nav */
+    .nav-toggle {
+      display: none;
       background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,.12);
-      color: white;
-      width: 44px;
-      height: 44px;
+      color: #fff;
+      border: 1px solid var(--border);
       border-radius: 12px;
-      align-items:center;
-      justify-content:center;
-      cursor:pointer;
-      font-size: 1.2rem;
+      padding: 10px 12px;
+      font-weight: 700;
+      cursor: pointer;
     }
 
-    .mobile-panel{
-      display:none;
-      padding: 10px 0 16px;
-      border-top: 1px solid rgba(255,255,255,.06);
+    .mobile-menu {
+      display: none;
+      padding: 0 0 14px;
     }
 
-    .mobile-panel a{
-      display:block;
-      padding: 12px 10px;
+    .mobile-menu .menu-panel {
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04);
+      border-radius: 14px;
+      padding: 12px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .mobile-menu a {
+      padding: 10px 12px;
       border-radius: 10px;
-      color: #dce7ff;
+      color: var(--muted);
       font-weight: 600;
     }
 
-    .mobile-panel a:hover{
-      background: rgba(255,255,255,.05);
-    }
-
-    .mobile-panel .btn{
-      width:100%;
-      margin-top: 8px;
+    .mobile-menu a:hover {
+      background: rgba(255,255,255,0.06);
+      color: #fff;
     }
 
     /* Hero */
-    .hero{
+    .hero-wrap {
       position: relative;
-      overflow: hidden;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
+      overflow: clip;
     }
 
-    .hero::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:
-        linear-gradient(110deg, rgba(6,10,20,.90) 12%, rgba(7,11,22,.78) 45%, rgba(7,11,22,.40) 75%, rgba(7,11,22,.82) 100%),
-        url("https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1800&q=80") center/cover no-repeat;
-      opacity: .95;
+    .hero-wrap::before,
+    .hero-wrap::after {
+      content: "";
+      position: absolute;
+      width: 420px;
+      height: 420px;
+      border-radius: 999px;
+      filter: blur(60px);
+      opacity: 0.28;
+      pointer-events: none;
       z-index: 0;
     }
 
-    .hero::after{
-      content:"";
-      position:absolute;
-      inset:auto -10% -25% -10%;
-      height: 55%;
-      background:
-        radial-gradient(50% 80% at 20% 50%, rgba(122,77,255,.28), transparent 65%),
-        radial-gradient(50% 80% at 70% 40%, rgba(36,196,255,.20), transparent 60%);
-      z-index:0;
-      pointer-events:none;
+    .hero-wrap::before {
+      top: -120px;
+      left: -120px;
+      background: #2563eb;
     }
 
-    .hero-inner{
-      position:relative;
-      z-index:1;
-      padding: 44px 0 54px;
+    .hero-wrap::after {
+      right: -120px;
+      top: 80px;
+      background: #8b5cf6;
     }
 
-    .hero-grid{
-      display:grid;
-      grid-template-columns: 1.04fr .96fr;
+    .hero {
+      position: relative;
+      z-index: 1;
+      padding: 38px 0 24px;
+      display: grid;
+      grid-template-columns: 1.08fr 0.92fr;
       gap: 24px;
-      align-items: stretch;
+      align-items: start;
     }
 
-    .hero-copy{
-      padding: 16px 8px 12px 0;
+    .hero-left {
+      padding: 24px 0 0;
     }
 
-    .eyebrow{
-      display:inline-flex;
-      align-items:center;
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
       gap: 10px;
-      color: #eaf2ff;
-      border:1px solid rgba(255,255,255,.18);
-      background: rgba(255,255,255,.06);
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.16);
+      color: #dbe7ff;
+      padding: 10px 14px;
       border-radius: 999px;
-      padding: 9px 14px;
-      font-size: .9rem;
-      margin-bottom: 16px;
-      box-shadow: 0 8px 20px rgba(0,0,0,.15);
+      font-weight: 700;
+      font-size: 0.85rem;
+      margin-bottom: 18px;
     }
 
-    .eyebrow .dot{
+    .eyebrow-dot {
       width: 8px;
       height: 8px;
       border-radius: 999px;
-      background: linear-gradient(90deg, #24c4ff, #2d6bff);
-      box-shadow: 0 0 0 4px rgba(36,196,255,.12);
+      background: linear-gradient(180deg, #6ee7ff, #3b82f6);
+      box-shadow: 0 0 0 5px rgba(59,130,246,0.15);
     }
 
-    .hero h1{
+    .hero h1 {
       margin: 0;
-      font-size: clamp(2rem, 5vw, 3.6rem);
+      font-size: clamp(2.1rem, 5vw, 3.6rem);
       line-height: 1.02;
       letter-spacing: -0.03em;
-      max-width: 16ch;
-      color: white;
+      font-weight: 900;
+      max-width: 14ch;
       text-wrap: balance;
     }
 
-    .hero p.lead{
-      margin: 16px 0 0;
-      color: #d3e0ff;
-      font-size: 1.05rem;
+    .hero p.lead {
+      margin: 18px 0 0;
+      color: var(--muted);
+      font-size: 1.08rem;
       max-width: 62ch;
     }
 
-    .hero-cta-row{
-      display:flex;
-      gap: 12px;
-      flex-wrap: wrap;
+    .hero-cta {
       margin-top: 20px;
-    }
-
-    .hero-highlight-grid{
-      display:grid;
-      grid-template-columns: repeat(3, minmax(0,1fr));
+      display: flex;
+      flex-wrap: wrap;
       gap: 12px;
+    }
+
+    .hero-visual {
       margin-top: 18px;
-    }
-
-    .highlight-card{
-      background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(255,255,255,0.14);
-      border-radius: 16px;
-      padding: 12px;
-      box-shadow: 0 10px 22px rgba(0,0,0,.18);
-      min-height: 100px;
-    }
-
-    .highlight-card strong{
-      display:flex;
-      align-items:center;
-      gap: 8px;
-      font-size: .97rem;
-      color: #fff;
-      margin-bottom: 4px;
-    }
-
-    .check{
-      width: 18px; height: 18px;
-      border-radius: 999px;
-      background: linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.08));
-      border: 1px solid rgba(255,255,255,.18);
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      font-size: 12px;
-      color: #b9ffdc;
-      flex: 0 0 auto;
-    }
-
-    .highlight-card p{
-      margin:0;
-      color:#d7e4ff;
-      font-size:.9rem;
-      line-height:1.35;
-    }
-
-    /* Form card */
-    .form-card{
-      align-self: start;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.05));
-      border: 1px solid rgba(255,255,255,.16);
-      border-radius: 22px;
-      box-shadow: 0 25px 60px rgba(0,0,0,.3);
+      border-radius: 18px;
       overflow: hidden;
-      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.14);
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      box-shadow: var(--shadow);
+      position: relative;
+      min-height: 250px;
     }
 
-    .form-card-header{
-      padding: 18px 18px 12px;
-      border-bottom: 1px solid rgba(255,255,255,.08);
-      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0));
+    .hero-visual img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.88;
     }
 
-    .form-card-header h3{
+    .hero-visual::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(7,16,41,0.12), rgba(7,16,41,0.5)),
+        radial-gradient(circle at 12% 18%, rgba(59,130,246,0.28), transparent 55%);
+      pointer-events: none;
+    }
+
+    .floating-tags {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .tag-card {
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.05);
+      border-radius: 14px;
+      padding: 12px 12px;
+      color: #dbe7ff;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .tag-card small {
+      display: block;
+      margin-top: 5px;
+      color: var(--soft);
+      font-weight: 500;
+      font-size: 0.78rem;
+      line-height: 1.35;
+    }
+
+    /* Hero form */
+    .hero-form {
+      border: 1px solid rgba(255,255,255,0.14);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero-form::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--violet), var(--blue), var(--cyan));
+      opacity: 0.95;
+    }
+
+    .hero-form-head {
+      padding: 20px 20px 8px;
+    }
+
+    .hero-form-head h2 {
       margin: 0;
       font-size: 1.35rem;
-      line-height: 1.1;
-      color: white;
+      letter-spacing: -0.02em;
     }
 
-    .form-card-header p{
+    .hero-form-head p {
       margin: 8px 0 0;
-      color: #d1defb;
-      font-size: .92rem;
+      color: var(--muted);
+      font-size: 0.95rem;
     }
 
-    .email-pill{
-      margin-top: 10px;
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.05);
-      border-radius: 999px;
-      padding: 6px 10px;
-      color: #e7efff;
-      font-size: .85rem;
+    .hero-form-body {
+      padding: 12px 20px 18px;
     }
 
-    .email-pill span{
-      color: #9fd8ff;
-      font-weight: 700;
-    }
-
-    .form-wrap{
-      padding: 16px 18px 18px;
-    }
-
-    .form-grid{
-      display:grid;
+    .form-grid {
+      display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
     }
 
-    .field{
-      display:flex;
-      flex-direction:column;
-      gap: 6px;
-    }
-
-    .field.full{
+    .form-row-full {
       grid-column: 1 / -1;
     }
 
-    .field label{
-      font-size: .79rem;
-      text-transform: uppercase;
-      letter-spacing: .1em;
-      color: #cfdcff;
-      font-weight: 700;
+    .field {
+      display: grid;
+      gap: 6px;
     }
 
-    .field input,
-    .field select,
-    .field textarea{
-      width:100%;
+    .field label {
+      font-size: 0.74rem;
+      color: #c9d7f7;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .input,
+    .select,
+    .textarea {
+      width: 100%;
       border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.16);
-      background: rgba(7,11,22,.55);
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(5, 12, 30, 0.55);
       color: #fff;
       padding: 12px 14px;
-      font-size: .95rem;
+      font: inherit;
       outline: none;
-      transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
 
-    .field input::placeholder,
-    .field textarea::placeholder{
-      color: rgba(234,241,255,.62);
+    .input::placeholder,
+    .textarea::placeholder {
+      color: #91a4cf;
     }
 
-    .field input:focus,
-    .field select:focus,
-    .field textarea:focus{
-      border-color: rgba(36,196,255,.55);
-      box-shadow: 0 0 0 4px rgba(36,196,255,.12);
-      background: rgba(7,11,22,.72);
+    .input:focus,
+    .select:focus,
+    .textarea:focus {
+      border-color: rgba(59,130,246,0.75);
+      box-shadow: 0 0 0 4px rgba(59,130,246,0.18);
     }
 
-    .field textarea{
-      min-height: 104px;
+    .textarea {
+      min-height: 122px;
       resize: vertical;
     }
 
-    .submit-btn{
-      width: 100%;
+    .form-actions {
       margin-top: 14px;
-      border-radius: 16px;
-      padding: 13px 16px;
-      font-size: 1rem;
+      display: grid;
+      gap: 10px;
     }
 
-    .form-note{
-      margin-top: 10px;
-      color: #d4e0fb;
-      font-size: .86rem;
+    .form-note {
+      color: var(--soft);
+      font-size: 0.85rem;
+    }
+
+    .form-status {
+      margin-top: 2px;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      min-height: 1.3em;
+    }
+
+    .form-status.loading {
+      color: #bfdbfe;
+    }
+
+    .form-status.success {
+      color: var(--green);
+    }
+
+    .form-status.error {
+      color: var(--danger);
+    }
+
+    #assessmentSubmitBtn[disabled] {
+      opacity: 0.75;
+      cursor: not-allowed;
+    }
+
+    /* Trust strip */
+    .trust-strip {
+      margin: 22px 0 0;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04);
+      border-radius: 18px;
+      padding: 14px;
+      display: grid;
+      grid-template-columns: 1.1fr 1fr 1fr 1fr;
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    .trust-item {
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      border-radius: 14px;
+      padding: 12px;
+    }
+
+    .trust-item strong {
+      display: block;
+      font-size: 0.92rem;
+      margin-bottom: 4px;
+    }
+
+    .trust-item span {
+      color: var(--soft);
+      font-size: 0.84rem;
       line-height: 1.35;
     }
 
-    .form-note a{
-      color: #9fd8ff;
-      text-decoration: underline;
-      text-underline-offset: 2px;
-      font-weight: 600;
+    /* Shared section styles */
+    .section {
+      padding: 58px 0;
+      position: relative;
     }
 
-    /* Generic sections */
-    section{
-      padding: 68px 0;
-    }
-
-    .section-light{
-      background:
-        radial-gradient(800px 300px at 20% 0%, rgba(36,196,255,.08), transparent 70%),
-        linear-gradient(180deg, rgba(255,255,255,.015), rgba(255,255,255,0));
-    }
-
-    .section-title{
-      margin: 0;
-      font-size: clamp(1.7rem, 3vw, 2.6rem);
+    .section h2 {
+      margin: 0 0 10px;
+      font-size: clamp(1.5rem, 3vw, 2.2rem);
       line-height: 1.08;
-      letter-spacing: -0.025em;
-      color: #f2f7ff;
+      letter-spacing: -0.02em;
     }
 
-    .section-sub{
-      margin: 12px 0 0;
+    .section-intro {
+      margin: 0 0 22px;
       color: var(--muted);
       max-width: 70ch;
       font-size: 1rem;
     }
 
-    .section-head{
-      margin-bottom: 26px;
-    }
-
-    .pill-row{
-      display:grid;
-      grid-template-columns: repeat(3, minmax(0,1fr));
-      gap: 12px;
-    }
-
-    .trust-pill{
-      display:flex;
-      align-items:center;
-      gap: 10px;
-      background: rgba(255,255,255,.04);
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius: 14px;
-      padding: 12px 14px;
-      color: #e7efff;
-      font-weight: 600;
-      min-height: 54px;
-    }
-
-    .trust-pill .icon{
-      width: 26px;
-      height: 26px;
-      border-radius: 9px;
-      flex: 0 0 auto;
-      display:grid;
-      place-items:center;
-      color: white;
-      font-size: .9rem;
-      background: linear-gradient(135deg, rgba(122,77,255,.9), rgba(36,196,255,.9));
-      box-shadow: 0 10px 20px rgba(36,196,255,.15);
+    .section-card {
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
     }
 
     /* Who we help */
-    .cards-3{
-      display:grid;
-      grid-template-columns: repeat(3, minmax(0,1fr));
-      gap: 18px;
-    }
-
-    .card{
-      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius: 18px;
-      padding: 18px;
-      box-shadow: 0 15px 30px rgba(0,0,0,.16);
-    }
-
-    .card h3{
-      margin: 0;
-      font-size: 1.1rem;
-      color: white;
-      letter-spacing: -0.01em;
-    }
-
-    .card p{
-      margin: 8px 0 0;
-      color: var(--muted);
-      font-size: .95rem;
-    }
-
-    .card ul{
-      margin: 12px 0 0;
-      padding: 0;
-      list-style: none;
-      display:grid;
-      gap: 8px;
-    }
-
-    .card li{
-      color: #e0eaff;
-      font-size: .92rem;
-      display:flex;
-      gap: 8px;
-      align-items:flex-start;
-    }
-
-    .card li::before{
-      content: "•";
-      color: #8fd8ff;
-      font-weight: 700;
-      line-height: 1;
-      margin-top: 2px;
-    }
-
-    /* image-content split section */
-    .split{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
+    .who-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
       gap: 22px;
-      align-items: center;
+      align-items: start;
     }
 
-    .image-panel{
-      position: relative;
-      border-radius: 22px;
+    .who-list {
+      display: grid;
+      gap: 12px;
+      padding: 18px;
+    }
+
+    .who-item {
+      display: grid;
+      grid-template-columns: 42px 1fr;
+      gap: 12px;
+      align-items: start;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      border-radius: 14px;
+      padding: 12px;
+    }
+
+    .who-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: rgba(59,130,246,0.14);
+      border: 1px solid rgba(59,130,246,0.28);
+      color: #cfe3ff;
+      font-weight: 800;
+      font-size: 1.05rem;
+    }
+
+    .who-item h3 {
+      margin: 1px 0 5px;
+      font-size: 1rem;
+      line-height: 1.2;
+    }
+
+    .who-item p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .who-visual {
       overflow: hidden;
-      border: 1px solid rgba(255,255,255,.10);
-      background: #0a1124;
-      box-shadow: var(--shadow);
-      min-height: 380px;
+      min-height: 100%;
+      position: relative;
     }
 
-    .image-panel img{
+    .who-visual img {
       width: 100%;
       height: 100%;
+      min-height: 420px;
       object-fit: cover;
+      opacity: 0.94;
     }
 
-    .image-panel .overlay-badge{
-      position:absolute;
-      right: 14px;
-      top: 14px;
-      background: rgba(255,255,255,.92);
-      color: #0f1630;
+    .who-visual::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(6,13,34,0.12), rgba(6,13,34,0.65)),
+        radial-gradient(circle at 75% 25%, rgba(34,211,238,0.22), transparent 50%);
+      pointer-events: none;
+    }
+
+    .who-visual-overlay {
+      position: absolute;
+      inset: auto 16px 16px 16px;
+      z-index: 2;
+      display: grid;
+      gap: 10px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
       border-radius: 999px;
       padding: 8px 12px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(7,16,41,0.45);
+      color: #ecf4ff;
       font-weight: 700;
-      font-size: .86rem;
-      box-shadow: 0 10px 25px rgba(0,0,0,.16);
+      font-size: 0.85rem;
+      backdrop-filter: blur(6px);
     }
 
-    .feature-list{
-      display:grid;
-      gap: 12px;
-      margin-top: 14px;
-    }
-
-    .feature-item{
-      display:flex;
-      gap: 12px;
-      align-items:flex-start;
-      background: rgba(255,255,255,.04);
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: 14px;
-      padding: 12px 14px;
-    }
-
-    .feature-item .num{
-      width: 28px;
-      height: 28px;
-      border-radius: 999px;
-      flex: 0 0 auto;
-      display:grid;
-      place-items:center;
-      font-weight: 800;
-      font-size: .83rem;
-      background: linear-gradient(135deg, #7a4dff, #2d6bff);
-      box-shadow: 0 10px 20px rgba(45,107,255,.2);
-    }
-
-    .feature-item strong{
-      display:block;
-      color: white;
-      margin-bottom: 2px;
-      font-size: .98rem;
-    }
-
-    .feature-item p{
-      margin: 0;
-      color: var(--muted);
-      font-size: .92rem;
-    }
-
-    /* Services grid */
-    .services-grid{
-      display:grid;
-      grid-template-columns: repeat(3, minmax(0,1fr));
-      gap: 16px;
-    }
-
-    .service{
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.035));
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius: 18px;
-      padding: 16px;
-      position: relative;
-      overflow: hidden;
-      min-height: 184px;
-    }
-
-    .service::before{
-      content:"";
-      position:absolute;
-      inset: -20% auto auto -10%;
-      width: 140px;
-      height: 140px;
-      background: radial-gradient(circle, rgba(36,196,255,.18), transparent 70%);
-      pointer-events:none;
-    }
-
-    .service .svc-icon{
-      width: 38px;
-      height: 38px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, rgba(122,77,255,.95), rgba(36,196,255,.9));
-      display:grid;
-      place-items:center;
-      font-size: 1rem;
-      margin-bottom: 10px;
-      box-shadow: 0 12px 24px rgba(36,196,255,.14);
-    }
-
-    .service h3{
-      margin:0;
-      color:white;
-      font-size:1.04rem;
-      line-height:1.15;
-    }
-
-    .service p{
-      margin:8px 0 0;
-      color: var(--muted);
-      font-size:.92rem;
-      line-height:1.42;
-    }
-
-    /* Process */
-    .process-grid{
-      display:grid;
-      grid-template-columns: repeat(4, minmax(0,1fr));
+    /* Services */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 14px;
     }
 
-    .process-card{
-      background: rgba(255,255,255,.04);
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius: 16px;
+    .service-card {
       padding: 16px;
-      position: relative;
-      box-shadow: 0 12px 24px rgba(0,0,0,.14);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.03);
+      transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
     }
 
-    .step-pill{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-width: 68px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.12);
-      color: #9fd8ff;
-      font-size: .8rem;
-      font-weight: 800;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-      padding: 6px 10px;
-      margin-bottom: 10px;
+    .service-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(59,130,246,0.28);
+      background: rgba(255,255,255,0.05);
     }
 
-    .process-card h3{
-      margin:0;
-      color:white;
-      font-size:1.03rem;
+    .service-card h3 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+      letter-spacing: -0.01em;
     }
 
-    .process-card p{
-      margin:8px 0 0;
+    .service-card p {
+      margin: 0;
       color: var(--muted);
-      font-size:.92rem;
+      font-size: 0.92rem;
     }
 
-    /* Proof strip */
-    .proof-grid{
-      display:grid;
-      grid-template-columns: 1.15fr .85fr;
+    /* How we work */
+    .workflow {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .step {
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .step::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 3px;
+      background: linear-gradient(180deg, var(--violet), var(--blue), var(--cyan));
+      opacity: 0.85;
+    }
+
+    .step-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      background: rgba(59,130,246,0.12);
+      border: 1px solid rgba(59,130,246,0.25);
+      color: #cfe3ff;
+      font-weight: 800;
+      margin-bottom: 10px;
+      font-size: 0.85rem;
+    }
+
+    .step h3 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+    }
+
+    .step p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    /* Proof / Why Sentinel */
+    .proof-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
       gap: 18px;
-      align-items: stretch;
     }
 
-    .proof-panel,
-    .proof-list-panel{
-      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
-      border:1px solid rgba(255,255,255,.10);
-      border-radius: 20px;
+    .proof-panel {
       padding: 18px;
-      box-shadow: 0 14px 30px rgba(0,0,0,.16);
     }
 
-    .proof-panel h3,
-    .proof-list-panel h3{
-      margin:0;
-      color:white;
-      font-size:1.18rem;
-    }
-
-    .proof-panel p{
-      margin:10px 0 0;
-      color:var(--muted);
-    }
-
-    .proof-list{
-      margin: 12px 0 0;
-      padding: 0;
-      list-style: none;
-      display:grid;
+    .proof-bullets {
+      display: grid;
       gap: 10px;
+      margin-top: 10px;
     }
 
-    .proof-list li{
-      display:flex;
+    .proof-bullets .row {
+      display: grid;
+      grid-template-columns: 26px 1fr;
       gap: 10px;
-      align-items:flex-start;
-      color:#e5eeff;
-      font-size:.94rem;
-      line-height:1.4;
+      align-items: start;
+      color: var(--muted);
     }
 
-    .proof-list li .tick{
-      width:20px;height:20px;border-radius:999px;
-      background: rgba(36,196,255,.12);
-      border:1px solid rgba(36,196,255,.35);
-      color:#76e0ff;
-      display:grid;place-items:center;
-      flex:0 0 auto;
-      font-size:.8rem;
-      margin-top: 1px;
+    .check {
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: rgba(52,211,153,0.12);
+      border: 1px solid rgba(52,211,153,0.25);
+      color: #b8f5dc;
+      font-weight: 900;
+      font-size: 0.9rem;
     }
 
-    .deliverables{
-      display:grid;
-      gap:10px;
-      margin-top:12px;
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      align-content: start;
     }
 
-    .deliverables .chip{
-      display:flex;
-      align-items:center;
-      gap: 10px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.03);
-      border-radius: 12px;
-      padding: 10px 12px;
-      color:#e7efff;
-      font-weight: 600;
-      font-size: .9rem;
+    .stat-card {
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
     }
 
-    .deliverables .chip i{
-      width: 22px; height: 22px;
-      border-radius: 8px;
-      display:grid; place-items:center;
-      background: linear-gradient(135deg, rgba(122,77,255,.9), rgba(36,196,255,.9));
-      font-style: normal;
-      font-size: .8rem;
+    .stat-card .num {
+      font-size: 1.5rem;
+      line-height: 1;
+      font-weight: 900;
+      margin-bottom: 6px;
+      letter-spacing: -0.02em;
+    }
+
+    .stat-card .label {
+      color: var(--muted);
+      font-size: 0.86rem;
+      line-height: 1.35;
     }
 
     /* Blog preview */
-    .blog-grid{
-      display:grid;
-      grid-template-columns: repeat(3, minmax(0,1fr));
-      gap: 16px;
+    .blog-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
     }
 
-    .blog-card{
-      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
-      border: 1px solid rgba(255,255,255,.1);
-      border-radius: 18px;
+    .blog-card {
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      border-radius: 16px;
       overflow: hidden;
-      box-shadow: 0 14px 28px rgba(0,0,0,.16);
-      transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+      transition: transform 0.15s ease, border-color 0.15s ease;
     }
 
-    .blog-card:hover{
-      transform: translateY(-3px);
-      border-color: rgba(36,196,255,.3);
-      box-shadow: 0 18px 34px rgba(0,0,0,.2);
+    .blog-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(59,130,246,0.28);
     }
 
-    .blog-thumb{
-      aspect-ratio: 16 / 9;
-      position:relative;
-      overflow:hidden;
-      background: #0f1730;
+    .blog-thumb {
+      height: 148px;
+      background:
+        radial-gradient(circle at 15% 10%, rgba(34,211,238,0.35), transparent 55%),
+        radial-gradient(circle at 85% 25%, rgba(139,92,246,0.35), transparent 50%),
+        linear-gradient(135deg, #0d1b44, #0f245d 55%, #102a6f);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      position: relative;
+      overflow: hidden;
     }
 
-    .blog-thumb img{
-      width:100%;
-      height:100%;
-      object-fit: cover;
-      opacity: .88;
-      transform: scale(1.02);
+    .blog-thumb::before {
+      content: "";
+      position: absolute;
+      inset: 14px;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 14px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
     }
 
-    .blog-thumb::after{
-      content:"";
-      position:absolute; inset:0;
-      background: linear-gradient(180deg, rgba(7,11,22,.12), rgba(7,11,22,.55));
-    }
-
-    .blog-body{
-      padding: 14px 14px 16px;
-    }
-
-    .blog-tag{
-      display:inline-flex;
+    .blog-thumb::after {
+      content: "";
+      position: absolute;
+      left: 24px;
+      right: 24px;
+      bottom: 24px;
+      height: 6px;
       border-radius: 999px;
-      padding: 6px 10px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.04);
-      color: #cfe2ff;
-      font-size: .78rem;
-      font-weight: 700;
-      letter-spacing: .06em;
-      text-transform: uppercase;
+      background: linear-gradient(90deg, rgba(139,92,246,0.8), rgba(59,130,246,0.8), rgba(34,211,238,0.8));
+      opacity: 0.9;
     }
 
-    .blog-body h3{
-      margin: 10px 0 0;
-      color: white;
-      font-size: 1.03rem;
+    .blog-body {
+      padding: 14px;
+    }
+
+    .blog-meta {
+      color: var(--soft);
+      font-size: 0.78rem;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .blog-title {
+      margin: 0 0 8px;
+      font-size: 1rem;
       line-height: 1.25;
+      letter-spacing: -0.01em;
     }
 
-    .blog-body p{
-      margin: 8px 0 0;
+    .blog-excerpt {
+      margin: 0;
       color: var(--muted);
-      font-size: .92rem;
+      font-size: 0.9rem;
       line-height: 1.45;
     }
 
-    .blog-link{
-      margin-top: 12px;
-      display:inline-flex;
-      align-items:center;
-      gap: 8px;
-      color: #9fd8ff;
-      font-weight: 700;
-      font-size: .93rem;
-    }
-
-    /* CTA band */
-    .cta-band{
-      padding: 0 0 76px;
-    }
-
-    .cta-panel{
-      position:relative;
-      overflow:hidden;
-      border-radius: 22px;
-      border: 1px solid rgba(255,255,255,.12);
-      background:
-        radial-gradient(600px 200px at 10% 0%, rgba(122,77,255,.25), transparent 70%),
-        radial-gradient(800px 240px at 80% 30%, rgba(36,196,255,.18), transparent 70%),
-        linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
-      box-shadow: 0 22px 50px rgba(0,0,0,.22);
-      padding: 24px;
-    }
-
-    .cta-grid{
-      display:grid;
-      grid-template-columns: 1.05fr .95fr;
+    /* Contact CTA */
+    .contact-cta {
+      padding: 20px;
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
       gap: 18px;
-      align-items:center;
+      align-items: center;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 10% 10%, rgba(34,211,238,0.14), transparent 55%),
+        radial-gradient(circle at 90% 15%, rgba(139,92,246,0.16), transparent 55%),
+        rgba(255,255,255,0.04);
+      box-shadow: var(--shadow);
     }
 
-    .cta-panel h2{
-      margin:0;
-      font-size: clamp(1.8rem, 3vw, 2.6rem);
-      line-height:1.08;
-      letter-spacing:-0.02em;
-      color:white;
-      max-width: 18ch;
+    .contact-cta h2 {
+      margin-bottom: 8px;
     }
 
-    .cta-panel p{
-      margin: 12px 0 0;
+    .contact-cta p {
+      margin: 0;
       color: var(--muted);
-      max-width: 55ch;
+      max-width: 65ch;
     }
 
-    .cta-actions{
-      display:flex;
-      gap: 12px;
+    .contact-cta-actions {
+      display: flex;
       flex-wrap: wrap;
-      margin-top: 16px;
-    }
-
-    .cta-contact-card{
-      background: rgba(255,255,255,.04);
-      border:1px solid rgba(255,255,255,.10);
-      border-radius: 16px;
-      padding: 16px;
-    }
-
-    .cta-contact-card h3{
-      margin:0;
-      color:white;
-      font-size:1.05rem;
-    }
-
-    .contact-lines{
-      margin-top: 10px;
-      display:grid;
-      gap: 10px;
-    }
-
-    .contact-line{
-      display:flex;
-      gap: 10px;
-      align-items:flex-start;
-      color: #dce8ff;
-      font-size: .94rem;
-    }
-
-    .contact-line .doticon{
-      width: 24px; height: 24px; border-radius: 8px;
-      display:grid; place-items:center;
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.12);
-      flex: 0 0 auto;
-      font-size: .8rem;
-    }
-
-    .contact-line a{
-      color: #9fd8ff;
-      text-decoration: underline;
-      text-underline-offset: 2px;
-      font-weight: 700;
+      justify-content: flex-end;
+      gap: 12px;
     }
 
     /* Footer */
-    .footer{
-      border-top: 1px solid rgba(255,255,255,.06);
-      background: rgba(5,8,16,.58);
-      padding: 44px 0 18px;
+    .footer {
+      border-top: 1px solid rgba(255,255,255,0.08);
+      background: rgba(4, 9, 22, 0.55);
+      margin-top: 20px;
     }
 
-    .footer-grid{
-      display:grid;
-      grid-template-columns: 1.25fr 1fr 1fr 1fr;
-      gap: 20px;
+    .footer-inner {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 16px;
+      padding: 26px 0;
+      align-items: start;
     }
 
-    .footer h4{
-      margin: 0 0 10px;
-      color: white;
-      font-size: .98rem;
-    }
-
-    .footer p,
-    .footer li,
-    .footer a{
+    .footer p {
+      margin: 0;
       color: var(--muted);
-      font-size: .92rem;
-      line-height: 1.45;
+      font-size: 0.9rem;
     }
 
-    .footer ul{
-      list-style:none;
-      margin:0;
-      padding:0;
-      display:grid;
-      gap: 8px;
-    }
-
-    .footer a:hover{
-      color: #eaf1ff;
-    }
-
-    .footer-bottom{
-      margin-top: 24px;
-      padding-top: 14px;
-      border-top: 1px solid rgba(255,255,255,.06);
-      color: #aebcdd;
-      font-size: .88rem;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 12px;
+    .footer-links {
+      display: flex;
       flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 16px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      font-weight: 600;
     }
+
+    .footer-links a:hover {
+      color: #fff;
+    }
+
+    /* Helper spacing */
+    .mt-8 { margin-top: 8px; }
+    .mt-12 { margin-top: 12px; }
+    .mt-16 { margin-top: 16px; }
+    .mt-20 { margin-top: 20px; }
 
     /* Responsive */
-    @media (max-width: 1100px){
-      .nav-links{ display:none; }
-      .nav-cta .btn{ display:none; }
-      .mobile-menu-btn{ display:flex; }
-
-      .hero-grid{
+    @media (max-width: 1080px) {
+      .hero {
         grid-template-columns: 1fr;
       }
 
-      .hero h1{
-        max-width: 20ch;
-      }
-
-      .form-card{
-        margin-top: 6px;
-      }
-
-      .services-grid{
-        grid-template-columns: repeat(2, minmax(0,1fr));
-      }
-
-      .process-grid{
-        grid-template-columns: repeat(2, minmax(0,1fr));
-      }
-
-      .proof-grid{
-        grid-template-columns: 1fr;
-      }
-
-      .cta-grid{
-        grid-template-columns: 1fr;
-      }
-
-      .footer-grid{
-        grid-template-columns: 1.2fr 1fr 1fr;
-      }
-    }
-
-    @media (max-width: 860px){
-      .pill-row{
-        grid-template-columns: 1fr;
-      }
-
-      .cards-3{
-        grid-template-columns: 1fr;
-      }
-
-      .services-grid{
-        grid-template-columns: 1fr;
-      }
-
-      .split{
-        grid-template-columns: 1fr;
-      }
-
-      .blog-grid{
-        grid-template-columns: 1fr;
-      }
-
-      .footer-grid{
+      .trust-strip {
         grid-template-columns: 1fr 1fr;
       }
 
-      .hero-highlight-grid{
+      .who-grid,
+      .proof-grid,
+      .contact-cta {
         grid-template-columns: 1fr;
       }
 
-      .form-grid{
-        grid-template-columns: 1fr;
+      .workflow {
+        grid-template-columns: 1fr 1fr;
       }
 
-      .brand-text span{
-        max-width: 220px;
+      .services-grid {
+        grid-template-columns: 1fr 1fr;
       }
 
-      .hero-inner{
-        padding-top: 30px;
-        padding-bottom: 40px;
+      .blog-grid {
+        grid-template-columns: 1fr 1fr;
       }
 
-      section{
-        padding: 52px 0;
-      }
-
-      .cta-band{
-        padding-bottom: 56px;
+      .contact-cta-actions {
+        justify-content: flex-start;
       }
     }
 
-    @media (max-width: 560px){
-      .container{
-        width: min(var(--max), calc(100% - 20px));
+    @media (max-width: 780px) {
+      .nav-links,
+      .nav .desktop-cta {
+        display: none;
       }
 
-      .nav{
-        min-height: 68px;
+      .nav-toggle {
+        display: inline-flex;
       }
 
-      .brand-badge{
-        width: 34px;
-        height: 34px;
-        border-radius: 10px;
+      .mobile-menu.show {
+        display: block;
       }
 
-      .brand-text strong{
-        font-size: .95rem;
+      .hero {
+        padding-top: 24px;
       }
 
-      .brand-text span{
-        font-size: .75rem;
-        max-width: 180px;
+      .hero-left {
+        padding-top: 8px;
       }
 
-      .hero h1{
-        font-size: 2.15rem;
-      }
-
-      .hero p.lead{
-        font-size: .98rem;
-      }
-
-      .btn{
-        width:100%;
-      }
-
-      .hero-cta-row{
-        display:grid;
+      .floating-tags {
         grid-template-columns: 1fr;
       }
 
-      .process-grid{
+      .trust-strip {
         grid-template-columns: 1fr;
       }
 
-      .footer-grid{
+      .form-grid {
         grid-template-columns: 1fr;
       }
 
-      .footer-bottom{
-        align-items:flex-start;
-        flex-direction: column;
+      .services-grid,
+      .workflow,
+      .blog-grid,
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .section {
+        padding: 46px 0;
+      }
+
+      .footer-inner {
+        grid-template-columns: 1fr;
+      }
+
+      .footer-links {
+        justify-content: flex-start;
+      }
+
+      .hero h1 {
+        max-width: 100%;
+      }
+
+      .who-visual img {
+        min-height: 260px;
       }
     }
   </style>
 </head>
 <body>
-
-  <!-- Header -->
-  <header class="header">
+  <header class="site-header">
     <div class="container">
-      <nav class="nav" aria-label="Main navigation">
-        <a class="brand" href="#top" aria-label="Sentinel Identity home">
-          <div class="brand-badge" aria-hidden="true"></div>
-          <div class="brand-text">
-            <strong>Sentinel Identity</strong>
-            <span>Entra ID & Microsoft 365 consulting</span>
-          </div>
+      <nav class="nav" aria-label="Primary">
+        <a href="#top" class="brand" aria-label="Sentinel Identity home">
+          <span class="brand-badge" aria-hidden="true"></span>
+          <span class="brand-text">
+            <p class="brand-title">Sentinel Identity</p>
+            <p class="brand-sub">Entra ID & Microsoft 365 security consulting</p>
+          </span>
         </a>
 
-        <div class="nav-links" role="menubar" aria-label="Desktop menu">
-          <a role="menuitem" href="#who-we-help">Who we help</a>
-          <a role="menuitem" href="#services">Services</a>
-          <a role="menuitem" href="#how-we-work">How we work</a>
-          <a role="menuitem" href="#why-sentinel">Why Sentinel Identity</a>
-          <a role="menuitem" href="blog.html">Blog</a>
-          <a role="menuitem" href="#contact">Contact</a>
+        <div class="nav-links" aria-label="Desktop links">
+          <a href="#who-we-help">Who we help</a>
+          <a href="#services">Services</a>
+          <a href="#how-we-work">How we work</a>
+          <a href="#why-sentinel">Why Sentinel Identity</a>
+          <a href="blog.html">Blog</a>
+          <a href="#contact">Contact</a>
         </div>
 
-        <div class="nav-cta">
-          <a class="btn btn-primary" href="#contact">Request an Assessment</a>
-          <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="mobilePanel">☰</button>
-        </div>
+        <a class="btn btn-primary desktop-cta" href="#contact">Request an Assessment</a>
+
+        <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="mobileMenu">
+          Menu
+        </button>
       </nav>
 
-      <div class="mobile-panel" id="mobilePanel" aria-label="Mobile menu">
-        <a href="#who-we-help">Who we help</a>
-        <a href="#services">Services</a>
-        <a href="#how-we-work">How we work</a>
-        <a href="#why-sentinel">Why Sentinel Identity</a>
-        <a href="blog.html">Blog</a>
-        <a href="#contact">Contact</a>
-        <a class="btn btn-primary" href="#contact">Request an Assessment</a>
+      <div class="mobile-menu" id="mobileMenu">
+        <div class="menu-panel">
+          <a href="#who-we-help">Who we help</a>
+          <a href="#services">Services</a>
+          <a href="#how-we-work">How we work</a>
+          <a href="#why-sentinel">Why Sentinel Identity</a>
+          <a href="blog.html">Blog</a>
+          <a href="#contact">Contact</a>
+          <a class="btn btn-primary" href="#contact">Request an Assessment</a>
+        </div>
       </div>
     </div>
   </header>
 
-  <!-- Hero -->
   <main id="top">
-    <section class="hero" aria-labelledby="hero-heading">
-      <div class="container hero-inner">
-        <div class="hero-grid">
-          <div class="hero-copy">
-            <div class="eyebrow">
-              <span class="dot" aria-hidden="true"></span>
-              Microsoft Entra ID + Microsoft 365 Consulting Services
+    <!-- HERO -->
+    <section class="hero-wrap">
+      <div class="container hero">
+        <div class="hero-left">
+          <div class="eyebrow">
+            <span class="eyebrow-dot" aria-hidden="true"></span>
+            Microsoft Entra + M365 consulting for small teams
+          </div>
+
+          <h1>Secure Entra ID and Microsoft 365 without slowing down the business.</h1>
+
+          <p class="lead">
+            Practical consulting for <strong>Conditional Access</strong>, <strong>MFA</strong>,
+            admin role cleanup, <strong>Exchange / Teams / SharePoint admin support</strong>,
+            and <strong>hybrid identity (Entra Connect sync)</strong>. We help small businesses
+            and lean IT teams reduce risk without breaking daily work.
+          </p>
+
+          <div class="hero-cta">
+            <a class="btn btn-primary" href="#contact">Talk with a consultant</a>
+            <a class="btn btn-secondary" href="#services">See services</a>
+            <a class="btn btn-secondary" href="blog.html">Read the blog</a>
+          </div>
+
+          <div class="hero-visual" aria-hidden="true">
+            <!-- Replace src with your own real image later -->
+            <img
+              src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80"
+              alt=""
+              loading="lazy"
+            />
+          </div>
+
+          <div class="floating-tags">
+            <div class="tag-card">
+              Entra ID
+              <small>Identity, access, auth methods, role governance</small>
             </div>
+            <div class="tag-card">
+              Microsoft 365 Admin
+              <small>Exchange, Teams, SharePoint admin and support workflows</small>
+            </div>
+            <div class="tag-card">
+              Hybrid Identity
+              <small>Entra Connect sync health, configuration and issue triage</small>
+            </div>
+          </div>
+        </div>
 
-            <h1 id="hero-heading">Microsoft Entra and Microsoft 365 consulting that actually fixes the problem.</h1>
-
-            <p class="lead">
-              Practical support for small businesses and healthcare teams dealing with access issues, MFA confusion,
-              Conditional Access policies, Exchange and Teams admin tasks, SharePoint administration, and Entra Connect sync problems.
+        <!-- CONTACT FORM -->
+        <aside class="hero-form" id="contact" aria-labelledby="assessmentTitle">
+          <div class="hero-form-head">
+            <h2 id="assessmentTitle">Request an assessment</h2>
+            <p>
+              Tell us what is going wrong in your tenant. You will get a practical response and next steps.
             </p>
+          </div>
 
-            <div class="hero-cta-row">
-              <a class="btn btn-primary" href="#contact">Talk With Our Team</a>
-              <a class="btn btn-secondary" href="#services">Explore Services</a>
+          <div class="hero-form-body">
+            <form id="assessmentForm" novalidate>
+              <div class="form-grid">
+                <div class="field">
+                  <label for="name">Name</label>
+                  <input id="name" class="input" type="text" name="name" placeholder="Your name" required />
+                </div>
+
+                <div class="field">
+                  <label for="email">Email</label>
+                  <input id="email" class="input" type="email" name="email" placeholder="you@company.com" required />
+                </div>
+
+                <div class="field form-row-full">
+                  <label for="company">Company</label>
+                  <input id="company" class="input" type="text" name="company" placeholder="Company name" />
+                </div>
+
+                <div class="field">
+                  <label for="userCount">User count</label>
+                  <select id="userCount" class="select" name="userCount">
+                    <option value="1-25">1-25</option>
+                    <option value="26-100">26-100</option>
+                    <option value="101-300">101-300</option>
+                    <option value="301-500">301-500</option>
+                    <option value="500+">500+</option>
+                  </select>
+                </div>
+
+                <div class="field">
+                  <label for="primaryFocus">Primary focus</label>
+                  <select id="primaryFocus" class="select" name="primaryFocus">
+                    <option value="Conditional Access + MFA">Conditional Access + MFA</option>
+                    <option value="Entra ID Hardening">Entra ID Hardening</option>
+                    <option value="Exchange / Mail Security">Exchange / Mail Security</option>
+                    <option value="Teams / SharePoint Admin">Teams / SharePoint Admin</option>
+                    <option value="Entra Connect / Hybrid Sync">Entra Connect / Hybrid Sync</option>
+                    <option value="General M365 Support">General M365 Support</option>
+                  </select>
+                </div>
+
+                <div class="field form-row-full">
+                  <label for="problemSummary">What are you trying to fix?</label>
+                  <textarea
+                    id="problemSummary"
+                    class="textarea"
+                    name="problemSummary"
+                    placeholder="Example: We need to enforce MFA properly, remove legacy auth, clean up admin roles, and fix Entra Connect sync issues."
+                    required
+                  ></textarea>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" id="assessmentSubmitBtn" class="btn btn-primary">
+                  Send Request
+                </button>
+
+                <p class="form-note">
+                  This submits directly to Sentinel Identity and sends a confirmation email back to you.
+                </p>
+
+                <p id="formStatus" class="form-status" aria-live="polite"></p>
+              </div>
+            </form>
+          </div>
+        </aside>
+      </div>
+
+      <!-- TRUST STRIP -->
+      <div class="container">
+        <div class="trust-strip" aria-label="Trust indicators">
+          <div class="trust-item">
+            <strong>Canada-based consulting</strong>
+            <span>Remote support for SMBs and lean IT teams.</span>
+          </div>
+          <div class="trust-item">
+            <strong>Practical first</strong>
+            <span>Fix the real issue, not a slide deck performance.</span>
+          </div>
+          <div class="trust-item">
+            <strong>Identity + M365 admin</strong>
+            <span>Entra, Exchange, Teams, SharePoint, sync, and access controls.</span>
+          </div>
+          <div class="trust-item">
+            <strong>Clear next steps</strong>
+            <span>Assessment, priority list, and action plan you can execute.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WHO WE HELP -->
+    <section class="section" id="who-we-help">
+      <div class="container">
+        <h2>Who we help</h2>
+        <p class="section-intro">
+          Sentinel Identity is designed for organizations that need strong Microsoft 365 and Entra administration
+          without a giant security team. Especially the people doing five jobs at once, which is most of IT now.
+        </p>
+
+        <div class="who-grid">
+          <div class="section-card who-list">
+            <div class="who-item">
+              <div class="who-icon">SMB</div>
+              <div>
+                <h3>Small businesses (10 to 500 users)</h3>
+                <p>
+                  Companies that need secure access, stable admin operations, and support for everyday M365 issues
+                  without hiring a full internal cloud security team.
+                </p>
+              </div>
             </div>
 
-            <div class="hero-highlight-grid" aria-label="Key value points">
-              <div class="highlight-card">
-                <strong><span class="check">✓</span>Baseline first</strong>
-                <p>Secure the obvious gaps first, then tailor the tenant based on business needs.</p>
+            <div class="who-item">
+              <div class="who-icon">HC</div>
+              <div>
+                <h3>Small healthcare and regulated teams</h3>
+                <p>
+                  Teams that need stronger identity controls, cleaner admin roles, and better authentication hygiene
+                  while keeping staff productive.
+                </p>
               </div>
-              <div class="highlight-card">
-                <strong><span class="check">✓</span>Less friction</strong>
-                <p>Fix security and authentication without turning every login into a support ticket.</p>
+            </div>
+
+            <div class="who-item">
+              <div class="who-icon">IT</div>
+              <div>
+                <h3>Businesses with no dedicated cloud/identity admin</h3>
+                <p>
+                  Owners, managers, or general IT staff who inherited Microsoft 365 and Entra settings and need
+                  expert help untangling them safely.
+                </p>
               </div>
-              <div class="highlight-card">
-                <strong><span class="check">✓</span>Hybrid stability</strong>
-                <p>Support for Entra Connect sync configuration and troubleshooting when things break.</p>
+            </div>
+
+            <div class="who-item">
+              <div class="who-icon">HY</div>
+              <div>
+                <h3>Hybrid environments</h3>
+                <p>
+                  Organizations using Entra Connect / sync who need help with configuration, synchronization issues,
+                  auth cleanup, and predictable identity operations.
+                </p>
               </div>
             </div>
           </div>
 
-          <aside class="form-card" id="contact" aria-labelledby="contact-form-heading">
-            <div class="form-card-header">
-              <h3 id="contact-form-heading">Request an assessment</h3>
-              <p>Tell us what is going wrong and what outcome you need. We will reply with a clear plan and next steps.</p>
-              <div class="email-pill" aria-label="Business contact email">
-                Contact email: <span>info@sentinelidentity.ca</span>
-              </div>
-            </div>
-
-            <div class="form-wrap">
-              <form id="contactForm">
-                <div class="form-grid">
-                  <div class="field">
-                    <label for="name">Name</label>
-                    <input type="text" id="name" name="name" placeholder="Your name" required />
-                  </div>
-
-                  <div class="field">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" placeholder="you@company.com" required />
-                  </div>
-
-                  <div class="field full">
-                    <label for="company">Company</label>
-                    <input type="text" id="company" name="company" placeholder="Company name" />
-                  </div>
-
-                  <div class="field">
-                    <label for="users">User count</label>
-                    <select id="users" name="users">
-                      <option>1-25</option>
-                      <option>26-50</option>
-                      <option>51-100</option>
-                      <option>101-300</option>
-                      <option>300+</option>
-                    </select>
-                  </div>
-
-                  <div class="field">
-                    <label for="focus">Primary focus</label>
-                    <select id="focus" name="focus">
-                      <option>Conditional Access + MFA</option>
-                      <option>Entra ID Administration</option>
-                      <option>Entra Connect / Sync Issues</option>
-                      <option>Exchange Online Admin</option>
-                      <option>Teams + SharePoint Admin</option>
-                      <option>General M365 Support</option>
-                    </select>
-                  </div>
-
-                  <div class="field full">
-                    <label for="message">What are you trying to fix?</label>
-                    <textarea id="message" name="message" placeholder="Example: We need to enforce MFA properly, reduce legacy auth, clean up admin roles, and stabilize Entra Connect sync."></textarea>
-                  </div>
-                </div>
-
-                <button type="submit" class="btn btn-primary submit-btn">Open Email Draft</button>
-
-                <div class="form-note">
-                  This opens your email app with a pre-filled draft to
-                  <a href="mailto:info@sentinelidentity.ca">info@sentinelidentity.ca</a>.
-                  If no email app opens, email us directly.
-                </div>
-              </form>
-            </div>
-          </aside>
-        </div>
-      </div>
-    </section>
-
-    <!-- Trust strip -->
-    <section class="section-light" aria-labelledby="trust-strip-heading">
-      <div class="container">
-        <div class="section-head" style="margin-bottom:16px;">
-          <h2 id="trust-strip-heading" class="section-title" style="font-size:1.35rem;">Built for practical support, not vague consulting decks</h2>
-          <p class="section-sub">We focus on real admin issues across Entra ID and Microsoft 365 environments used by small and mid-sized organizations.</p>
-        </div>
-
-        <div class="pill-row" role="list" aria-label="Trust indicators">
-          <div class="trust-pill" role="listitem"><span class="icon">🍁</span>Canada-based remote consulting</div>
-          <div class="trust-pill" role="listitem"><span class="icon">🛡️</span>Entra ID + Microsoft 365 focused</div>
-          <div class="trust-pill" role="listitem"><span class="icon">⚙️</span>Technical support and remediation</div>
-          <div class="trust-pill" role="listitem"><span class="icon">🏥</span>Small business and healthcare friendly</div>
-          <div class="trust-pill" role="listitem"><span class="icon">📋</span>Clear action plans and next steps</div>
-          <div class="trust-pill" role="listitem"><span class="icon">🔄</span>Sync and tenant stability support</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Who we help -->
-    <section id="who-we-help" aria-labelledby="who-we-help-heading">
-      <div class="container">
-        <div class="section-head">
-          <h2 class="section-title" id="who-we-help-heading">Who we help</h2>
-          <p class="section-sub">
-            We support organizations that need practical help with Microsoft Entra ID and Microsoft 365 administration,
-            especially when there is no dedicated in-house identity specialist.
-          </p>
-        </div>
-
-        <div class="cards-3">
-          <article class="card">
-            <h3>Small businesses</h3>
-            <p>Organizations that need secure identity and reliable admin support without enterprise complexity.</p>
-            <ul>
-              <li>1 to 300 users with growing access needs</li>
-              <li>MFA, sign-in, user lifecycle, and tenant cleanup support</li>
-              <li>Need stability without hiring a full-time specialist yet</li>
-            </ul>
-          </article>
-
-          <article class="card">
-            <h3>Small healthcare teams and clinics</h3>
-            <p>Teams that need dependable access control and admin support while staying focused on operations.</p>
-            <ul>
-              <li>Mailbox, Teams, and user access administration support</li>
-              <li>High urgency environments with limited IT bandwidth</li>
-              <li>Need practical help, not trial-and-error changes</li>
-            </ul>
-          </article>
-
-          <article class="card">
-            <h3>Businesses without dedicated IT staff</h3>
-            <p>When nobody owns Entra ID or M365 admin, issues pile up fast. We help restore order.</p>
-            <ul>
-              <li>Admin role sprawl and permissions confusion</li>
-              <li>Setup mistakes, sync issues, and recurring user access problems</li>
-              <li>Clear guidance in plain language for non-specialists</li>
-            </ul>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <!-- Visual section -->
-    <section class="section-light" aria-labelledby="support-across-heading">
-      <div class="container">
-        <div class="split">
-          <div class="image-panel" aria-hidden="true">
-            <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1400&q=80" alt="" />
-            <div class="overlay-badge">Consulting + technical support</div>
-          </div>
-
-          <div>
-            <div class="section-head" style="margin-bottom:12px;">
-              <h2 class="section-title" id="support-across-heading">Support across the Microsoft admin stack, not just one blade in the portal</h2>
-              <p class="section-sub">
-                Your business problem usually crosses multiple admin areas. Identity, Exchange, Teams, SharePoint, and sync issues tend to travel together.
-              </p>
-            </div>
-
-            <div class="feature-list">
-              <div class="feature-item">
-                <div class="num">01</div>
-                <div>
-                  <strong>Identity and access foundation</strong>
-                  <p>Entra ID administration, MFA, authentication methods, admin roles, and Conditional Access review.</p>
-                </div>
-              </div>
-
-              <div class="feature-item">
-                <div class="num">02</div>
-                <div>
-                  <strong>Microsoft 365 admin support</strong>
-                  <p>Exchange Online, Teams admin, SharePoint administration, and day-to-day user and permission issues.</p>
-                </div>
-              </div>
-
-              <div class="feature-item">
-                <div class="num">03</div>
-                <div>
-                  <strong>Hybrid identity and sync stability</strong>
-                  <p>Entra Connect configuration, syncing issues, object mismatches, and practical troubleshooting support.</p>
-                </div>
-              </div>
+          <div class="section-card who-visual">
+            <!-- Replace with your own image later -->
+            <img
+              src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=80"
+              alt="IT professionals collaborating in an office"
+              loading="lazy"
+            />
+            <div class="who-visual-overlay">
+              <span class="pill">Entra ID tenant hardening</span>
+              <span class="pill">M365 admin support</span>
+              <span class="pill">Sync issue triage and cleanup</span>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Services -->
-    <section id="services" aria-labelledby="services-heading">
+    <!-- SERVICES -->
+    <section class="section" id="services">
       <div class="container">
-        <div class="section-head">
-          <h2 class="section-title" id="services-heading">Services</h2>
-          <p class="section-sub">
-            End-to-end support across Microsoft Entra ID and Microsoft 365 administration, from assessment and cleanup
-            to implementation and troubleshooting.
-          </p>
-        </div>
+        <h2>Services</h2>
+        <p class="section-intro">
+          Coverage across the admin blades people actually use, plus the weird issues that show up at the worst possible time.
+        </p>
 
         <div class="services-grid">
-          <article class="service">
-            <div class="svc-icon">🔐</div>
-            <h3>Entra ID administration and support</h3>
-            <p>User access, groups, role assignments, tenant hygiene, day-to-day admin tasks, and issue triage.</p>
-          </article>
-
-          <article class="service">
-            <div class="svc-icon">📲</div>
-            <h3>MFA and authentication methods</h3>
-            <p>MFA rollout cleanup, authentication method configuration, and sign-in experience improvements.</p>
-          </article>
-
-          <article class="service">
-            <div class="svc-icon">🧩</div>
-            <h3>Conditional Access review</h3>
-            <p>Policy review, duplicate rule cleanup, gap analysis, safer configuration, and user lockout reduction.</p>
-          </article>
-
-          <article class="service">
-            <div class="svc-icon">🔄</div>
-            <h3>Entra Connect and sync support</h3>
-            <p>Sync configuration reviews, troubleshooting sync failures, object mismatch issues, and hybrid identity stabilization.</p>
-          </article>
-
-          <article class="service">
-            <div class="svc-icon">📧</div>
-            <h3>Exchange Online administration</h3>
-            <p>Mailbox administration, permissions, shared mailboxes, day-to-day support tasks, and issue remediation.</p>
-          </article>
-
-          <article class="service">
-            <div class="svc-icon">💬</div>
-            <h3>Teams and SharePoint admin support</h3>
-            <p>Collaboration platform administration, access issues, permissions troubleshooting, and tenant support guidance.</p>
-          </article>
-
-          <article class="service">
-            <div class="svc-icon">🧰</div>
-            <h3>Microsoft 365 admin technical support</h3>
-            <p>Practical troubleshooting across M365 admin centers when systems “kind of work” but keep causing operational pain.</p>
-          </article>
-
-          <article class="service">
-            <div class="svc-icon">🧹</div>
-            <h3>Tenant cleanup and hardening support</h3>
-            <p>Admin role cleanup, authentication cleanup, legacy setting review, and basic hardening recommendations.</p>
-          </article>
-
-          <article class="service">
-            <div class="svc-icon">📋</div>
-            <h3>Assessment and remediation planning</h3>
-            <p>Clear issue summaries, prioritized next steps, and a practical plan for what to fix first and why.</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <!-- How we work -->
-    <section id="how-we-work" class="section-light" aria-labelledby="how-we-work-heading">
-      <div class="container">
-        <div class="section-head">
-          <h2 class="section-title" id="how-we-work-heading">How we work</h2>
-          <p class="section-sub">
-            A simple process built for busy teams. No endless discovery phase, no 70-slide deck before anything gets fixed.
-          </p>
-        </div>
-
-        <div class="process-grid">
-          <article class="process-card">
-            <div class="step-pill">Step 1</div>
-            <h3>Initial assessment</h3>
-            <p>We review your issue, environment size, and what is currently blocking users or admins.</p>
-          </article>
-
-          <article class="process-card">
-            <div class="step-pill">Step 2</div>
-            <h3>Focused call</h3>
-            <p>A practical discussion to understand your setup, current risks, and the fastest path to a stable fix.</p>
-          </article>
-
-          <article class="process-card">
-            <div class="step-pill">Step 3</div>
-            <h3>Action plan</h3>
-            <p>You get clear next steps, priorities, and recommended changes. No vague “best practice” hand-waving.</p>
-          </article>
-
-          <article class="process-card">
-            <div class="step-pill">Step 4</div>
-            <h3>Support and remediation</h3>
-            <p>Hands-on help with configuration, cleanup, troubleshooting, validation, and follow-up guidance.</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <!-- Why Sentinel Identity -->
-    <section id="why-sentinel" aria-labelledby="why-sentinel-heading">
-      <div class="container">
-        <div class="proof-grid">
-          <div class="proof-panel">
-            <h2 class="section-title" id="why-sentinel-heading" style="font-size:2rem; margin:0;">Why Sentinel Identity</h2>
+          <article class="service-card section-card">
+            <h3>Entra ID tenant hardening</h3>
             <p>
-              Sentinel Identity is built for organizations that need practical Entra ID and Microsoft 365 help without enterprise-level overhead.
-              The focus is clear communication, real technical support, and actionable fixes.
+              Baseline security review, admin account exposure reduction, authentication method cleanup, and access posture improvements.
             </p>
+          </article>
 
-            <ul class="proof-list" aria-label="Reasons to choose Sentinel Identity">
-              <li><span class="tick">✓</span><span>Focused on <strong>Microsoft Entra ID</strong> and <strong>Microsoft 365 administration</strong>, not generic “everything IT” services.</span></li>
-              <li><span class="tick">✓</span><span>Designed for <strong>small businesses, small healthcare teams, and lean operations</strong> without dedicated identity specialists.</span></li>
-              <li><span class="tick">✓</span><span>Support for real admin pain points: MFA, Conditional Access, Exchange admin, Teams admin, SharePoint admin, Entra Connect syncing issues.</span></li>
-              <li><span class="tick">✓</span><span>Plain-language explanations so your team understands what changed and why.</span></li>
-            </ul>
+          <article class="service-card section-card">
+            <h3>Conditional Access and MFA</h3>
+            <p>
+              Design and cleanup of policies, staged rollout plans, exclusions, break-glass strategy, and lockout prevention.
+            </p>
+          </article>
+
+          <article class="service-card section-card">
+            <h3>Privileged access and role cleanup</h3>
+            <p>
+              Admin role review, least privilege alignment, standing access reduction, and accountability improvements.
+            </p>
+          </article>
+
+          <article class="service-card section-card">
+            <h3>Exchange admin and mail security support</h3>
+            <p>
+              Mail flow basics, mailbox permissions, forwarding risks, operational hygiene, and practical troubleshooting guidance.
+            </p>
+          </article>
+
+          <article class="service-card section-card">
+            <h3>Teams and SharePoint admin support</h3>
+            <p>
+              Permission hygiene, collaboration controls, tenant settings review, and admin-side troubleshooting support.
+            </p>
+          </article>
+
+          <article class="service-card section-card">
+            <h3>Entra Connect / hybrid sync support</h3>
+            <p>
+              Sync configuration review, health checks, issue triage, auth path cleanup, and predictable hybrid identity operations.
+            </p>
+          </article>
+
+          <article class="service-card section-card">
+            <h3>Microsoft 365 technical support guidance</h3>
+            <p>
+              Practical help for recurring admin problems and tenant cleanup priorities, focused on reducing friction and risk.
+            </p>
+          </article>
+
+          <article class="service-card section-card">
+            <h3>Tenant assessment and remediation roadmap</h3>
+            <p>
+              Clear findings, prioritized fixes, and a sequence that fits your business size and admin capacity.
+            </p>
+          </article>
+
+          <article class="service-card section-card">
+            <h3>Admin process standardization</h3>
+            <p>
+              Repeatable checklists and operating routines so the tenant stays clean after the immediate fire is put out.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOW WE WORK -->
+    <section class="section" id="how-we-work">
+      <div class="container">
+        <h2>How we work</h2>
+        <p class="section-intro">
+          Straightforward workflow. No mystery process, no performative buzzwords, and no disappearing after the first call.
+        </p>
+
+        <div class="workflow">
+          <div class="step section-card">
+            <div class="step-num">01</div>
+            <h3>Initial assessment request</h3>
+            <p>
+              You submit the form with the problem, environment size, and what you need fixed first.
+            </p>
           </div>
 
-          <div class="proof-list-panel">
-            <h3>What you receive</h3>
-            <div class="deliverables">
-              <div class="chip"><i>1</i>Issue summary and problem framing</div>
-              <div class="chip"><i>2</i>Prioritized recommendations</div>
-              <div class="chip"><i>3</i>Configuration guidance and remediation support</div>
-              <div class="chip"><i>4</i>Clear next-step roadmap</div>
-              <div class="chip"><i>5</i>Support that fits SMB reality</div>
+          <div class="step section-card">
+            <div class="step-num">02</div>
+            <h3>Consultation call</h3>
+            <p>
+              We review the tenant issues, current constraints, risk level, and what can be safely changed next.
+            </p>
+          </div>
+
+          <div class="step section-card">
+            <div class="step-num">03</div>
+            <h3>Prioritized action plan</h3>
+            <p>
+              You get a practical plan with clear priorities, expected impact, and rollout considerations.
+            </p>
+          </div>
+
+          <div class="step section-card">
+            <div class="step-num">04</div>
+            <h3>Fixes and support</h3>
+            <p>
+              Implementation guidance and admin-side support to stabilize the tenant and reduce repeat incidents.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WHY SENTINEL -->
+    <section class="section" id="why-sentinel">
+      <div class="container">
+        <h2>Why Sentinel Identity</h2>
+        <p class="section-intro">
+          Built for real admin work. The goal is not to impress your procurement team with giant PDF decks.
+          The goal is to make your tenant safer and easier to operate.
+        </p>
+
+        <div class="proof-grid">
+          <div class="section-card proof-panel">
+            <h3 style="margin:0 0 6px; font-size:1.12rem;">What clients should expect</h3>
+            <div class="proof-bullets">
+              <div class="row">
+                <div class="check">✓</div>
+                <div>
+                  <strong style="color:#fff;">Practical recommendations</strong><br />
+                  <span>Advice tailored to your size, staff, and actual admin capacity.</span>
+                </div>
+              </div>
+              <div class="row">
+                <div class="check">✓</div>
+                <div>
+                  <strong style="color:#fff;">Risk reduction without chaos</strong><br />
+                  <span>Safer access controls and cleanup plans that avoid breaking business workflows.</span>
+                </div>
+              </div>
+              <div class="row">
+                <div class="check">✓</div>
+                <div>
+                  <strong style="color:#fff;">Identity and M365 admin context</strong><br />
+                  <span>Not generic security advice disconnected from Exchange, Teams, SharePoint, and hybrid reality.</span>
+                </div>
+              </div>
+              <div class="row">
+                <div class="check">✓</div>
+                <div>
+                  <strong style="color:#fff;">Clear communication</strong><br />
+                  <span>Plain English findings, next steps, and priorities for technical and non-technical stakeholders.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="stats">
+            <div class="section-card stat-card">
+              <div class="num">Entra ID</div>
+              <div class="label">Tenant hardening, access posture, and auth methods cleanup</div>
+            </div>
+            <div class="section-card stat-card">
+              <div class="num">M365 Admin</div>
+              <div class="label">Exchange, Teams, SharePoint admin support and troubleshooting guidance</div>
+            </div>
+            <div class="section-card stat-card">
+              <div class="num">Hybrid</div>
+              <div class="label">Entra Connect sync configuration and issue triage support</div>
+            </div>
+            <div class="section-card stat-card">
+              <div class="num">SMB-first</div>
+              <div class="label">Designed for smaller teams that still need enterprise-grade thinking</div>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Blog preview -->
-    <section class="section-light" aria-labelledby="blog-preview-heading">
+    <!-- BLOG PREVIEW -->
+    <section class="section" id="blog-preview">
       <div class="container">
-        <div class="section-head">
-          <h2 class="section-title" id="blog-preview-heading">From the blog</h2>
-          <p class="section-sub">
-            Practical articles on Entra ID, Microsoft 365 admin, MFA, Conditional Access, Entra Connect sync troubleshooting, and tenant hygiene.
-          </p>
+        <div style="display:flex; align-items:end; justify-content:space-between; gap:14px; flex-wrap:wrap;">
+          <div>
+            <h2>Admin notes and blog</h2>
+            <p class="section-intro" style="margin-bottom:0;">
+              Practical articles on Entra ID, Conditional Access, MFA, admin roles, hybrid sync, and Microsoft 365 admin operations.
+            </p>
+          </div>
+          <a class="btn btn-secondary" href="blog.html">Open blog</a>
         </div>
 
-        <div class="blog-grid">
-          <a class="blog-card" href="blog/entra-id-settings-small-business.html" aria-label="Read article: 5 Entra ID settings small businesses should review first">
-            <div class="blog-thumb">
-              <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80" alt="Cloud and network visualization" />
-            </div>
+        <div class="blog-grid mt-20">
+          <a class="blog-card section-card" href="blog.html">
+            <div class="blog-thumb" aria-hidden="true"></div>
             <div class="blog-body">
-              <span class="blog-tag">Entra ID</span>
-              <h3>5 Entra ID settings small businesses should review first</h3>
-              <p>A practical baseline review before you touch advanced policies and break something at 4:47 PM on a Friday.</p>
-              <span class="blog-link">Read article →</span>
-            </div>
-          </a>
-
-          <a class="blog-card" href="blog/common-entra-connect-sync-issues.html" aria-label="Read article: Common Entra Connect sync issues and what causes them">
-            <div class="blog-thumb">
-              <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1200&q=80" alt="IT team collaboration" />
-            </div>
-            <div class="blog-body">
-              <span class="blog-tag">Sync</span>
-              <h3>Common Entra Connect sync issues and what causes them</h3>
-              <p>A field guide to the usual suspects behind sync instability, object mismatch problems, and admin confusion.</p>
-              <span class="blog-link">Read article →</span>
-            </div>
-          </a>
-
-          <a class="blog-card" href="blog/conditional-access-lockout-mistakes.html" aria-label="Read article: Conditional Access mistakes that cause lockouts">
-            <div class="blog-thumb">
-              <img src="https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=1200&q=80" alt="Security lock concept" />
-            </div>
-            <div class="blog-body">
-              <span class="blog-tag">Conditional Access</span>
-              <h3>Conditional Access mistakes that create user lockouts</h3>
-              <p>How to reduce risk without turning your tenant into a support queue generator.</p>
-              <span class="blog-link">Read article →</span>
-            </div>
-          </a>
-        </div>
-
-        <div style="margin-top:18px;">
-          <a class="btn btn-secondary" href="blog.html">View all articles</a>
-        </div>
-      </div>
-    </section>
-
-    <!-- Contact CTA -->
-    <section class="cta-band" aria-labelledby="cta-heading">
-      <div class="container">
-        <div class="cta-panel">
-          <div class="cta-grid">
-            <div>
-              <h2 id="cta-heading">Talk to a consultant, not a sales bot.</h2>
-              <p>
-                Tell us what is going wrong in your tenant and what outcome you need.
-                We will reply with clear next steps and a practical path forward.
+              <div class="blog-meta">Conditional Access • MFA</div>
+              <h3 class="blog-title">How to build a safer MFA rollout without locking out staff</h3>
+              <p class="blog-excerpt">
+                A practical rollout sequence for SMB tenants with limited IT coverage.
               </p>
-
-              <div class="cta-actions">
-                <a class="btn btn-primary" href="mailto:info@sentinelidentity.ca?subject=Sentinel%20Identity%20Inquiry">Email us</a>
-                <a class="btn btn-secondary" href="#contact">Request an assessment</a>
-              </div>
             </div>
+          </a>
 
-            <div class="cta-contact-card">
-              <h3>Contact details</h3>
-              <div class="contact-lines">
-                <div class="contact-line">
-                  <span class="doticon">📧</span>
-                  <div>
-                    Business Email<br />
-                    <a href="mailto:info@sentinelidentity.ca">info@sentinelidentity.ca</a>
-                  </div>
-                </div>
-
-                <div class="contact-line">
-                  <span class="doticon">🌎</span>
-                  <div>
-                    Service Region<br />
-                    Canada-based remote consulting for small and mid-sized businesses
-                  </div>
-                </div>
-
-                <div class="contact-line">
-                  <span class="doticon">⏱️</span>
-                  <div>
-                    Response Time<br />
-                    Typically within 1 business day
-                  </div>
-                </div>
-              </div>
+          <a class="blog-card section-card" href="blog.html">
+            <div class="blog-thumb" aria-hidden="true"></div>
+            <div class="blog-body">
+              <div class="blog-meta">Roles • Least privilege</div>
+              <h3 class="blog-title">Admin role cleanup checklist for Microsoft 365 and Entra ID</h3>
+              <p class="blog-excerpt">
+                Reduce standing privileges without slowing down day-to-day support work.
+              </p>
             </div>
+          </a>
+
+          <a class="blog-card section-card" href="blog.html">
+            <div class="blog-thumb" aria-hidden="true"></div>
+            <div class="blog-body">
+              <div class="blog-meta">Hybrid Identity • Entra Connect</div>
+              <h3 class="blog-title">Sync issues that quietly become outages and how to catch them early</h3>
+              <p class="blog-excerpt">
+                Common Entra Connect warning signs and what to review before users notice.
+              </p>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT CTA -->
+    <section class="section" aria-labelledby="contactCtaHeading">
+      <div class="container">
+        <div class="contact-cta">
+          <div>
+            <h2 id="contactCtaHeading">Need help with Entra ID or Microsoft 365 admin issues?</h2>
+            <p>
+              Start with the assessment form above. If you prefer email, contact
+              <strong><a href="mailto:info@sentinelidentity.ca">info@sentinelidentity.ca</a></strong>.
+              We focus on practical tenant fixes, clean admin operations, and clear next steps.
+            </p>
+          </div>
+          <div class="contact-cta-actions">
+            <a class="btn btn-primary" href="#contact">Request an Assessment</a>
+            <a class="btn btn-secondary" href="mailto:info@sentinelidentity.ca">Email Sentinel Identity</a>
           </div>
         </div>
       </div>
     </section>
   </main>
 
-  <!-- Footer -->
-  <footer class="footer" aria-label="Footer">
-    <div class="container">
-      <div class="footer-grid">
-        <div>
-          <div class="brand" style="margin-bottom:10px;">
-            <div class="brand-badge" aria-hidden="true"></div>
-            <div class="brand-text">
-              <strong>Sentinel Identity</strong>
-              <span>Entra ID & Microsoft 365 consulting</span>
-            </div>
-          </div>
-          <p>
-            Microsoft Entra ID and Microsoft 365 consulting and technical support for small businesses,
-            healthcare teams, and organizations without dedicated identity administration staff.
-          </p>
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div>
+        <div class="brand" style="margin-bottom:10px;">
+          <span class="brand-badge" aria-hidden="true"></span>
+          <span class="brand-text">
+            <p class="brand-title">Sentinel Identity</p>
+            <p class="brand-sub">Entra ID & Microsoft 365 security consulting</p>
+          </span>
         </div>
-
-        <div>
-          <h4>Services</h4>
-          <ul>
-            <li><a href="#services">Entra ID Support</a></li>
-            <li><a href="#services">MFA & Conditional Access</a></li>
-            <li><a href="#services">Entra Connect Sync Support</a></li>
-            <li><a href="#services">Exchange / Teams / SharePoint Admin</a></li>
-            <li><a href="#services">M365 Technical Support</a></li>
-          </ul>
-        </div>
-
-        <div>
-          <h4>Resources</h4>
-          <ul>
-            <li><a href="blog.html">Blog</a></li>
-            <li><a href="#how-we-work">How we work</a></li>
-            <li><a href="#why-sentinel">Why Sentinel Identity</a></li>
-            <li><a href="#contact">Request an assessment</a></li>
-          </ul>
-        </div>
-
-        <div>
-          <h4>Contact</h4>
-          <ul>
-            <li><a href="mailto:info@sentinelidentity.ca">info@sentinelidentity.ca</a></li>
-            <li>Canada-based remote consulting</li>
-            <li><a href="blog.html">Blog page</a></li>
-          </ul>
-        </div>
+        <p>
+          Practical consulting for identity, access, and Microsoft 365 administration.
+          Remote support for small and mid-sized businesses in Canada and beyond.
+        </p>
+        <p class="mt-8">Contact: <a href="mailto:info@sentinelidentity.ca">info@sentinelidentity.ca</a></p>
+        <p class="mt-8">© <span id="year"></span> Sentinel Identity. All rights reserved.</p>
       </div>
 
-      <div class="footer-bottom">
-        <div>© 2026 Sentinel Identity. All rights reserved.</div>
-        <div>sentinelidentity.ca</div>
+      <div class="footer-links" aria-label="Footer links">
+        <a href="#who-we-help">Who we help</a>
+        <a href="#services">Services</a>
+        <a href="#how-we-work">How we work</a>
+        <a href="#why-sentinel">Why Sentinel Identity</a>
+        <a href="blog.html">Blog</a>
+        <a href="#contact">Contact</a>
       </div>
     </div>
   </footer>
 
   <script>
-    // Mobile menu toggle
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-    const mobilePanel = document.getElementById('mobilePanel');
+    // Mobile nav toggle
+    (function () {
+      const btn = document.getElementById("navToggle");
+      const menu = document.getElementById("mobileMenu");
+      if (!btn || !menu) return;
 
-    if (mobileMenuBtn && mobilePanel) {
-      mobileMenuBtn.addEventListener('click', () => {
-        const isOpen = mobilePanel.style.display === 'block';
-        mobilePanel.style.display = isOpen ? 'none' : 'block';
-        mobileMenuBtn.setAttribute('aria-expanded', String(!isOpen));
+      btn.addEventListener("click", function () {
+        const isOpen = menu.classList.toggle("show");
+        btn.setAttribute("aria-expanded", String(isOpen));
       });
 
-      mobilePanel.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', () => {
-          mobilePanel.style.display = 'none';
-          mobileMenuBtn.setAttribute('aria-expanded', 'false');
+      menu.querySelectorAll("a").forEach((a) => {
+        a.addEventListener("click", function () {
+          menu.classList.remove("show");
+          btn.setAttribute("aria-expanded", "false");
         });
       });
-    }
+    })();
 
-    // Contact form -> opens mailto draft (free setup compatible)
-    const form = document.getElementById('contactForm');
+    // Footer year
+    document.getElementById("year").textContent = new Date().getFullYear();
 
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
+    // Assessment form submit -> Cloudflare Pages Function /api/contact
+    (function () {
+      const form = document.getElementById("assessmentForm");
+      const statusEl = document.getElementById("formStatus");
+      const submitBtn = document.getElementById("assessmentSubmitBtn");
 
-      const data = new FormData(form);
-      const name = (data.get('name') || '').toString().trim();
-      const email = (data.get('email') || '').toString().trim();
-      const company = (data.get('company') || '').toString().trim();
-      const users = (data.get('users') || '').toString().trim();
-      const focus = (data.get('focus') || '').toString().trim();
-      const message = (data.get('message') || '').toString().trim();
+      if (!form) return;
 
-      const subject = `New Inquiry from ${company || name || 'Website Visitor'} | ${focus || 'General Support'}`;
+      function setStatus(message, type) {
+        if (!statusEl) return;
+        statusEl.textContent = message;
+        statusEl.className = "form-status " + (type || "");
+      }
 
-      const body = [
-        'Hello Sentinel Identity,',
-        '',
-        'I would like help with the following:',
-        '',
-        `Name: ${name}`,
-        `Email: ${email}`,
-        `Company: ${company || 'Not provided'}`,
-        `User Count: ${users || 'Not provided'}`,
-        `Primary Focus: ${focus || 'Not provided'}`,
-        '',
-        'What are we trying to fix?',
-        message || 'Not provided',
-        '',
-        'Submitted from sentinelidentity.ca'
-      ].join('\n');
+      form.addEventListener("submit", async function (e) {
+        e.preventDefault();
 
-      const mailto = `mailto:info@sentinelidentity.ca?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        const name = (form.querySelector('[name="name"]')?.value || "").trim();
+        const email = (form.querySelector('[name="email"]')?.value || "").trim();
+        const company = (form.querySelector('[name="company"]')?.value || "").trim();
+        const userCount = (form.querySelector('[name="userCount"]')?.value || "").trim();
+        const primaryFocus = (form.querySelector('[name="primaryFocus"]')?.value || "").trim();
+        const problemSummary = (form.querySelector('[name="problemSummary"]')?.value || "").trim();
 
-      window.location.href = mailto;
-    });
+        if (!name || !email || !problemSummary) {
+          setStatus("Please fill in name, email, and what you are trying to fix.", "error");
+          return;
+        }
+
+        const payload = {
+          name,
+          email,
+          company,
+          userCount,
+          primaryFocus,
+          problemSummary,
+          sourcePage: window.location.href
+        };
+
+        try {
+          if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.dataset.originalText = submitBtn.textContent;
+            submitBtn.textContent = "Sending...";
+          }
+
+          setStatus("Submitting your request...", "loading");
+
+          const res = await fetch("/api/contact", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+          });
+
+          const data = await res.json().catch(() => ({}));
+
+          if (!res.ok || !data.ok) {
+            throw new Error(data.error || data.details || "Submission failed");
+          }
+
+          if (data.warning) {
+            setStatus(
+              "Request submitted. We received your message, but the confirmation email may not have been delivered.",
+              "success"
+            );
+          } else {
+            setStatus(
+              "Request submitted successfully. You should receive a confirmation email shortly.",
+              "success"
+            );
+          }
+
+          form.reset();
+        } catch (err) {
+          setStatus(
+            (err && err.message) || "Something went wrong. Please email info@sentinelidentity.ca directly.",
+            "error"
+          );
+        } finally {
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = submitBtn.dataset.originalText || "Send Request";
+          }
+        }
+      });
+    })();
   </script>
 </body>
 </html>
