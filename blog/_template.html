@@ -1,1 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sentinel Identity Blog Post</title>
+  <meta name="description" content="Sentinel Identity blog post on Entra ID and Microsoft 365 security." />
+  <style>
+    :root{
+      --bg:#071126;
+      --bg2:#0c1834;
+      --panel:rgba(255,255,255,0.06);
+      --panel-border:rgba(255,255,255,0.12);
+      --text:#e8efff;
+      --muted:#b8c5ea;
+      --blue:#3b82f6;
+      --cyan:#22d3ee;
+      --violet:#8b5cf6;
+      --green:#22c55e;
+      --shadow:0 20px 60px rgba(0,0,0,.35);
+      --radius:20px;
+      --max:1180px;
+    }
 
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(900px 500px at 8% -10%, rgba(59,130,246,.35), transparent 60%),
+        radial-gradient(700px 400px at 95% 10%, rgba(139,92,246,.28), transparent 60%),
+        radial-gradient(500px 300px at 80% 70%, rgba(34,211,238,.15), transparent 60%),
+        linear-gradient(180deg, var(--bg), var(--bg2));
+      line-height:1.6;
+    }
+
+    a{color:inherit;text-decoration:none}
+    img{max-width:100%;display:block}
+
+    .container{
+      width:min(var(--max), calc(100% - 32px));
+      margin:0 auto;
+    }
+
+    /* Header */
+    .site-header{
+      position:sticky;
+      top:0;
+      z-index:50;
+      backdrop-filter: blur(10px);
+      background:rgba(7,17,38,.75);
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+
+    .nav{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      min-height:78px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:0;
+    }
+
+    .brand-badge{
+      width:36px;
+      height:36px;
+      border-radius:12px;
+      background:
+        radial-gradient(circle at 30% 30%, #7dd3fc, #3b82f6 45%, #1d4ed8 70%, #1e1b4b);
+      box-shadow: 0 8px 24px rgba(59,130,246,.45);
+      border:1px solid rgba(255,255,255,.22);
+      flex:0 0 auto;
+    }
+
+    .brand-text{
+      display:flex;
+      flex-direction:column;
+      min-width:0;
+    }
+
+    .brand-title{
+      font-weight:800;
+      letter-spacing:.01em;
+      font-size:1.05rem;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .brand-sub{
+      color:var(--muted);
+      font-size:.82rem;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .nav-links{
+      display:flex;
+      align-items:center;
+      gap:20px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .nav-links a{
+      color:#d9e5ff;
+      font-weight:600;
+      opacity:.9;
+    }
+    .nav-links a:hover{opacity:1}
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      border:none;
+      cursor:pointer;
+      border-radius:14px;
+      padding:12px 18px;
+      font-weight:700;
+      transition:.2s ease;
+      text-decoration:none;
+      white-space:nowrap;
+    }
+
+    .btn-primary{
+      color:white;
+      background:linear-gradient(90deg, var(--violet), var(--blue), var(--cyan));
+      box-shadow: 0 10px 30px rgba(59,130,246,.35);
+    }
+    .btn-primary:hover{transform:translateY(-1px)}
+
+    .btn-outline{
+      color:#dfe9ff;
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.14);
+    }
+
+    /* Hero */
+    .hero{
+      padding:34px 0 18px;
+    }
+
+    .hero-card{
+      position:relative;
+      overflow:hidden;
+      border-radius:26px;
+      border:1px solid rgba(255,255,255,.12);
+      background:
+        linear-gradient(135deg, rgba(17,24,39,.85), rgba(9,14,29,.9)),
+        radial-gradient(circle at 15% 20%, rgba(59,130,246,.22), transparent 60%);
+      box-shadow:var(--shadow);
+      padding:26px;
+    }
+
+    .hero-grid{
+      display:grid;
+      grid-template-columns: 1.25fr .9fr;
+      gap:22px;
+      align-items:stretch;
+    }
+
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      color:#dbeafe;
+      background:rgba(59,130,246,.12);
+      border:1px solid rgba(59,130,246,.26);
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:.85rem;
+      font-weight:700;
+      margin-bottom:14px;
+    }
+    .eyebrow-dot{
+      width:8px;height:8px;border-radius:999px;background:#60a5fa;
+      box-shadow:0 0 16px rgba(96,165,250,.8);
+    }
+
+    h1{
+      margin:0 0 12px;
+      font-size:clamp(2rem, 3vw, 3rem);
+      line-height:1.08;
+      letter-spacing:-.02em;
+    }
+
+    .subtitle{
+      margin:0 0 18px;
+      color:var(--muted);
+      font-size:1.03rem;
+      max-width:65ch;
+    }
+
+    .meta-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-bottom:18px;
+    }
+
+    .meta-pill{
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:999px;
+      padding:8px 12px;
+      color:#d9e6ff;
+      font-size:.86rem;
+      font-weight:600;
+    }
+
+    .hero-image{
+      position:relative;
+      border-radius:18px;
+      min-height:260px;
+      border:1px solid rgba(255,255,255,.12);
+      overflow:hidden;
+      background:
+        radial-gradient(circle at 20% 25%, rgba(34,211,238,.25), transparent 45%),
+        radial-gradient(circle at 80% 20%, rgba(139,92,246,.24), transparent 45%),
+        linear-gradient(135deg, #0b1328, #111b3b 45%, #0a1022);
+    }
+
+    .hero-image::before{
+      content:"";
+      position:absolute; inset:0;
+      background:
+        linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+      background-size: 24px 24px;
+      opacity:.35;
+    }
+
+    .hero-image-inner{
+      position:absolute; inset:0;
+      display:grid;
+      place-items:center;
+      padding:20px;
+      text-align:center;
+    }
+
+    .shield{
+      width:min(220px, 55%);
+      aspect-ratio:1;
+      border-radius:28px;
+      border:1px solid rgba(255,255,255,.14);
+      background:
+        radial-gradient(circle at 35% 25%, rgba(125,211,252,.35), transparent 50%),
+        linear-gradient(145deg, rgba(59,130,246,.22), rgba(139,92,246,.18), rgba(34,211,238,.14));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 20px 60px rgba(0,0,0,.35);
+      display:grid;
+      place-items:center;
+      position:relative;
+    }
+
+    .shield svg{width:48%; height:48%; opacity:.95; color:#e6f0ff;}
+    .floating-chip{
+      position:absolute;
+      padding:8px 10px;
+      border-radius:12px;
+      background:rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.12);
+      font-size:.78rem;
+      color:#d7e6ff;
+      backdrop-filter: blur(6px);
+    }
+    .chip1{top:16px; left:16px}
+    .chip2{top:20px; right:14px}
+    .chip3{bottom:16px; left:50%; transform:translateX(-50%)}
+
+    /* Layout */
+    .main-wrap{
+      padding: 10px 0 70px;
+    }
+
+    .content-grid{
+      display:grid;
+      grid-template-columns: minmax(0, 1fr) 320px;
+      gap:22px;
+      align-items:start;
+    }
+
+    .panel{
+      background:var(--panel);
+      border:1px solid var(--panel-border);
+      border-radius:20px;
+      box-shadow:var(--shadow);
+    }
+
+    .article-panel{
+      padding:24px;
+    }
+
+    .article-panel h2{
+      font-size:1.45rem;
+      margin:28px 0 10px;
+      line-height:1.2;
+      letter-spacing:-.01em;
+    }
+
+    .article-panel h3{
+      font-size:1.1rem;
+      margin:22px 0 8px;
+      line-height:1.25;
+    }
+
+    .article-panel p{
+      margin:0 0 14px;
+      color:#dde7ff;
+    }
+
+    .article-panel ul, .article-panel ol{
+      margin:0 0 16px 20px;
+      color:#dde7ff;
+    }
+
+    .article-panel li{margin:6px 0}
+
+    .article-panel blockquote{
+      margin:18px 0;
+      border-left:3px solid rgba(59,130,246,.75);
+      background:rgba(59,130,246,.08);
+      padding:12px 14px;
+      border-radius:10px;
+      color:#e8f0ff;
+    }
+
+    .callout{
+      margin:18px 0;
+      padding:14px;
+      border-radius:14px;
+      border:1px solid rgba(34,211,238,.22);
+      background:rgba(34,211,238,.07);
+    }
+
+    .callout strong{display:block; margin-bottom:6px}
+
+    .note-card{
+      margin:18px 0;
+      padding:16px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.1);
+      background:rgba(255,255,255,.03);
+    }
+
+    .article-footer{
+      margin-top:26px;
+      padding-top:18px;
+      border-top:1px solid rgba(255,255,255,.1);
+      display:flex;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    .tags{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+
+    .tag{
+      padding:7px 10px;
+      border-radius:999px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.1);
+      color:#dbe8ff;
+      font-size:.82rem;
+      font-weight:600;
+    }
+
+    /* Sidebar */
+    .sidebar{
+      display:grid;
+      gap:16px;
+      position:sticky;
+      top:92px;
+    }
+
+    .side-card{
+      padding:16px;
+      border-radius:18px;
+      background:var(--panel);
+      border:1px solid var(--panel-border);
+      box-shadow:var(--shadow);
+    }
+
+    .side-card h4{
+      margin:0 0 10px;
+      font-size:1rem;
+      line-height:1.2;
+    }
+
+    .side-card p{
+      margin:0 0 10px;
+      color:var(--muted);
+      font-size:.94rem;
+    }
+
+    .toc{
+      display:grid;
+      gap:8px;
+    }
+    .toc a{
+      color:#dce8ff;
+      font-size:.92rem;
+      padding:8px 10px;
+      border-radius:10px;
+      border:1px solid transparent;
+      background:rgba(255,255,255,.02);
+    }
+    .toc a:hover{
+      border-color:rgba(255,255,255,.1);
+      background:rgba(255,255,255,.04);
+    }
+
+    .contact-box{
+      background:
+        radial-gradient(220px 140px at 15% 10%, rgba(59,130,246,.22), transparent 70%),
+        radial-gradient(220px 140px at 100% 100%, rgba(139,92,246,.2), transparent 70%),
+        rgba(255,255,255,.04);
+    }
+
+    .small-muted{
+      color:var(--muted);
+      font-size:.88rem;
+    }
+
+    /* Related */
+    .related{
+      margin-top:22px;
+      padding:20px;
+    }
+
+    .related h3{
+      margin:0 0 14px;
+      font-size:1.1rem;
+    }
+
+    .related-grid{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0,1fr));
+      gap:12px;
+    }
+
+    .related-item{
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.1);
+      background:rgba(255,255,255,.03);
+      padding:14px;
+      transition:.2s ease;
+    }
+    .related-item:hover{
+      transform:translateY(-2px);
+      background:rgba(255,255,255,.05);
+      border-color:rgba(255,255,255,.16);
+    }
+
+    .related-item .kicker{
+      color:#bcd0ff;
+      font-size:.78rem;
+      letter-spacing:.03em;
+      text-transform:uppercase;
+      margin-bottom:6px;
+    }
+    .related-item .title{
+      font-weight:700;
+      line-height:1.25;
+      color:#ecf3ff;
+      margin-bottom:6px;
+    }
+    .related-item .desc{
+      color:var(--muted);
+      font-size:.9rem;
+    }
+
+    /* Footer */
+    .footer{
+      border-top:1px solid rgba(255,255,255,.08);
+      padding:20px 0 36px;
+      color:var(--muted);
+    }
+
+    .footer-row{
+      display:flex;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      font-size:.92rem;
+    }
+
+    /* Mobile */
+    .mobile-nav-toggle{
+      display:none;
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.12);
+      color:#ecf4ff;
+      border-radius:12px;
+      padding:10px 12px;
+      font-weight:700;
+      cursor:pointer;
+    }
+
+    @media (max-width: 980px){
+      .hero-grid{
+        grid-template-columns:1fr;
+      }
+      .content-grid{
+        grid-template-columns:1fr;
+      }
+      .sidebar{
+        position:static;
+      }
+      .related-grid{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width: 780px){
+      .nav{
+        align-items:flex-start;
+        flex-direction:column;
+        padding:12px 0;
+      }
+
+      .nav-top{
+        width:100%;
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:10px;
+      }
+
+      .mobile-nav-toggle{display:inline-flex}
+
+      .nav-links{
+        width:100%;
+        display:none;
+        flex-direction:column;
+        align-items:flex-start;
+        gap:12px;
+        padding:6px 0 6px;
+      }
+
+      .nav-links.show{display:flex}
+
+      .nav-links .btn{
+        width:100%;
+        justify-content:center;
+      }
+
+      .hero-card{
+        padding:18px;
+      }
+
+      .article-panel{
+        padding:18px;
+      }
+    }
+
+    @media (max-width: 520px){
+      .container{
+        width:min(var(--max), calc(100% - 20px));
+      }
+      h1{
+        font-size:1.75rem;
+      }
+      .subtitle{
+        font-size:.96rem;
+      }
+      .hero-image{
+        min-height:220px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container nav">
+      <div class="nav-top">
+        <a href="../index.html" class="brand" aria-label="Sentinel Identity home">
+          <div class="brand-badge"></div>
+          <div class="brand-text">
+            <div class="brand-title">Sentinel Identity</div>
+            <div class="brand-sub">Entra ID & Microsoft 365 security consulting</div>
+          </div>
+        </a>
+        <button class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Toggle menu">Menu</button>
+      </div>
+
+      <nav class="nav-links" id="navLinks">
+        <a href="../index.html#coverage">Coverage</a>
+        <a href="../index.html#services">Services</a>
+        <a href="../blog.html">Blog</a>
+        <a href="../index.html#contact">Contact</a>
+        <a class="btn btn-primary" href="../index.html#contact">Request an Assessment</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <div class="hero-card">
+        <div class="hero-grid">
+          <div>
+            <div class="eyebrow">
+              <span class="eyebrow-dot"></span>
+              <span>BLOG POST TEMPLATE · SENTINEL IDENTITY</span>
+            </div>
+
+            <!-- EDIT THESE -->
+            <h1>Your blog post title goes here</h1>
+            <p class="subtitle">
+              Use this section for a sharp summary of the article. One or two lines only.
+              Make it clear what problem you are solving and who this is for.
+            </p>
+
+            <div class="meta-row">
+              <span class="meta-pill">2026-02-22</span>
+              <span class="meta-pill">8 min read</span>
+              <span class="meta-pill">Entra ID</span>
+              <span class="meta-pill">Conditional Access</span>
+            </div>
+
+            <a class="btn btn-outline" href="../blog.html">← Back to Blog</a>
+          </div>
+
+          <div class="hero-image" aria-hidden="true">
+            <div class="hero-image-inner">
+              <div class="shield">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M12 3l7 3v6c0 4.4-2.8 7.9-7 9-4.2-1.1-7-4.6-7-9V6l7-3z"></path>
+                  <path d="M9 12l2 2 4-4"></path>
+                </svg>
+                <div class="floating-chip chip1">MFA</div>
+                <div class="floating-chip chip2">CA Policies</div>
+                <div class="floating-chip chip3">Least Privilege</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main class="main-wrap">
+    <div class="container">
+      <div class="content-grid">
+        <!-- MAIN ARTICLE -->
+        <article class="panel article-panel">
+          <!-- EDIT ARTICLE CONTENT BELOW -->
+
+          <p>
+            Start with the problem. Admins do not need fluff. They need to know what breaks,
+            why it matters, and what to do first before things get worse on a Monday morning.
+          </p>
+
+          <div class="callout">
+            <strong>Quick takeaway</strong>
+            If you only do one thing this week, do the highest-impact, lowest-risk control first.
+            Then test it. Then document it. Humans skip this and then act surprised later.
+          </div>
+
+          <h2 id="why-this-matters">Why this matters</h2>
+          <p>
+            Explain the risk in practical terms. Example: sign-in risk, legacy auth, weak MFA methods,
+            over-permissioned admins, broken sync, or no visibility in audit logs.
+          </p>
+          <p>
+            Keep this specific to the admin audience you want: small businesses, clinics, teams without
+            full-time IT, or organizations with a part-time MSP.
+          </p>
+
+          <h2 id="common-mistakes">Common mistakes</h2>
+          <ul>
+            <li>Turning on controls without a pilot group.</li>
+            <li>Using broad exclusions that never get removed.</li>
+            <li>Not documenting emergency access accounts.</li>
+            <li>Mixing identity hygiene issues with endpoint issues and fixing neither well.</li>
+          </ul>
+
+          <div class="note-card">
+            <strong>Production note</strong>
+            Add screenshots later if you want, but blur tenant names and emails before publishing.
+          </div>
+
+          <h2 id="recommended-approach">Recommended approach</h2>
+          <ol>
+            <li><strong>Assess current state:</strong> inventory admins, auth methods, sync dependencies, key apps.</li>
+            <li><strong>Prioritize:</strong> pick controls that reduce real risk without user revolt.</li>
+            <li><strong>Pilot:</strong> test with a small group and monitor sign-in logs.</li>
+            <li><strong>Roll out:</strong> expand in phases with rollback notes.</li>
+            <li><strong>Document:</strong> leave behind runbooks and ownership.</li>
+          </ol>
+
+          <blockquote>
+            A secure tenant is not “finished.” It is maintained. The goal is fewer surprises, not vanity settings.
+          </blockquote>
+
+          <h2 id="what-good-looks-like">What good looks like</h2>
+          <p>
+            Describe outcomes in business language: fewer lockouts, fewer risky sign-ins, cleaner admin model,
+            predictable hybrid sync, and faster troubleshooting for M365 issues.
+          </p>
+
+          <h2 id="next-steps">Next steps</h2>
+          <p>
+            End with one practical action item and a contact CTA. Make it easy for someone to reach out without
+            sounding desperate. Consulting sites die when every sentence screams “book a call now.”
+          </p>
+
+          <div class="article-footer">
+            <div class="tags">
+              <span class="tag">Entra ID</span>
+              <span class="tag">M365 Security</span>
+              <span class="tag">Tenant Hardening</span>
+              <span class="tag">Admin Notes</span>
+            </div>
+
+            <a class="btn btn-primary" href="../index.html#contact">Request an Assessment</a>
+          </div>
+
+          <section class="panel related" style="margin-top:22px;">
+            <h3>Related articles</h3>
+            <div class="related-grid">
+              <a class="related-item" href="../blog.html">
+                <div class="kicker">Conditional Access</div>
+                <div class="title">Build your baseline before adding exceptions</div>
+                <div class="desc">Start with broad controls, then narrow with real evidence.</div>
+              </a>
+              <a class="related-item" href="../blog.html">
+                <div class="kicker">MFA</div>
+                <div class="title">Methods cleanup checklist for small businesses</div>
+                <div class="desc">Reduce weak pathways that quietly undermine MFA.</div>
+              </a>
+            </div>
+          </section>
+        </article>
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+          <div class="side-card">
+            <h4>In this article</h4>
+            <div class="toc">
+              <a href="#why-this-matters">Why this matters</a>
+              <a href="#common-mistakes">Common mistakes</a>
+              <a href="#recommended-approach">Recommended approach</a>
+              <a href="#what-good-looks-like">What good looks like</a>
+              <a href="#next-steps">Next steps</a>
+            </div>
+          </div>
+
+          <div class="side-card">
+            <h4>Article details</h4>
+            <p><strong>Audience:</strong> SMB admins, small IT teams, healthcare practices</p>
+            <p><strong>Focus:</strong> Entra ID, M365 admin, hybrid identity, support</p>
+            <p class="small-muted">Tip: Keep posts practical and under 1,200 words at first.</p>
+          </div>
+
+          <div class="side-card contact-box">
+            <h4>Need help with your tenant?</h4>
+            <p>Use the assessment form on the main site and describe the issue clearly. You will get a practical response and next steps.</p>
+            <a class="btn btn-primary" href="../index.html#contact" style="width:100%;">Request an Assessment</a>
+            <p class="small-muted" style="margin-top:10px;">Email: info@sentinelidentity.ca</p>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-row">
+      <div>© <span id="year"></span> Sentinel Identity</div>
+      <div>Entra ID & Microsoft 365 security consulting · Canada-based</div>
+    </div>
+  </footer>
+
+  <script>
+    // Mobile nav
+    const mobileNavToggle = document.getElementById('mobileNavToggle');
+    const navLinks = document.getElementById('navLinks');
+    if (mobileNavToggle && navLinks) {
+      mobileNavToggle.addEventListener('click', () => {
+        navLinks.classList.toggle('show');
+      });
+    }
+
+    // Footer year
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
