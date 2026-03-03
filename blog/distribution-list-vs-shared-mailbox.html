@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Distribution List vs Shared Mailbox | Sentinel Identity</title>
+  <meta name="description" content="Distribution List vs Shared Mailbox in Microsoft 365: what each is for, how sending and ownership works, external senders, licensing, and the common mistakes admins see." />
+  <meta name="theme-color" content="#0b1020" />
+  <style>
+    :root{--text:#eaf1ff;--muted:#b9c6e4;--accent:linear-gradient(90deg,#7a4dff 0%, #2d6bff 50%, #24c4ff 100%);--max:980px;--radius:18px}
+    *{box-sizing:border-box} html,body{margin:0;padding:0}
+    body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--text);
+      background:radial-gradient(1000px 500px at 8% -5%, rgba(122,77,255,.18), transparent 60%),
+      radial-gradient(900px 500px at 95% 5%, rgba(36,196,255,.14), transparent 60%),
+      linear-gradient(180deg, #070b16 0%, #091126 45%, #0b1328 100%);line-height:1.55}
+    a{color:inherit;text-decoration:none}
+    .container{width:min(var(--max), calc(100% - 32px));margin:0 auto}
+    .header{position:sticky;top:0;z-index:50;backdrop-filter:blur(12px);background:rgba(7,11,22,.72);border-bottom:1px solid rgba(255,255,255,.06)}
+    .nav{min-height:76px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .brand-badge{width:36px;height:36px;border-radius:12px;background:radial-gradient(circle at 25% 25%, rgba(255,255,255,.7), rgba(255,255,255,.1) 40%),linear-gradient(135deg,#24c4ff 0%,#2d6bff 45%,#7a4dff 100%);box-shadow:0 0 0 1px rgba(255,255,255,.12) inset,0 10px 25px rgba(45,107,255,.35)}
+    .brand-text strong{display:block;color:#fff;font-size:1rem;line-height:1.08}
+    .brand-text span{display:block;color:var(--muted);font-size:.82rem}
+    .btn{display:inline-flex;align-items:center;justify-content:center;border-radius:14px;padding:12px 18px;font-weight:800;font-size:.95rem;border:0;cursor:pointer}
+    .btn-primary{background:var(--accent);color:#fff;box-shadow:0 12px 28px rgba(45,107,255,.35)}
+    main{padding:34px 0 46px}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.10);border-radius:var(--radius);padding:18px;box-shadow:0 14px 28px rgba(0,0,0,.16)}
+    .meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;color:#cfe0ff;font-size:.84rem}
+    .meta span{border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.03);border-radius:999px;padding:5px 9px}
+    h1{margin:0;font-size:2rem;line-height:1.15;letter-spacing:-.02em}
+    h2{margin:22px 0 10px;font-size:1.25rem}
+    p{margin:10px 0;color:#dce7ff}
+    ul{margin:10px 0 0;padding-left:18px;color:#dce7ff}
+    li{margin:7px 0}
+    .callout{margin-top:14px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);border-radius:14px;padding:14px;color:#dce7ff}
+    .table-wrap{overflow:auto;margin-top:10px;border:1px solid rgba(255,255,255,.10);border-radius:14px}
+    table{width:100%;border-collapse:collapse;min-width:760px;background:rgba(0,0,0,.18)}
+    th,td{padding:12px;border-bottom:1px solid rgba(255,255,255,.08);vertical-align:top}
+    th{color:#fff;text-align:left;background:rgba(255,255,255,.04)}
+    td{color:#dce7ff}
+    .footer{border-top:1px solid rgba(255,255,255,.06);background:rgba(5,8,16,.58);padding:28px 0 18px;margin-top:28px;color:var(--muted);font-size:.9rem}
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <nav class="nav" aria-label="Main navigation">
+        <a class="brand" href="/index.html" aria-label="Sentinel Identity home">
+          <div class="brand-badge" aria-hidden="true"></div>
+          <div class="brand-text">
+            <strong>Sentinel Identity</strong>
+            <span>Entra ID & Microsoft 365 consulting</span>
+          </div>
+        </a>
+        <a class="btn btn-primary" href="/index.html#contact">Request an Assessment</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <article class="card">
+        <div class="meta">
+          <span>2026-03-02</span>
+          <span>Exchange Online</span>
+          <span>Mail Flow</span>
+          <span>Design</span>
+        </div>
+
+        <h1>Key differences between a Distribution List and a Shared Mailbox</h1>
+
+        <p>
+          People ask for “a mailbox everyone can email” and then everything goes sideways because the wrong object gets created.
+          Here is the practical way to choose.
+        </p>
+
+        <h2>Quick definitions</h2>
+        <ul>
+          <li><strong>Distribution List (DL)</strong>: a group that forwards emails to multiple recipients.</li>
+          <li><strong>Shared Mailbox</strong>: a mailbox multiple people can open and work out of, with shared folders.</li>
+        </ul>
+
+        <h2>Comparison (the parts that actually matter)</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Feature</th>
+                <th>Distribution List</th>
+                <th>Shared Mailbox</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Purpose</td>
+                <td>Distribute mail to members</td>
+                <td>Central inbox people share</td>
+              </tr>
+              <tr>
+                <td>Where messages live</td>
+                <td>In each member’s mailbox</td>
+                <td>In the shared mailbox folders</td>
+              </tr>
+              <tr>
+                <td>Reply behavior</td>
+                <td>Replies come from the user (unless configured otherwise)</td>
+                <td>Can reply as the shared mailbox (Send As / Send on Behalf)</td>
+              </tr>
+              <tr>
+                <td>Best for</td>
+                <td>Announcements, simple routing, “everyone needs a copy”</td>
+                <td>Support, reception, bookings, finance inbox, shared processing</td>
+              </tr>
+              <tr>
+                <td>Ownership and workflow</td>
+                <td>Weak: everyone has their own copy, tracking is hard</td>
+                <td>Strong: one place to triage and process</td>
+              </tr>
+              <tr>
+                <td>External senders</td>
+                <td>Configurable, often restricted for safety</td>
+                <td>Configurable, can receive externally as a mailbox</td>
+              </tr>
+              <tr>
+                <td>Common mistake</td>
+                <td>Used when you actually need shared ownership</td>
+                <td>Used when you only needed a list of recipients</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Decision rules (fast)</h2>
+        <ul>
+          <li>If the requirement is “everyone needs a copy”, use a <strong>Distribution List</strong>.</li>
+          <li>If the requirement is “we need one shared inbox to manage”, use a <strong>Shared Mailbox</strong>.</li>
+          <li>If the requirement is “we need approvals, moderation, routing”, consider mail flow rules plus a shared mailbox.</li>
+        </ul>
+
+        <div class="callout">
+          <strong>Real-world admin note:</strong>
+          Shared mailboxes introduce permission questions (Full Access vs Send As), Sent Items behavior, and client differences.
+          DLs introduce spam risk if you allow external senders without restrictions.
+        </div>
+
+        <h2>Security and governance tips</h2>
+        <ul>
+          <li>For DLs that accept external mail, restrict who can send if abuse is a risk.</li>
+          <li>For shared mailboxes, standardize permissions and decide where Sent Items should be saved.</li>
+          <li>Document the mailbox owner and the expected workflow, otherwise it becomes an abandoned inbox.</li>
+        </ul>
+
+        <div class="callout">
+          <strong>Need help?</strong>
+          If your org has a messy mix of DLs and shared mailboxes, we can redesign the pattern with clean governance and fewer user-facing issues.
+          <br /><br />
+          <a class="btn btn-primary" href="/index.html#contact">Request an Assessment</a>
+        </div>
+      </article>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div>© 2026 Sentinel Identity · <a href="/blog.html">Back to blog</a></div>
+    </div>
+  </footer>
+</body>
+</html>
