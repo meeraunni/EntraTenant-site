@@ -237,7 +237,7 @@
       font-size: clamp(2rem, 4.4vw, 3.25rem);
       line-height:1.03;
       letter-spacing:-.03em;
-      max-width: 18ch;
+      max-width: 22ch;
       color:#fff;
       text-wrap: balance;
     }
@@ -246,7 +246,7 @@
       margin:14px 0 0;
       color:#d3e0ff;
       font-size:1.02rem;
-      max-width: 65ch;
+      max-width: 70ch;
     }
 
     .hero-meta{
@@ -289,62 +289,140 @@
     .section-sub{
       margin:10px 0 0;
       color: var(--muted);
-      max-width: 68ch;
+      max-width: 75ch;
     }
 
-    .blog-layout{
-      display:grid;
-      grid-template-columns: 1fr 340px;
-      gap: 22px;
-      align-items:start;
-    }
-
-    /* Featured */
-    .featured-card{
+    /* Controls card */
+    .controls{
       background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
       border:1px solid rgba(255,255,255,.10);
-      border-radius: 22px;
-      overflow:hidden;
-      box-shadow: var(--shadow);
-      margin-bottom: 18px;
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 14px 28px rgba(0,0,0,.16);
+      margin-bottom: 16px;
     }
 
-    .featured-media{
-      position:relative;
-      aspect-ratio: 16/8.5;
-      overflow:hidden;
+    .controls-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom: 10px;
     }
 
-    .featured-media img{
-      height:100%;
-      object-fit:cover;
-      transform: scale(1.02);
-      opacity:.9;
+    .controls h2{
+      margin:0;
+      font-size:1.05rem;
+      color:#fff;
     }
 
-    .featured-media::after{
-      content:"";
-      position:absolute; inset:0;
-      background: linear-gradient(180deg, rgba(7,11,22,.1), rgba(7,11,22,.7));
+    .muted{
+      color: var(--muted);
+      font-size:.92rem;
+      margin:6px 0 0;
+      max-width: 80ch;
     }
 
-    .featured-badge{
-      position:absolute;
-      left:14px; top:14px;
-      z-index:2;
+    .search-row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top: 12px;
+    }
+
+    .search-row input{
+      flex: 1 1 320px;
+      width:100%;
+      padding:12px 12px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.04);
+      color:var(--text);
+      outline:none;
+    }
+
+    .search-row input::placeholder{
+      color: rgba(185,198,228,.75);
+    }
+
+    .chip-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top: 10px;
+    }
+
+    .tag-chip{
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.03);
       border-radius:999px;
       padding:7px 10px;
-      font-size:.78rem;
-      text-transform:uppercase;
-      letter-spacing:.08em;
-      font-weight:800;
-      color:#fff;
-      background: linear-gradient(90deg, rgba(122,77,255,.95), rgba(45,107,255,.95));
-      box-shadow: 0 10px 22px rgba(45,107,255,.25);
+      font-size:.83rem;
+      color:#d5e3ff;
+      font-weight:700;
+      cursor:pointer;
+      transition:.18s ease;
     }
 
-    .featured-body{
-      padding: 16px 16px 18px;
+    .tag-chip:hover{
+      border-color: rgba(36,196,255,.28);
+      color:#fff;
+    }
+
+    .tag-chip.active{
+      background: rgba(36,196,255,.12);
+      border-color: rgba(36,196,255,.38);
+      color:#fff;
+    }
+
+    /* Feed */
+    .feed{
+      display:grid;
+      gap: 12px;
+    }
+
+    .post-row{
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:18px;
+      overflow:hidden;
+      box-shadow: 0 14px 28px rgba(0,0,0,.16);
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+      display:grid;
+      grid-template-columns: 220px 1fr;
+      min-height: 150px;
+    }
+
+    .post-row:hover{
+      transform: translateY(-2px);
+      border-color: rgba(36,196,255,.28);
+      box-shadow: 0 18px 34px rgba(0,0,0,.2);
+    }
+
+    .post-media{
+      position:relative;
+      overflow:hidden;
+      background:#0f1730;
+    }
+
+    .post-media img{
+      height:100%;
+      width:100%;
+      object-fit:cover;
+      opacity:.92;
+      transform: scale(1.02);
+    }
+
+    .post-media::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background: linear-gradient(180deg, rgba(7,11,22,.12), rgba(7,11,22,.60));
+    }
+
+    .post-content{
+      padding: 14px 14px 16px;
     }
 
     .post-meta{
@@ -363,248 +441,45 @@
       padding:5px 9px;
     }
 
-    .featured-body h2{
-      margin:0;
+    .post-content h3{
+      margin: 6px 0 0;
       color:#fff;
-      font-size: 1.35rem;
-      line-height:1.15;
-      letter-spacing:-.01em;
-    }
-
-    .featured-body p{
-      margin:10px 0 0;
-      color: var(--muted);
-      font-size:.95rem;
-    }
-
-    .featured-actions{
-      margin-top: 14px;
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-
-    /* List cards */
-    .posts-grid{
-      display:grid;
-      grid-template-columns: repeat(2, minmax(0,1fr));
-      gap: 16px;
-    }
-
-    .post-card{
-      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
-      border:1px solid rgba(255,255,255,.10);
-      border-radius:18px;
-      overflow:hidden;
-      box-shadow: 0 14px 28px rgba(0,0,0,.16);
-      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
-    }
-
-    .post-card:hover{
-      transform: translateY(-3px);
-      border-color: rgba(36,196,255,.28);
-      box-shadow: 0 18px 34px rgba(0,0,0,.2);
-    }
-
-    .post-thumb{
-      aspect-ratio: 16/9;
-      position:relative;
-      overflow:hidden;
-      background:#0f1730;
-    }
-
-    .post-thumb img{
-      height:100%;
-      object-fit:cover;
-      opacity:.9;
-    }
-
-    .post-thumb::after{
-      content:"";
-      position:absolute;
-      inset:0;
-      background: linear-gradient(180deg, rgba(7,11,22,.12), rgba(7,11,22,.55));
-    }
-
-    .post-body{
-      padding: 14px 14px 16px;
-    }
-
-    .post-body h3{
-      margin: 10px 0 0;
-      color:#fff;
-      font-size:1.05rem;
+      font-size:1.12rem;
       line-height:1.22;
       letter-spacing:-.01em;
     }
 
-    .post-body p{
+    .post-content p{
       margin:8px 0 0;
       color: var(--muted);
-      font-size:.92rem;
+      font-size:.94rem;
       line-height:1.45;
+      max-width: 95ch;
+    }
+
+    .post-actions{
+      margin-top: 12px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
     }
 
     .read-link{
-      margin-top: 12px;
       display:inline-flex;
       align-items:center;
       gap:7px;
       color:#9fd8ff;
-      font-weight:700;
-      font-size:.92rem;
-    }
-
-    /* Sidebar */
-    .sidebar{
-      display:grid;
-      gap: 16px;
-      position: sticky;
-      top: 96px;
-    }
-
-    .side-card{
-      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
-      border:1px solid rgba(255,255,255,.10);
-      border-radius: 18px;
-      padding: 16px;
-      box-shadow: 0 14px 28px rgba(0,0,0,.16);
-    }
-
-    .side-card h3{
-      margin:0;
-      color:#fff;
-      font-size:1.05rem;
-    }
-
-    .side-card p{
-      margin:10px 0 0;
-      color: var(--muted);
-      font-size:.93rem;
-      line-height:1.45;
-    }
-
-    .side-list{
-      list-style:none;
-      margin:10px 0 0;
-      padding:0;
-      display:grid;
-      gap:8px;
-    }
-
-    .side-list li{
-      color:#deebff;
-      font-size:.92rem;
-      display:flex;
-      gap:8px;
-      align-items:flex-start;
-    }
-
-    .side-list li::before{
-      content:"•";
-      color:#8fd8ff;
-      font-weight:700;
-      line-height:1;
-      margin-top:2px;
-    }
-
-    .tag-cloud{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-      margin-top: 10px;
-    }
-
-    .tag-cloud a{
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.03);
-      border-radius:999px;
-      padding:7px 10px;
-      font-size:.83rem;
-      color:#d5e3ff;
-      font-weight:600;
-    }
-
-    .tag-cloud a:hover{
-      border-color: rgba(36,196,255,.28);
-      color:#fff;
-    }
-
-    .mini-cta{
-      margin-top: 12px;
-      display:grid;
-      gap:10px;
-    }
-
-    .mini-cta .btn{
-      width:100%;
-    }
-
-    /* Add blog guide strip */
-    .admin-guide{
-      margin-top: 22px;
-      background:
-        radial-gradient(600px 180px at 10% 0%, rgba(122,77,255,.18), transparent 70%),
-        radial-gradient(600px 180px at 90% 20%, rgba(36,196,255,.12), transparent 70%),
-        linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
-      border:1px solid rgba(255,255,255,.10);
-      border-radius: 20px;
-      padding: 18px;
-      box-shadow: 0 14px 28px rgba(0,0,0,.16);
-    }
-
-    .admin-guide h3{
-      margin:0;
-      font-size:1.06rem;
-      color:#fff;
-    }
-
-    .admin-guide p{
-      margin:10px 0 0;
-      color: var(--muted);
-      font-size:.93rem;
-    }
-
-    .steps{
-      margin: 12px 0 0;
-      padding: 0;
-      list-style:none;
-      display:grid;
-      gap:10px;
-    }
-
-    .steps li{
-      display:flex;
-      gap:10px;
-      align-items:flex-start;
-      color:#e5eeff;
-      font-size:.92rem;
-      line-height:1.4;
-    }
-
-    .steps .n{
-      width:22px; height:22px;
-      border-radius:999px;
-      background: linear-gradient(135deg,#7a4dff,#2d6bff);
-      display:grid;
-      place-items:center;
-      flex:0 0 auto;
-      font-size:.78rem;
       font-weight:800;
-      margin-top:1px;
+      font-size:.92rem;
     }
 
-    .code-chip{
-      display:inline-block;
-      margin-top:10px;
-      border:1px solid rgba(255,255,255,.10);
+    .empty{
+      padding: 18px;
+      border:1px dashed rgba(255,255,255,.18);
+      border-radius:18px;
+      color: var(--muted);
       background: rgba(255,255,255,.03);
-      border-radius: 10px;
-      padding: 8px 10px;
-      color:#dce9ff;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size:.84rem;
-      word-break: break-all;
     }
 
     /* Footer */
@@ -663,25 +538,12 @@
       .nav .btn-primary{ display:none; }
       .mobile-menu-btn{ display:block; }
 
-      .blog-layout{
-        grid-template-columns: 1fr;
-      }
-
-      .sidebar{
-        position: static;
-        top: auto;
-      }
-
       .footer-grid{
         grid-template-columns: 1.2fr 1fr 1fr;
       }
     }
 
     @media (max-width: 860px){
-      .posts-grid{
-        grid-template-columns: 1fr;
-      }
-
       .footer-grid{
         grid-template-columns: 1fr 1fr;
       }
@@ -694,6 +556,14 @@
 
       section{
         padding: 46px 0;
+      }
+
+      .post-row{
+        grid-template-columns: 1fr;
+      }
+
+      .post-media{
+        aspect-ratio: 16/9;
       }
     }
 
@@ -716,11 +586,6 @@
       }
 
       .btn{ width:100%; }
-
-      .featured-actions{
-        display:grid;
-        grid-template-columns:1fr;
-      }
 
       .footer-grid{
         grid-template-columns: 1fr;
@@ -780,19 +645,18 @@
           Articles and admin notes
         </div>
 
-        <h1 id="blog-hero-heading">Entra ID, Conditional Access, MFA, and Microsoft 365 admin guidance for real-world teams</h1>
+        <h1 id="blog-hero-heading">Practical Entra ID and Microsoft 365 fixes for real-world IT teams</h1>
 
         <p>
-          Short, practical write-ups for small businesses, healthcare teams, and lean IT operations that want a cleaner tenant,
-          fewer sign-in issues, and less admin chaos.
+          No fluff. Just the stuff you actually need when a tenant is messy, mail flow is weird, or sign-ins start acting like they have free will.
         </p>
 
         <div class="hero-meta">
           <span>Entra ID</span>
-          <span>Conditional Access</span>
-          <span>MFA</span>
-          <span>Entra Connect</span>
-          <span>Exchange • Teams • SharePoint</span>
+          <span>Exchange Online</span>
+          <span>Defender</span>
+          <span>Outlook</span>
+          <span>Identity + Messaging</span>
         </div>
       </div>
     </section>
@@ -800,176 +664,40 @@
     <!-- Blog content -->
     <section aria-labelledby="latest-articles-heading">
       <div class="container">
-        <div class="blog-layout">
 
-          <!-- Main column -->
-          <div>
-            <!-- Featured article -->
-            <article class="featured-card" aria-label="Featured article">
-              <div class="featured-media">
-                <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1400&q=80" alt="Cybersecurity interface and lock visualization" />
-                <div class="featured-badge">Featured article</div>
-              </div>
-              <div class="featured-body">
-                <div class="post-meta">
-                  <span>2026-02-16</span>
-                  <span>Conditional Access</span>
-                  <span>Entra ID</span>
-                </div>
-                <h2>A practical Conditional Access baseline for small businesses</h2>
-                <p>
-                  What to enforce first, what to stage, and how to reduce risky sign-ins without locking out users and creating a support storm.
-                </p>
-                <div class="featured-actions">
-                  <a class="btn btn-primary" href="blog/conditional-access-baseline-small-business.html">Read article</a>
-                  <a class="btn btn-secondary" href="index.html#contact">Need help implementing this?</a>
-                </div>
-              </div>
-            </article>
+        <div class="section-head">
+          <h2 id="latest-articles-heading" class="section-title">Latest posts</h2>
+          <p class="section-sub">
+            Search and filter like a normal blog, not a “copy this card four times” demo page.
+          </p>
+        </div>
 
-            <div class="section-head">
-              <h2 id="latest-articles-heading" class="section-title">Latest articles</h2>
-              <p class="section-sub">
-                Add new posts here as you publish them. Newest first, because humans do not scroll forever.
-              </p>
+        <!-- Controls -->
+        <div class="controls" aria-label="Blog controls">
+          <div class="controls-top">
+            <div>
+              <h2>Browse posts</h2>
+              <p class="muted">Search titles and summaries. Filter by topic. Newest first.</p>
             </div>
-
-            <div class="posts-grid">
-              <!-- Post 1 -->
-              <a class="post-card" href="blog/mfa-methods-cleanup-checklist.html" aria-label="Read article: MFA that actually protects methods cleanup checklist">
-                <div class="post-thumb">
-                  <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=80" alt="Team reviewing screens and laptop" />
-                </div>
-                <div class="post-body">
-                  <div class="post-meta">
-                    <span>2026-02-16</span>
-                    <span>MFA</span>
-                    <span>Authentication Methods</span>
-                  </div>
-                  <h3>MFA that actually protects: methods cleanup checklist</h3>
-                  <p>Weak methods and legacy pathways quietly undermine MFA. Here is a cleanup approach that will not wreck user productivity.</p>
-                  <span class="read-link">Read article →</span>
-                </div>
-              </a>
-
-              <!-- Post 2 -->
-              <a class="post-card" href="blog/admin-role-cleanup-least-privilege.html" aria-label="Read article: Admin role cleanup least privilege without slowing IT down">
-                <div class="post-thumb">
-                  <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80" alt="Professionals in a meeting room" />
-                </div>
-                <div class="post-body">
-                  <div class="post-meta">
-                    <span>2026-02-16</span>
-                    <span>Roles</span>
-                    <span>Privileged Access</span>
-                  </div>
-                  <h3>Admin role cleanup: least privilege without slowing IT down</h3>
-                  <p>How to reduce standing admin access, clean up role sprawl, and keep accountability clear in smaller teams.</p>
-                  <span class="read-link">Read article →</span>
-                </div>
-              </a>
-
-              <!-- Post 3 -->
-              <a class="post-card" href="blog/common-entra-connect-sync-issues.html" aria-label="Read article: Common Entra Connect sync issues and what causes them">
-                <div class="post-thumb">
-                  <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1200&q=80" alt="IT team collaboration in office" />
-                </div>
-                <div class="post-body">
-                  <div class="post-meta">
-                    <span>2026-02-16</span>
-                    <span>Hybrid Identity</span>
-                    <span>Entra Connect</span>
-                  </div>
-                  <h3>Common Entra Connect sync issues and what causes them</h3>
-                  <p>The usual sync and sign-in failure patterns behind hybrid identity incidents, plus where to start troubleshooting.</p>
-                  <span class="read-link">Read article →</span>
-                </div>
-              </a>
-
-              <!-- Post 4 -->
-              <a class="post-card" href="blog/tenant-hardening-checklist-small-healthcare.html" aria-label="Read article: Tenant hardening checklist for small healthcare teams">
-                <div class="post-thumb">
-                  <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1200&q=80" alt="Healthcare professional reviewing laptop" />
-                </div>
-                <div class="post-body">
-                  <div class="post-meta">
-                    <span>2026-02-16</span>
-                    <span>Tenant Hardening</span>
-                    <span>Healthcare</span>
-                  </div>
-                  <h3>Tenant hardening checklist for small healthcare teams</h3>
-                  <p>A practical priority list for securing access and admin settings when time and IT bandwidth are limited.</p>
-                  <span class="read-link">Read article →</span>
-                </div>
-              </a>
-            </div>
-
-            <!-- How to add blogs -->
-            <div class="admin-guide">
-              <h3>How to add blogs on your own (simple manual method)</h3>
-              <p>
-                You do not need WordPress or a CMS right now. Keep it simple and professional with one file per article.
-              </p>
-
-              <ol class="steps">
-                <li><span class="n">1</span><span>Create a new file inside your <strong>/blog/</strong> folder (example: <strong>mfa-rollout-mistakes.html</strong>).</span></li>
-                <li><span class="n">2</span><span>Copy your blog post template into that file and replace the title, date, meta tags, and article content.</span></li>
-                <li><span class="n">3</span><span>Open <strong>blog.html</strong> and add a new blog card at the top of the list with the correct link.</span></li>
-                <li><span class="n">4</span><span>Commit and push to GitHub. Cloudflare Pages redeploys automatically.</span></li>
-              </ol>
-
-              <div class="code-chip">Example link: blog/mfa-rollout-mistakes.html</div>
-            </div>
+            <a class="btn btn-secondary" href="index.html#contact">Request an Assessment</a>
           </div>
 
-          <!-- Sidebar -->
-          <aside class="sidebar" aria-label="Blog sidebar">
-            <div class="side-card">
-              <h3>What this blog covers</h3>
-              <p>
-                Entra ID posture, Conditional Access, MFA and authentication methods, admin role governance,
-                Microsoft 365 admin support, Exchange, Teams, SharePoint, and hybrid identity sync (Entra Connect).
-              </p>
-            </div>
+          <div class="search-row">
+            <input id="searchInput" type="text" placeholder="Search (e.g., AADSTS76026, sent items, distribution list, Defender)" />
+          </div>
 
-            <div class="side-card">
-              <h3>Popular topics</h3>
-              <div class="tag-cloud">
-                <a href="#">Entra ID</a>
-                <a href="#">Conditional Access</a>
-                <a href="#">MFA</a>
-                <a href="#">Auth Methods</a>
-                <a href="#">Entra Connect</a>
-                <a href="#">Exchange Online</a>
-                <a href="#">Teams Admin</a>
-                <a href="#">SharePoint Admin</a>
-                <a href="#">Tenant Hardening</a>
-              </div>
-            </div>
-
-            <div class="side-card">
-              <h3>Need help with your tenant?</h3>
-              <p>
-                Use the assessment form on the main page. You will get a practical response and clear next steps.
-              </p>
-              <div class="mini-cta">
-                <a class="btn btn-primary" href="index.html#contact">Request an Assessment</a>
-                <a class="btn btn-secondary" href="mailto:info@sentinelidentity.ca">Email info@sentinelidentity.ca</a>
-              </div>
-            </div>
-
-            <div class="side-card">
-              <h3>Publishing tip</h3>
-              <ul class="side-list">
-                <li>Keep article titles practical and searchable</li>
-                <li>Use short intros and clear subheadings</li>
-                <li>Write for business owners and admins, not just engineers</li>
-                <li>End each article with a contact CTA</li>
-              </ul>
-            </div>
-          </aside>
-
+          <div class="chip-row" aria-label="Topic filters">
+            <button class="tag-chip active" type="button" data-filter-tag="All">All</button>
+            <button class="tag-chip" type="button" data-filter-tag="Entra ID">Entra ID</button>
+            <button class="tag-chip" type="button" data-filter-tag="Exchange Online">Exchange Online</button>
+            <button class="tag-chip" type="button" data-filter-tag="Microsoft Defender">Microsoft Defender</button>
+            <button class="tag-chip" type="button" data-filter-tag="Outlook">Outlook</button>
+          </div>
         </div>
+
+        <!-- Feed -->
+        <div id="feed" class="feed" aria-label="Blog feed"></div>
+
       </div>
     </section>
   </main>
@@ -1005,9 +733,9 @@
           <h4>Topics</h4>
           <ul>
             <li><a href="blog.html">Entra ID</a></li>
-            <li><a href="blog.html">Conditional Access</a></li>
-            <li><a href="blog.html">MFA</a></li>
-            <li><a href="blog.html">Entra Connect</a></li>
+            <li><a href="blog.html">Exchange Online</a></li>
+            <li><a href="blog.html">Defender</a></li>
+            <li><a href="blog.html">Outlook</a></li>
           </ul>
         </div>
 
@@ -1029,6 +757,7 @@
   </footer>
 
   <script>
+    // Mobile menu
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');
     const mobilePanel = document.getElementById('mobilePanel');
 
@@ -1046,6 +775,138 @@
         });
       });
     }
+
+    // Blog feed data (edit this when you add posts)
+    const posts = [
+      {
+        title: "How to resolve AADSTS76026: The request has expired. Try to submit new request.",
+        slug: "aadsts76026-request-expired.html",
+        date: "2026-03-02",
+        tags: ["Entra ID", "Authentication", "AADSTS"],
+        excerpt: "What this error actually means, why it happens (common causes), and a clean troubleshooting checklist that avoids endless guesswork.",
+        minutes: 6,
+        image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1200&q=80"
+      },
+      {
+        title: "How to recall a message using Microsoft Defender",
+        slug: "recall-message-microsoft-defender.html",
+        date: "2026-03-02",
+        tags: ["Microsoft Defender", "Email Security", "M365"],
+        excerpt: "What ‘recall’ really means in Microsoft 365, what you can actually do with Defender, and the practical steps to reduce impact fast.",
+        minutes: 5,
+        image: "https://images.unsplash.com/photo-1555949963-aa79dcee981c?auto=format&fit=crop&w=1200&q=80"
+      },
+      {
+        title: "You don’t have permission to send messages from this mailbox (Outlook app)",
+        slug: "no-permission-send-from-mailbox-outlook.html",
+        date: "2026-03-02",
+        tags: ["Exchange Online", "Outlook", "Permissions"],
+        excerpt: "The classic permissions trap: Send As vs Send on Behalf, mailbox delegation, cached tokens, and why it breaks in Outlook even when OWA works.",
+        minutes: 7,
+        image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=80"
+      },
+      {
+        title: "Key differences between Distribution List and Shared Mailbox",
+        slug: "distribution-list-vs-shared-mailbox.html",
+        date: "2026-03-02",
+        tags: ["Exchange Online", "Mail Flow", "Design"],
+        excerpt: "A practical comparison: what each is for, what it is not for, and which one to choose when people ask for ‘a mailbox that everyone can email’.",
+        minutes: 8,
+        image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80"
+      },
+      {
+        title: "Mails sent from a shared mailbox are appearing in personal ‘Sent Items’",
+        slug: "shared-mailbox-sent-items-personal.html",
+        date: "2026-03-02",
+        tags: ["Exchange Online", "Shared Mailbox", "Outlook"],
+        excerpt: "Why this happens, the settings that control where Sent Items are saved, and what differs across Outlook desktop, OWA, and mobile clients.",
+        minutes: 6,
+        image: "https://images.unsplash.com/photo-1560472355-536de3962603?auto=format&fit=crop&w=1200&q=80"
+      }
+    ];
+
+    // Sort newest first
+    posts.sort((a,b) => (b.date || "").localeCompare(a.date || ""));
+
+    const feed = document.getElementById("feed");
+    const searchInput = document.getElementById("searchInput");
+    const chips = Array.from(document.querySelectorAll(".tag-chip"));
+
+    let activeTag = "All";
+
+    function setActiveChip(tag) {
+      activeTag = tag;
+      chips.forEach(c => c.classList.toggle("active", c.dataset.filterTag === tag));
+      render();
+    }
+
+    chips.forEach(chip => {
+      chip.addEventListener("click", () => setActiveChip(chip.dataset.filterTag));
+    });
+
+    if (searchInput) {
+      searchInput.addEventListener("input", () => render());
+    }
+
+    function matchesFilter(post, q) {
+      const query = (q || "").trim().toLowerCase();
+      const text = `${post.title} ${post.excerpt} ${(post.tags || []).join(" ")}`.toLowerCase();
+
+      const tagOk =
+        activeTag === "All" ||
+        (post.tags || []).some(t => t.toLowerCase() === activeTag.toLowerCase());
+
+      const searchOk = !query || text.includes(query);
+
+      return tagOk && searchOk;
+    }
+
+    function postRowHtml(p) {
+      const tagsHtml = (p.tags || []).slice(0, 4).map(t => `<span>${t}</span>`).join("");
+      return `
+        <a class="post-row" href="blog/${p.slug}" aria-label="Read article: ${escapeHtml(p.title)}">
+          <div class="post-media">
+            <img src="${p.image}" alt="" />
+          </div>
+          <div class="post-content">
+            <div class="post-meta">
+              <span>${p.date}</span>
+              <span>${p.minutes} min read</span>
+              ${tagsHtml}
+            </div>
+            <h3>${escapeHtml(p.title)}</h3>
+            <p>${escapeHtml(p.excerpt)}</p>
+            <div class="post-actions">
+              <span class="read-link">Read article →</span>
+            </div>
+          </div>
+        </a>
+      `;
+    }
+
+    function render() {
+      const q = searchInput ? searchInput.value : "";
+      const filtered = posts.filter(p => matchesFilter(p, q));
+
+      if (!filtered.length) {
+        feed.innerHTML = `<div class="empty">No posts match your search or filter. Try a different keyword or click “All”.</div>`;
+        return;
+      }
+
+      feed.innerHTML = filtered.map(postRowHtml).join("");
+    }
+
+    function escapeHtml(str) {
+      return String(str || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    // Initial render
+    render();
   </script>
 </body>
 </html>
