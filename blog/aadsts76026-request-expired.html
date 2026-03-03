@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AADSTS76026 The request has expired | Sentinel Identity</title>
+  <meta name="description" content="Fix AADSTS76026: The request has expired. Causes include stale sign-in links, back-button replays, clock skew, cached auth state, and proxy caching. Step-by-step troubleshooting checklist." />
+  <meta name="theme-color" content="#0b1020" />
+  <style>
+    :root{
+      --bg:#070b16; --text:#eaf1ff; --muted:#b9c6e4; --border:rgba(255,255,255,.12);
+      --surface:rgba(255,255,255,.06); --surface2:rgba(255,255,255,.04);
+      --accent: linear-gradient(90deg,#7a4dff 0%, #2d6bff 50%, #24c4ff 100%);
+      --max:980px; --radius:18px;
+    }
+    *{box-sizing:border-box} html,body{margin:0;padding:0}
+    body{
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1000px 500px at 8% -5%, rgba(122,77,255,.18), transparent 60%),
+        radial-gradient(900px 500px at 95% 5%, rgba(36,196,255,.14), transparent 60%),
+        linear-gradient(180deg, #070b16 0%, #091126 45%, #0b1328 100%);
+      line-height:1.55;
+    }
+    a{color:inherit;text-decoration:none}
+    .container{width:min(var(--max), calc(100% - 32px));margin:0 auto}
+    .header{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter: blur(12px);
+      background: rgba(7,11,22,.72);
+      border-bottom:1px solid rgba(255,255,255,.06);
+    }
+    .nav{min-height:76px; display:flex; align-items:center; justify-content:space-between; gap:14px}
+    .brand{display:flex; align-items:center; gap:12px}
+    .brand-badge{
+      width:36px; height:36px; border-radius:12px;
+      background:
+        radial-gradient(circle at 25% 25%, rgba(255,255,255,.7), rgba(255,255,255,.1) 40%),
+        linear-gradient(135deg, #24c4ff 0%, #2d6bff 45%, #7a4dff 100%);
+      box-shadow: 0 0 0 1px rgba(255,255,255,.12) inset, 0 10px 25px rgba(45,107,255,.35);
+    }
+    .brand-text strong{display:block;color:#fff;font-size:1rem;line-height:1.08}
+    .brand-text span{display:block;color:var(--muted);font-size:.82rem}
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      border-radius:14px; padding:12px 18px; font-weight:800; font-size:.95rem;
+      border:0; cursor:pointer;
+    }
+    .btn-primary{background:var(--accent); color:#fff; box-shadow:0 12px 28px rgba(45,107,255,.35)}
+    main{padding:34px 0 46px}
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: var(--radius);
+      padding:18px;
+      box-shadow: 0 14px 28px rgba(0,0,0,.16);
+    }
+    .meta{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; color:#cfe0ff; font-size:.84rem}
+    .meta span{border:1px solid rgba(255,255,255,.10); background:rgba(255,255,255,.03); border-radius:999px; padding:5px 9px}
+    h1{margin:0; font-size:2rem; line-height:1.15; letter-spacing:-.02em}
+    h2{margin:22px 0 10px; font-size:1.25rem}
+    p{margin:10px 0; color:#dce7ff}
+    ul{margin:10px 0 0; padding-left:18px; color:#dce7ff}
+    li{margin:7px 0}
+    .callout{
+      margin-top:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      border-radius: 14px;
+      padding:14px;
+      color:#dce7ff;
+    }
+    code, pre{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size:.9rem;
+    }
+    pre{
+      background: rgba(0,0,0,.25);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: 14px;
+      padding:12px;
+      overflow:auto;
+      color:#eaf1ff;
+      margin:12px 0;
+    }
+    .toc a{color:#9fd8ff; font-weight:700}
+    .footer{
+      border-top:1px solid rgba(255,255,255,.06);
+      background: rgba(5,8,16,.58);
+      padding: 28px 0 18px;
+      margin-top: 28px;
+      color: var(--muted);
+      font-size:.9rem;
+    }
+    .footer a:hover{color:#fff}
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <nav class="nav" aria-label="Main navigation">
+        <a class="brand" href="/index.html" aria-label="Sentinel Identity home">
+          <div class="brand-badge" aria-hidden="true"></div>
+          <div class="brand-text">
+            <strong>Sentinel Identity</strong>
+            <span>Entra ID & Microsoft 365 consulting</span>
+          </div>
+        </a>
+        <a class="btn btn-primary" href="/index.html#contact">Request an Assessment</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <article class="card">
+        <div class="meta">
+          <span>2026-03-02</span>
+          <span>Entra ID</span>
+          <span>Authentication</span>
+          <span>AADSTS</span>
+        </div>
+
+        <h1>How to resolve AADSTS76026: “The request has expired. Try to submit new request.”</h1>
+
+        <p>
+          This error almost always means one thing: the sign-in request you are trying to complete is no longer valid.
+          Not “your tenant is broken”, not “Microsoft is down”, just a stale auth request.
+        </p>
+
+        <div class="callout toc">
+          <strong>Quick navigation</strong>
+          <ul>
+            <li><a href="#what-it-means">What it means</a></li>
+            <li><a href="#fast-fix">Fast fix checklist</a></li>
+            <li><a href="#root-causes">Common root causes</a></li>
+            <li><a href="#admin-checks">Admin checks</a></li>
+            <li><a href="#prevention">Prevent it in the future</a></li>
+          </ul>
+        </div>
+
+        <h2 id="what-it-means">What it means</h2>
+        <p>
+          Entra ID (Azure AD) uses short-lived values during interactive authentication (for example, an authorization code, state, nonce).
+          If the user tries to finish a sign-in using an old browser tab, an old link, or a cached page, Entra refuses it.
+          That refusal is what shows up as AADSTS76026.
+        </p>
+
+        <h2 id="fast-fix">Fast fix checklist (do this first)</h2>
+        <ul>
+          <li><strong>Close all tabs</strong> for the app, M365 portal, and login.microsoftonline.com.</li>
+          <li>Open a <strong>fresh InPrivate/Incognito</strong> window and try the sign-in again.</li>
+          <li>Do not use the browser back button during the sign-in flow.</li>
+          <li>If it is a password reset or MFA registration flow, <strong>restart the process</strong> from the original app entry point.</li>
+          <li>Verify your device time is correct (clock skew can break auth flows).</li>
+        </ul>
+
+        <h2 id="root-causes">Common root causes</h2>
+        <ul>
+          <li><strong>Stale sign-in link</strong>: user clicked an old email link, old bookmark, or reopened yesterday’s tab.</li>
+          <li><strong>Back button replay</strong>: user completed part of the flow, then navigated back and resubmitted.</li>
+          <li><strong>Proxy or gateway caching</strong>: a reverse proxy caches auth pages and serves old content.</li>
+          <li><strong>Long user delays</strong>: user started sign-in and waited too long before completing MFA or consent.</li>
+          <li><strong>Clock skew</strong>: device time is off by a few minutes.</li>
+          <li><strong>Multiple sessions</strong>: user is signed into multiple accounts and the browser mixes cookies.</li>
+        </ul>
+
+        <h2 id="admin-checks">Admin checks (when the fast fix does not work)</h2>
+        <p>These checks help you decide if this is a user behavior issue or a real configuration issue.</p>
+
+        <ul>
+          <li><strong>Sign-in logs</strong>: check the sign-in entry and confirm the failure is AADSTS76026.</li>
+          <li><strong>Conditional Access</strong>: confirm there is no policy forcing repeated reauthentication loops (Sign-in frequency, device compliance).</li>
+          <li><strong>Client type</strong>: see if it is happening in browser only, Outlook only, or a specific app.</li>
+          <li><strong>App configuration</strong>: for custom apps, verify redirect URI and that the app is not reusing old authorization responses.</li>
+        </ul>
+
+        <div class="callout">
+          <strong>Tip for stubborn cases:</strong>
+          If only one app is affected and Incognito does not help, suspect caching or session handling in that app or its proxy.
+          If many apps are affected for the same user, suspect browser cookie chaos or device time.
+        </div>
+
+        <h2 id="prevention">Prevent it in the future</h2>
+        <ul>
+          <li>Train users: “If sign-in fails, close the tab and start again.”</li>
+          <li>Avoid sending “deep” auth links that expire quickly.</li>
+          <li>On reverse proxies, disable caching for auth endpoints and callback URLs.</li>
+          <li>For custom apps, ensure you never reuse an authorization code or replay an old state/nonce.</li>
+        </ul>
+
+        <div class="callout">
+          <strong>Need help?</strong>
+          If this is happening repeatedly for a group of users or one business-critical app, we can trace the sign-in flow end-to-end and tighten the tenant controls without locking people out.
+          <br /><br />
+          <a class="btn btn-primary" href="/index.html#contact">Request an Assessment</a>
+        </div>
+      </article>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div>© 2026 Sentinel Identity · <a href="/blog.html">Back to blog</a></div>
+    </div>
+  </footer>
+</body>
+</html>
