@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>No permission to send from this mailbox in Outlook | Sentinel Identity</title>
+  <meta name="description" content="Fix 'You don’t have permission to send messages from this mailbox' in Outlook. Check Send As vs Send on Behalf, Full Access, cached tokens, automapping, and replication. Includes PowerShell." />
+  <meta name="theme-color" content="#0b1020" />
+  <style>
+    :root{--text:#eaf1ff;--muted:#b9c6e4;--accent:linear-gradient(90deg,#7a4dff 0%, #2d6bff 50%, #24c4ff 100%);--max:980px;--radius:18px}
+    *{box-sizing:border-box} html,body{margin:0;padding:0}
+    body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--text);
+      background:radial-gradient(1000px 500px at 8% -5%, rgba(122,77,255,.18), transparent 60%),
+      radial-gradient(900px 500px at 95% 5%, rgba(36,196,255,.14), transparent 60%),
+      linear-gradient(180deg, #070b16 0%, #091126 45%, #0b1328 100%);line-height:1.55}
+    a{color:inherit;text-decoration:none}
+    .container{width:min(var(--max), calc(100% - 32px));margin:0 auto}
+    .header{position:sticky;top:0;z-index:50;backdrop-filter:blur(12px);background:rgba(7,11,22,.72);border-bottom:1px solid rgba(255,255,255,.06)}
+    .nav{min-height:76px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .brand-badge{width:36px;height:36px;border-radius:12px;background:radial-gradient(circle at 25% 25%, rgba(255,255,255,.7), rgba(255,255,255,.1) 40%),linear-gradient(135deg,#24c4ff 0%,#2d6bff 45%,#7a4dff 100%);box-shadow:0 0 0 1px rgba(255,255,255,.12) inset,0 10px 25px rgba(45,107,255,.35)}
+    .brand-text strong{display:block;color:#fff;font-size:1rem;line-height:1.08}
+    .brand-text span{display:block;color:var(--muted);font-size:.82rem}
+    .btn{display:inline-flex;align-items:center;justify-content:center;border-radius:14px;padding:12px 18px;font-weight:800;font-size:.95rem;border:0;cursor:pointer}
+    .btn-primary{background:var(--accent);color:#fff;box-shadow:0 12px 28px rgba(45,107,255,.35)}
+    main{padding:34px 0 46px}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.10);border-radius:var(--radius);padding:18px;box-shadow:0 14px 28px rgba(0,0,0,.16)}
+    .meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;color:#cfe0ff;font-size:.84rem}
+    .meta span{border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.03);border-radius:999px;padding:5px 9px}
+    h1{margin:0;font-size:2rem;line-height:1.15;letter-spacing:-.02em}
+    h2{margin:22px 0 10px;font-size:1.25rem}
+    p{margin:10px 0;color:#dce7ff}
+    ul{margin:10px 0 0;padding-left:18px;color:#dce7ff}
+    li{margin:7px 0}
+    pre{background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.10);border-radius:14px;padding:12px;overflow:auto;color:#eaf1ff;margin:12px 0;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.9rem}
+    .callout{margin-top:14px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);border-radius:14px;padding:14px;color:#dce7ff}
+    .footer{border-top:1px solid rgba(255,255,255,.06);background:rgba(5,8,16,.58);padding:28px 0 18px;margin-top:28px;color:var(--muted);font-size:.9rem}
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <nav class="nav" aria-label="Main navigation">
+        <a class="brand" href="/index.html" aria-label="Sentinel Identity home">
+          <div class="brand-badge" aria-hidden="true"></div>
+          <div class="brand-text">
+            <strong>Sentinel Identity</strong>
+            <span>Entra ID & Microsoft 365 consulting</span>
+          </div>
+        </a>
+        <a class="btn btn-primary" href="/index.html#contact">Request an Assessment</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <article class="card">
+        <div class="meta">
+          <span>2026-03-02</span>
+          <span>Exchange Online</span>
+          <span>Outlook</span>
+          <span>Permissions</span>
+        </div>
+
+        <h1>Fix: “You don’t have permission to send messages from this mailbox” (Outlook app)</h1>
+
+        <p>
+          This error usually shows up when Outlook tries to send as a mailbox you do not have the right permission for,
+          or Outlook is holding onto stale permission state.
+        </p>
+
+        <h2>Understand the 3 permissions (most people mix them up)</h2>
+        <ul>
+          <li><strong>Full Access</strong>: lets you open the mailbox. It does not grant sending permission.</li>
+          <li><strong>Send As</strong>: email appears as if it came from the shared mailbox.</li>
+          <li><strong>Send on Behalf</strong>: email shows “User on behalf of Shared Mailbox”.</li>
+        </ul>
+
+        <div class="callout">
+          <strong>Common trap:</strong> The user has Full Access but does not have Send As or Send on Behalf.
+          Outlook lets them open the mailbox, then fails at send time.
+        </div>
+
+        <h2>Fast fix checklist (user side)</h2>
+        <ul>
+          <li>Confirm the From address is correct (the shared mailbox you expect).</li>
+          <li>Close Outlook fully and reopen it.</li>
+          <li>Sign out of Office apps and sign back in.</li>
+          <li>If it is Outlook desktop, try sending from Outlook on the web to compare behavior.</li>
+          <li>If it only fails in Outlook desktop, suspect cached auth or profile corruption.</li>
+        </ul>
+
+        <h2>Admin checklist (the real fix)</h2>
+        <ul>
+          <li>Confirm the user has <strong>Send As</strong> or <strong>Send on Behalf</strong> on that mailbox.</li>
+          <li>Wait for permission replication (it can take time).</li>
+          <li>If it still fails, force Outlook to refresh by removing and re-adding the mailbox or recreating the Outlook profile.</li>
+        </ul>
+
+        <h2>PowerShell: verify permissions</h2>
+        <p>Replace values before running.</p>
+        <pre>### Requires Exchange Online PowerShell
+# Connect-ExchangeOnline
+
+$SharedMailbox = "sharedmailbox@domain.com"
+$User = "user@domain.com"
+
+"Full Access:"
+Get-MailboxPermission -Identity $SharedMailbox |
+  Where-Object { $_.User -like "*$User*" -and $_.AccessRights -contains "FullAccess" } |
+  Format-Table User, AccessRights, IsInherited -Auto
+
+"Send As:"
+Get-RecipientPermission -Identity $SharedMailbox |
+  Where-Object { $_.Trustee -like "*$User*" -and $_.AccessRights -contains "SendAs" } |
+  Format-Table Trustee, AccessRights, IsInherited -Auto
+
+"Send on Behalf:"
+(Get-Mailbox -Identity $SharedMailbox).GrantSendOnBehalfTo</pre>
+
+        <h2>PowerShell: assign Send As (if missing)</h2>
+        <pre># Add Send As
+Add-RecipientPermission -Identity $SharedMailbox -Trustee $User -AccessRights SendAs -Confirm:$false</pre>
+
+        <h2>PowerShell: assign Send on Behalf (if that is what you want)</h2>
+        <pre># Add Send on Behalf
+Set-Mailbox -Identity $SharedMailbox -GrantSendOnBehalfTo @{Add=$User}</pre>
+
+        <div class="callout">
+          <strong>Still failing?</strong>
+          If permissions are correct but Outlook still throws the error, the next suspects are:
+          cached tokens, profile corruption, automapping weirdness, or multiple accounts in the same profile causing From confusion.
+        </div>
+
+        <div class="callout">
+          <strong>Need help?</strong>
+          If this is happening across multiple shared mailboxes or keeps coming back, we can standardize delegation and client behavior.
+          <br /><br />
+          <a class="btn btn-primary" href="/index.html#contact">Request an Assessment</a>
+        </div>
+      </article>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div>© 2026 Sentinel Identity · <a href="/blog.html">Back to blog</a></div>
+    </div>
+  </footer>
+</body>
+</html>
