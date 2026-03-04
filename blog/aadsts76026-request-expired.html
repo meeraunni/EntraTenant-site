@@ -4,16 +4,26 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AADSTS76026 The request has expired | Sentinel Identity</title>
-  <meta name="description" content="Fix AADSTS76026: The request has expired. Causes include stale sign-in links, back-button replays, clock skew, cached auth state, and proxy caching. Step-by-step troubleshooting checklist." />
+  <meta name="description" content="Fix AADSTS76026 (RequestIssueTimeExpired) for SAML SSO. Most common fix: set the Sign-on URL in the app’s Entra SAML configuration so My Apps launches create a fresh request." />
   <meta name="theme-color" content="#0b1020" />
+
   <style>
     :root{
-      --bg:#070b16; --text:#eaf1ff; --muted:#b9c6e4; --border:rgba(255,255,255,.12);
-      --surface:rgba(255,255,255,.06); --surface2:rgba(255,255,255,.04);
+      --bg:#070b16;
+      --text:#eaf1ff;
+      --muted:#b9c6e4;
+      --border:rgba(255,255,255,.12);
+      --surface:rgba(255,255,255,.06);
+      --surface2:rgba(255,255,255,.04);
       --accent: linear-gradient(90deg,#7a4dff 0%, #2d6bff 50%, #24c4ff 100%);
-      --max:980px; --radius:18px;
+      --shadow:0 20px 50px rgba(0,0,0,.25);
+      --max:980px;
+      --radius:18px;
     }
-    *{box-sizing:border-box} html,body{margin:0;padding:0}
+
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+
     body{
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
       color:var(--text);
@@ -21,34 +31,56 @@
         radial-gradient(1000px 500px at 8% -5%, rgba(122,77,255,.18), transparent 60%),
         radial-gradient(900px 500px at 95% 5%, rgba(36,196,255,.14), transparent 60%),
         linear-gradient(180deg, #070b16 0%, #091126 45%, #0b1328 100%);
-      line-height:1.55;
+      line-height:1.6;
     }
+
     a{color:inherit;text-decoration:none}
     .container{width:min(var(--max), calc(100% - 32px));margin:0 auto}
+
+    /* Header */
     .header{
       position:sticky; top:0; z-index:50;
       backdrop-filter: blur(12px);
       background: rgba(7,11,22,.72);
       border-bottom:1px solid rgba(255,255,255,.06);
     }
-    .nav{min-height:76px; display:flex; align-items:center; justify-content:space-between; gap:14px}
-    .brand{display:flex; align-items:center; gap:12px}
+    .nav{
+      min-height:76px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+    }
+    .brand{display:flex;align-items:center;gap:12px}
     .brand-badge{
-      width:36px; height:36px; border-radius:12px;
+      width:36px;height:36px;border-radius:12px;
       background:
         radial-gradient(circle at 25% 25%, rgba(255,255,255,.7), rgba(255,255,255,.1) 40%),
         linear-gradient(135deg, #24c4ff 0%, #2d6bff 45%, #7a4dff 100%);
       box-shadow: 0 0 0 1px rgba(255,255,255,.12) inset, 0 10px 25px rgba(45,107,255,.35);
+      flex:0 0 auto;
     }
     .brand-text strong{display:block;color:#fff;font-size:1rem;line-height:1.08}
     .brand-text span{display:block;color:var(--muted);font-size:.82rem}
+
     .btn{
-      display:inline-flex; align-items:center; justify-content:center;
-      border-radius:14px; padding:12px 18px; font-weight:800; font-size:.95rem;
-      border:0; cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:14px;
+      padding:12px 18px;
+      font-weight:800;
+      font-size:.95rem;
+      border:0;
+      cursor:pointer;
+      transition: transform .18s ease, box-shadow .18s ease;
     }
-    .btn-primary{background:var(--accent); color:#fff; box-shadow:0 12px 28px rgba(45,107,255,.35)}
+    .btn:hover{transform:translateY(-1px)}
+    .btn-primary{background:var(--accent);color:#fff;box-shadow:0 12px 28px rgba(45,107,255,.35)}
+    .btn-secondary{background: rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);color:#fff}
+
     main{padding:34px 0 46px}
+
     .card{
       background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
       border:1px solid rgba(255,255,255,.10);
@@ -56,13 +88,27 @@
       padding:18px;
       box-shadow: 0 14px 28px rgba(0,0,0,.16);
     }
-    .meta{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; color:#cfe0ff; font-size:.84rem}
-    .meta span{border:1px solid rgba(255,255,255,.10); background:rgba(255,255,255,.03); border-radius:999px; padding:5px 9px}
-    h1{margin:0; font-size:2rem; line-height:1.15; letter-spacing:-.02em}
-    h2{margin:22px 0 10px; font-size:1.25rem}
-    p{margin:10px 0; color:#dce7ff}
-    ul{margin:10px 0 0; padding-left:18px; color:#dce7ff}
+
+    .meta{
+      display:flex; flex-wrap:wrap; gap:8px;
+      margin-bottom:12px;
+      color:#cfe0ff;
+      font-size:.84rem;
+    }
+    .meta span{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      border-radius:999px;
+      padding:5px 9px;
+    }
+
+    h1{margin:0;font-size:2rem;line-height:1.15;letter-spacing:-.02em}
+    h2{margin:24px 0 10px;font-size:1.28rem}
+    h3{margin:18px 0 8px;font-size:1.05rem}
+    p{margin:10px 0;color:#dce7ff}
+    ul,ol{margin:10px 0 0;padding-left:18px;color:#dce7ff}
     li{margin:7px 0}
+
     .callout{
       margin-top:14px;
       border:1px solid rgba(255,255,255,.12);
@@ -71,10 +117,7 @@
       padding:14px;
       color:#dce7ff;
     }
-    code, pre{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size:.9rem;
-    }
+
     pre{
       background: rgba(0,0,0,.25);
       border:1px solid rgba(255,255,255,.10);
@@ -83,8 +126,31 @@
       overflow:auto;
       color:#eaf1ff;
       margin:12px 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size:.9rem;
     }
-    .toc a{color:#9fd8ff; font-weight:700}
+
+    .toc{
+      margin-top:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.03);
+      border-radius: 14px;
+      padding:14px;
+    }
+    .toc a{color:#9fd8ff;font-weight:800}
+    .toc ul{margin:8px 0 0}
+    .kbd{
+      display:inline-block;
+      padding:2px 8px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.03);
+      font-weight:800;
+      font-size:.86rem;
+      color:#eaf1ff;
+      white-space:nowrap;
+    }
+
     .footer{
       border-top:1px solid rgba(255,255,255,.06);
       background: rgba(5,8,16,.58);
@@ -94,8 +160,14 @@
       font-size:.9rem;
     }
     .footer a:hover{color:#fff}
+
+    @media (max-width: 560px){
+      .btn{width:100%}
+      .nav{flex-wrap:wrap}
+    }
   </style>
 </head>
+
 <body>
   <header class="header">
     <div class="container">
@@ -107,6 +179,7 @@
             <span>Entra ID & Microsoft 365 consulting</span>
           </div>
         </a>
+
         <a class="btn btn-primary" href="/index.html#contact">Request an Assessment</a>
       </nav>
     </div>
@@ -116,86 +189,127 @@
     <div class="container">
       <article class="card">
         <div class="meta">
-          <span>2026-03-02</span>
+          <span>2026-03-03</span>
           <span>Entra ID</span>
-          <span>Authentication</span>
-          <span>AADSTS</span>
+          <span>SAML SSO</span>
+          <span>AADSTS76026</span>
         </div>
 
-        <h1>How to resolve AADSTS76026: “The request has expired. Try to submit new request.”</h1>
+        <h1>AADSTS76026: The request has expired. Try to submit new request.</h1>
 
         <p>
-          This error almost always means one thing: the sign-in request you are trying to complete is no longer valid.
-          Not “your tenant is broken”, not “Microsoft is down”, just a stale auth request.
+          This error is a SAML timing problem.
+          Microsoft maps <strong>AADSTS76026</strong> to <strong>RequestIssueTimeExpired</strong>, meaning the <strong>IssueTime</strong> inside the SAML2 authentication request is expired. :contentReference[oaicite:2]{index=2}
         </p>
 
-        <div class="callout toc">
-          <strong>Quick navigation</strong>
+        <div class="callout">
+          <strong>The “real-world” symptom:</strong>
+          It often happens when users launch the app from <strong>My Apps</strong> (IdP-initiated) and the app configuration is missing a proper entry point.
+          The fix that usually stops it: set the <strong>Sign-on URL</strong> in the app’s SAML configuration.
+        </div>
+
+        <div class="toc" aria-label="Table of contents">
+          <strong>Table of contents</strong>
           <ul>
-            <li><a href="#what-it-means">What it means</a></li>
-            <li><a href="#fast-fix">Fast fix checklist</a></li>
-            <li><a href="#root-causes">Common root causes</a></li>
-            <li><a href="#admin-checks">Admin checks</a></li>
-            <li><a href="#prevention">Prevent it in the future</a></li>
+            <li><a href="#what-it-means">What this error means</a></li>
+            <li><a href="#common-scenario">Common scenario (My Apps launch)</a></li>
+            <li><a href="#main-fix">Main fix: set the Sign-on URL</a></li>
+            <li><a href="#verify">Verify the fix</a></li>
+            <li><a href="#other-causes">Other causes to check</a></li>
+            <li><a href="#wrap-up">Wrap up</a></li>
           </ul>
         </div>
 
-        <h2 id="what-it-means">What it means</h2>
+        <h2 id="what-it-means">What this error means</h2>
         <p>
-          Entra ID (Azure AD) uses short-lived values during interactive authentication (for example, an authorization code, state, nonce).
-          If the user tries to finish a sign-in using an old browser tab, an old link, or a cached page, Entra refuses it.
-          That refusal is what shows up as AADSTS76026.
+          In SAML SSO, the service provider (your app) generates a SAML AuthnRequest that includes a timestamp (IssueInstant / IssueTime).
+          Entra validates that timestamp. If the request looks “too old” (or gets replayed), Entra rejects it as expired. :contentReference[oaicite:3]{index=3}
         </p>
 
-        <h2 id="fast-fix">Fast fix checklist (do this first)</h2>
+        <h2 id="common-scenario">Common scenario: it works SP-initiated, fails from My Apps</h2>
+        <p>
+          You’ll see this pattern a lot:
+        </p>
         <ul>
-          <li><strong>Close all tabs</strong> for the app, M365 portal, and login.microsoftonline.com.</li>
-          <li>Open a <strong>fresh InPrivate/Incognito</strong> window and try the sign-in again.</li>
-          <li>Do not use the browser back button during the sign-in flow.</li>
-          <li>If it is a password reset or MFA registration flow, <strong>restart the process</strong> from the original app entry point.</li>
-          <li>Verify your device time is correct (clock skew can break auth flows).</li>
+          <li>SP-initiated login (starting from the app) works.</li>
+          <li>IdP-initiated login (user clicks the tile in My Apps) fails with AADSTS76026.</li>
         </ul>
+        <p>
+          When users click the tile in My Apps, Entra needs a reliable entry point to initiate the sign-in flow.
+          That’s where the <strong>Sign-on URL</strong> comes in.
+          The Sign-on URL is the application entry point used for user-initiated launches from Entra (including My Apps). :contentReference[oaicite:4]{index=4}
+        </p>
 
-        <h2 id="root-causes">Common root causes</h2>
-        <ul>
-          <li><strong>Stale sign-in link</strong>: user clicked an old email link, old bookmark, or reopened yesterday’s tab.</li>
-          <li><strong>Back button replay</strong>: user completed part of the flow, then navigated back and resubmitted.</li>
-          <li><strong>Proxy or gateway caching</strong>: a reverse proxy caches auth pages and serves old content.</li>
-          <li><strong>Long user delays</strong>: user started sign-in and waited too long before completing MFA or consent.</li>
-          <li><strong>Clock skew</strong>: device time is off by a few minutes.</li>
-          <li><strong>Multiple sessions</strong>: user is signed into multiple accounts and the browser mixes cookies.</li>
-        </ul>
+        <h2 id="main-fix">Main fix: specify the Sign-on URL in Entra SAML configuration</h2>
+        <p>
+          In the Enterprise Application:
+        </p>
 
-        <h2 id="admin-checks">Admin checks (when the fast fix does not work)</h2>
-        <p>These checks help you decide if this is a user behavior issue or a real configuration issue.</p>
-
-        <ul>
-          <li><strong>Sign-in logs</strong>: check the sign-in entry and confirm the failure is AADSTS76026.</li>
-          <li><strong>Conditional Access</strong>: confirm there is no policy forcing repeated reauthentication loops (Sign-in frequency, device compliance).</li>
-          <li><strong>Client type</strong>: see if it is happening in browser only, Outlook only, or a specific app.</li>
-          <li><strong>App configuration</strong>: for custom apps, verify redirect URI and that the app is not reusing old authorization responses.</li>
-        </ul>
+        <ol>
+          <li>Go to <span class="kbd">Entra admin center</span> → <span class="kbd">Enterprise applications</span>.</li>
+          <li>Select your application.</li>
+          <li>Go to <span class="kbd">Single sign-on</span> → choose <span class="kbd">SAML</span>.</li>
+          <li>In <span class="kbd">Basic SAML Configuration</span>, click <span class="kbd">Edit</span>.</li>
+          <li>Set <strong>Sign on URL</strong> to your app’s <strong>SP-initiated login URL</strong> (the page that starts SAML login).</li>
+          <li>Save.</li>
+        </ol>
 
         <div class="callout">
-          <strong>Tip for stubborn cases:</strong>
-          If only one app is affected and Incognito does not help, suspect caching or session handling in that app or its proxy.
-          If many apps are affected for the same user, suspect browser cookie chaos or device time.
+          <strong>What should the Sign-on URL be?</strong><br />
+          It should be the URL where your application starts the SAML login flow (your “login” or “SSO” landing endpoint).
+          Microsoft’s SAML setup guidance calls this the <strong>SP Initiated Login URL</strong> value. :contentReference[oaicite:5]{index=5}
         </div>
 
-        <h2 id="prevention">Prevent it in the future</h2>
+        <p>
+          Why this resolves AADSTS76026 in this scenario:
+          clicking the app tile now sends the user to a proper entry point that generates a <strong>fresh</strong> AuthnRequest,
+          instead of a stale/replayed request flow.
+        </p>
+
+        <h2 id="verify">Verify the fix</h2>
+        <ol>
+          <li>Open a new InPrivate window (fresh cookies).</li>
+          <li>Go to <span class="kbd">myapps.microsoft.com</span>.</li>
+          <li>Click your app tile.</li>
+          <li>You should be redirected to the Sign-on URL and then signed in successfully.</li>
+        </ol>
+
+        <h3>Optional: validate in sign-in logs</h3>
         <ul>
-          <li>Train users: “If sign-in fails, close the tab and start again.”</li>
-          <li>Avoid sending “deep” auth links that expire quickly.</li>
-          <li>On reverse proxies, disable caching for auth endpoints and callback URLs.</li>
-          <li>For custom apps, ensure you never reuse an authorization code or replay an old state/nonce.</li>
+          <li>Entra admin center → <span class="kbd">Sign-in logs</span></li>
+          <li>Find the failed attempt timestamp</li>
+          <li>Confirm the error stops occurring after the change</li>
+        </ul>
+
+        <h2 id="other-causes">Other causes to check (if Sign-on URL doesn’t fix it)</h2>
+        <ul>
+          <li><strong>Clock skew</strong> on the server generating AuthnRequests (or on the user device) can make IssueInstant look “too old”. :contentReference[oaicite:6]{index=6}</li>
+          <li><strong>Proxy or caching layer</strong> accidentally replaying an auth request.</li>
+          <li><strong>Signed request validation</strong> issues can surface as timing-related failures when signatures are validated against strict windows (common in SAML).</li>
         </ul>
 
         <div class="callout">
-          <strong>Need help?</strong>
-          If this is happening repeatedly for a group of users or one business-critical app, we can trace the sign-in flow end-to-end and tighten the tenant controls without locking people out.
+          <strong>Practical rule:</strong>
+          If it fails only from My Apps, start with Sign-on URL.
+          If it fails everywhere, check time sync and replay/caching behavior first.
+        </div>
+
+        <h2 id="wrap-up">Wrap up</h2>
+        <p>
+          AADSTS76026 is an “expired request” error in SAML, not a mysterious tenant curse. :contentReference[oaicite:7]{index=7}
+          If your app works SP-initiated but fails from My Apps, setting the Enterprise App’s <strong>Sign-on URL</strong>
+          is the first fix to apply. :contentReference[oaicite:8]{index=8}
+        </p>
+
+        <div class="callout">
+          <strong>Want this fixed cleanly?</strong>
+          If you want someone to sanity-check the full SAML setup (Identifier, Reply URL, Sign-on URL, claims, certs, and user impact),
+          I can help you stabilize it without creating a “works only on Tuesdays” SSO configuration.
           <br /><br />
           <a class="btn btn-primary" href="/index.html#contact">Request an Assessment</a>
+          <a class="btn btn-secondary" href="/blog.html" style="margin-left:8px;">Back to Blog</a>
         </div>
+
       </article>
     </div>
   </main>
