@@ -3,40 +3,152 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Recall a message using Microsoft Defender | Sentinel Identity</title>
-  <meta name="description" content="Outlook recall is unreliable. Learn the real modern approach: use Microsoft Defender for Office 365 (Explorer, remediation actions, purge) to remove or neutralize an email tenant-wide." />
-  <meta name="theme-color" content="#0b1020" />
+  <title>Recall an email using Microsoft Defender | Sentinel Identity</title>
+  <meta name="description" content="How to remove or neutralize an email using Microsoft Defender for Office 365. Find it in Explorer, take action, verify remediation, and prevent repeats." />
+  <meta name="theme-color" content="#ffffff" />
+
   <style>
-    :root{--bg:#070b16;--text:#eaf1ff;--muted:#b9c6e4;--accent:linear-gradient(90deg,#7a4dff 0%, #2d6bff 50%, #24c4ff 100%);--max:980px;--radius:18px}
-    *{box-sizing:border-box} html,body{margin:0;padding:0}
-    body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--text);
-      background:radial-gradient(1000px 500px at 8% -5%, rgba(122,77,255,.18), transparent 60%),
-      radial-gradient(900px 500px at 95% 5%, rgba(36,196,255,.14), transparent 60%),
-      linear-gradient(180deg, #070b16 0%, #091126 45%, #0b1328 100%);line-height:1.55}
-    a{color:inherit;text-decoration:none}
+    :root{
+      --bg:#ffffff;
+      --bg2:#f6f7fb;
+      --card:#ffffff;
+      --border:#e6e8ef;
+      --text:#111827;
+      --muted:#6b7280;
+      --link:#2563eb;
+      --chip:#f3f4f6;
+      --shadow: 0 10px 25px rgba(17,24,39,.06);
+      --radius:16px;
+      --max:980px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);
+      background:var(--bg);
+      line-height:1.6;
+    }
+    a{color:var(--link);text-decoration:none}
+    a:hover{text-decoration:underline}
     .container{width:min(var(--max), calc(100% - 32px));margin:0 auto}
-    .header{position:sticky;top:0;z-index:50;backdrop-filter:blur(12px);background:rgba(7,11,22,.72);border-bottom:1px solid rgba(255,255,255,.06)}
-    .nav{min-height:76px;display:flex;align-items:center;justify-content:space-between;gap:14px}
-    .brand{display:flex;align-items:center;gap:12px}
-    .brand-badge{width:36px;height:36px;border-radius:12px;background:radial-gradient(circle at 25% 25%, rgba(255,255,255,.7), rgba(255,255,255,.1) 40%),linear-gradient(135deg,#24c4ff 0%,#2d6bff 45%,#7a4dff 100%);box-shadow:0 0 0 1px rgba(255,255,255,.12) inset,0 10px 25px rgba(45,107,255,.35)}
-    .brand-text strong{display:block;color:#fff;font-size:1rem;line-height:1.08}
-    .brand-text span{display:block;color:var(--muted);font-size:.82rem}
-    .btn{display:inline-flex;align-items:center;justify-content:center;border-radius:14px;padding:12px 18px;font-weight:800;font-size:.95rem;border:0;cursor:pointer}
-    .btn-primary{background:var(--accent);color:#fff;box-shadow:0 12px 28px rgba(45,107,255,.35)}
-    main{padding:34px 0 46px}
-    .card{background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.10);border-radius:var(--radius);padding:18px;box-shadow:0 14px 28px rgba(0,0,0,.16)}
-    .meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;color:#cfe0ff;font-size:.84rem}
-    .meta span{border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.03);border-radius:999px;padding:5px 9px}
-    h1{margin:0;font-size:2rem;line-height:1.15;letter-spacing:-.02em}
-    h2{margin:22px 0 10px;font-size:1.25rem}
-    p{margin:10px 0;color:#dce7ff}
-    ul{margin:10px 0 0;padding-left:18px;color:#dce7ff}
+
+    /* Header */
+    .header{
+      position:sticky; top:0; z-index:50;
+      background:rgba(255,255,255,.92);
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid var(--border);
+    }
+    .nav{min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+    .brand{display:flex;align-items:center;gap:12px;min-width:0;color:inherit}
+    .brand-badge{
+      width:34px;height:34px;border-radius:10px;
+      background: linear-gradient(135deg, #2563eb 0%, #7c3aed 60%, #06b6d4 100%);
+      box-shadow: 0 0 0 1px rgba(0,0,0,.06) inset;
+      flex:0 0 auto;
+    }
+    .brand-text strong{display:block;font-size:.98rem;letter-spacing:.01em;color:#111827}
+    .brand-text span{display:block;font-size:.82rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:420px}
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;
+      padding:11px 14px;border-radius:12px;border:1px solid var(--border);
+      background:#fff;font-weight:800;font-size:.92rem;color:#111827;
+      cursor:pointer;transition:transform .15s ease, box-shadow .15s ease;
+    }
+    .btn:hover{transform:translateY(-1px);box-shadow:var(--shadow);text-decoration:none}
+    .btn-primary{
+      border:0;color:#fff;
+      background: linear-gradient(90deg, #2563eb 0%, #7c3aed 60%, #06b6d4 100%);
+    }
+
+    /* Hero */
+    .hero{
+      background: linear-gradient(180deg, #ffffff 0%, #f7f8fc 100%);
+      border-bottom:1px solid var(--border);
+    }
+    .hero-inner{padding:28px 0 18px}
+    .kicker{display:flex;gap:10px;align-items:center;color:var(--muted);font-weight:800;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase}
+    .dot{width:8px;height:8px;border-radius:999px;background:#2563eb}
+    h1{margin:10px 0 0;font-size:clamp(1.8rem, 3.2vw, 2.35rem);letter-spacing:-.02em;line-height:1.12}
+    .subtitle{margin:10px 0 0;color:var(--muted);max-width:72ch}
+
+    /* Content */
+    main{padding:22px 0 52px}
+    .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+    .meta span{
+      background:var(--chip);
+      border:1px solid var(--border);
+      color:#374151;
+      font-weight:800;
+      font-size:.82rem;
+      border-radius:999px;
+      padding:5px 9px;
+    }
+    .article{
+      margin-top:16px;
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .cover{
+      width:100%;
+      aspect-ratio: 16/6;
+      background:#e5e7eb;
+      overflow:hidden;
+    }
+    .cover img{width:100%;height:100%;object-fit:cover;display:block}
+    .body{padding:18px}
+    h2{margin:22px 0 10px;font-size:1.25rem;letter-spacing:-.01em}
+    h3{margin:16px 0 8px;font-size:1.02rem}
+    p{margin:10px 0;color:#111827}
+    ul,ol{margin:10px 0 0;padding-left:18px}
     li{margin:7px 0}
-    pre{background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.10);border-radius:14px;padding:12px;overflow:auto;color:#eaf1ff;margin:12px 0;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.9rem}
-    .callout{margin-top:14px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);border-radius:14px;padding:14px;color:#dce7ff}
-    .footer{border-top:1px solid rgba(255,255,255,.06);background:rgba(5,8,16,.58);padding:28px 0 18px;margin-top:28px;color:var(--muted);font-size:.9rem}
+    .callout{
+      margin-top:14px;
+      border:1px solid var(--border);
+      background:var(--bg2);
+      border-radius:14px;
+      padding:14px;
+    }
+    .toc{
+      margin-top:14px;
+      border:1px solid var(--border);
+      background:#fff;
+      border-radius:14px;
+      padding:14px;
+    }
+    .toc a{font-weight:900}
+    pre{
+      margin:12px 0;
+      padding:12px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background:#0b1220;
+      color:#eaf1ff;
+      overflow:auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size:.9rem;
+    }
+    code{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace}
+    .divider{height:1px;background:var(--border);margin:18px 0}
+    .footer{
+      border-top:1px solid var(--border);
+      padding:22px 0 18px;
+      color:var(--muted);
+      font-size:.9rem;
+      background:#fff;
+    }
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    @media (max-width:560px){
+      .btn{width:100%}
+      .cover{aspect-ratio:16/9}
+    }
   </style>
 </head>
+
 <body>
   <header class="header">
     <div class="container">
@@ -53,101 +165,123 @@
     </div>
   </header>
 
+  <section class="hero">
+    <div class="container hero-inner">
+      <div class="kicker"><span class="dot"></span> Microsoft Defender</div>
+      <h1>How to recall an email using Microsoft Defender</h1>
+      <p class="subtitle">
+        Outlook recall is inconsistent. Defender remediation is the practical way: find the message everywhere, take action, and verify the result.
+      </p>
+
+      <div class="meta" aria-label="Post metadata">
+        <span>2026-03-03</span>
+        <span>5 min read</span>
+        <span>Email security</span>
+      </div>
+    </div>
+  </section>
+
   <main>
     <div class="container">
-      <article class="card">
-        <div class="meta">
-          <span>2026-03-02</span>
-          <span>Microsoft Defender</span>
-          <span>Email Security</span>
-          <span>M365</span>
+      <article class="article">
+        <div class="cover">
+          <img src="https://images.unsplash.com/photo-1555949963-aa79dcee981c?auto=format&fit=crop&w=1600&q=80" alt="Security monitoring dashboard on screens" />
         </div>
 
-        <h1>How to “recall” a message using Microsoft Defender (the real way)</h1>
+        <div class="body">
+          <div class="callout">
+            <strong>Quick definition:</strong>
+            In Defender, “recall” means remediation. You locate the email and remove it (or move it) from user mailboxes.
+          </div>
 
-        <p>
-          Outlook recall is unreliable and depends on client conditions that you do not control.
-          If your goal is “get that email out of mailboxes,” you want a security remediation approach.
-        </p>
-
-        <div class="callout">
-          <strong>Translation:</strong> Defender is not “recall.” Defender is “find the message everywhere and remove or neutralize it.”
-        </div>
-
-        <h2>What you can actually do with Defender</h2>
-        <ul>
-          <li><strong>Locate</strong> the message across recipients.</li>
-          <li><strong>Remediate</strong> by moving to Junk, soft delete, quarantine, or deleting from mailboxes.</li>
-          <li><strong>Block</strong> the sender, domain, URL, or attachment hash if it is malicious.</li>
-          <li><strong>Investigate</strong> related messages (campaign view).</li>
-        </ul>
-
-        <h2>Step-by-step: remove the message tenant-wide</h2>
-        <ul>
-          <li>Open the <strong>Microsoft Defender portal</strong>.</li>
-          <li>Go to <strong>Email & collaboration</strong> and open <strong>Explorer</strong> (or Real-time detections if that is your setup).</li>
-          <li>Search using something reliable:
+          <div class="toc" aria-label="Table of contents">
+            <strong>Table of contents</strong>
             <ul>
-              <li>Subject</li>
-              <li>Sender</li>
-              <li>Recipient</li>
-              <li>Message ID (best if you have it)</li>
+              <li><a href="#prereqs">Prerequisites</a></li>
+              <li><a href="#find">Step 1: Find the email</a></li>
+              <li><a href="#action">Step 2: Take action</a></li>
+              <li><a href="#verify">Step 3: Verify</a></li>
+              <li><a href="#when-not">When this won’t help</a></li>
+              <li><a href="#prevention">Prevent repeats</a></li>
             </ul>
-          </li>
-          <li>Select the message results.</li>
-          <li>Use <strong>Take action</strong>:
-            <ul>
-              <li><strong>Move to Junk</strong> for nuisance messages</li>
-              <li><strong>Soft delete</strong> for “remove it now” scenarios</li>
-              <li><strong>Quarantine</strong> if you want it recoverable with oversight</li>
-            </ul>
-          </li>
-          <li>Verify in Explorer that the remediation completed successfully.</li>
-        </ul>
+          </div>
 
-        <h2>When you need stronger removal (purge behavior)</h2>
-        <p>
-          Sometimes you need a more aggressive “purge” behavior for a known bad message.
-          Depending on licensing and configuration, your org may use compliance search and purge workflows as the stronger tool.
-        </p>
+          <h2 id="prereqs">Prerequisites</h2>
+          <ul>
+            <li>Access to Microsoft Defender portal.</li>
+            <li>Permission to search and remediate email (role depends on your tenant setup).</li>
+            <li>Message details: subject, sender, recipient, time window, or Message ID.</li>
+          </ul>
 
-        <div class="callout">
-          <strong>Operational tip:</strong> If this is a security incident, document the message ID, timestamps, and the remediation action you took.
-          It saves you later when someone asks “what happened?”.
-        </div>
+          <h2 id="find">Step 1: Find the email</h2>
+          <ol>
+            <li>Open the Defender portal.</li>
+            <li>Go to <strong>Email &amp; collaboration</strong> → <strong>Explorer</strong> (sometimes called Threat Explorer).</li>
+            <li>Search using the best identifier you have:
+              <ul>
+                <li><strong>Message ID</strong> (best)</li>
+                <li>Sender address</li>
+                <li>Subject</li>
+                <li>Recipient</li>
+              </ul>
+            </li>
+            <li>Confirm it is the exact message (timestamp + sender domain + subject).</li>
+          </ol>
 
-        <h2>Checklist: what to capture before you delete it</h2>
-        <ul>
-          <li>Message ID</li>
-          <li>Sender address and domain</li>
-          <li>Recipients count</li>
-          <li>URLs and attachment names</li>
-          <li>Delivery time</li>
-          <li>Action taken (soft delete, quarantine, etc.)</li>
-        </ul>
+          <h2 id="action">Step 2: Take action</h2>
+          <p>Pick the action based on the goal:</p>
+          <ul>
+            <li><strong>Move to Junk</strong>: low risk, reversible.</li>
+            <li><strong>Soft delete</strong>: remove from mailbox, recoverable by admins.</li>
+            <li><strong>Hard delete</strong>: aggressive removal. Use only when needed.</li>
+          </ul>
 
-        <h2>Prevent repeats</h2>
-        <ul>
-          <li>Create or tighten an anti-phishing policy if this was impersonation.</li>
-          <li>Block sender domain if it is clearly abusive.</li>
-          <li>Use Safe Links and Safe Attachments where possible.</li>
-          <li>Train users to report suspicious messages fast.</li>
-        </ul>
+          <ol>
+            <li>Select the message(s) in Explorer.</li>
+            <li>Click <strong>Take action</strong>.</li>
+            <li>Choose the remediation action and submit.</li>
+            <li>Document what you did (subject, sender, time, action, scope).</li>
+          </ol>
 
-        <div class="callout">
-          <strong>Need help?</strong>
-          If your tenant has frequent “oops email” events or recurring phishing campaigns, we can tune your policies so remediation is faster and less manual.
-          <br /><br />
-          <a class="btn btn-primary" href="/index.html#contact">Request an Assessment</a>
+          <h2 id="verify">Step 3: Verify</h2>
+          <ul>
+            <li>Refresh Explorer results and check action status.</li>
+            <li>Spot check one recipient mailbox to confirm the message is gone or moved.</li>
+            <li>If users clicked links, treat as an incident: reset passwords, revoke sessions, investigate sign-ins.</li>
+          </ul>
+
+          <h2 id="when-not">When this won’t help</h2>
+          <ul>
+            <li>If the email was sent externally and users already copied the content elsewhere.</li>
+            <li>If the “damage” is already done (credential entry, malware execution).</li>
+            <li>If you don’t have the right licensing or permissions for remediation actions.</li>
+          </ul>
+
+          <h2 id="prevention">Prevent repeats</h2>
+          <ul>
+            <li>Tune anti-phishing and anti-spam policies.</li>
+            <li>Enable and enforce reporting (“Report message”).</li>
+            <li>Review Safe Links / Safe Attachments if available.</li>
+            <li>Run awareness training for common patterns (invoice, password reset, DocShare).</li>
+          </ul>
+
+          <div class="divider"></div>
+
+          <div class="callout">
+            <strong>Need help?</strong>
+            If you want a repeatable remediation playbook (fast and auditable), we can build one for your tenant.
+            <div class="actions">
+              <a class="btn btn-primary" href="/index.html#contact">Request an Assessment</a>
+              <a class="btn" href="/blog.html">Back to Blog</a>
+            </div>
+          </div>
         </div>
       </article>
     </div>
   </main>
 
   <footer class="footer">
-    <div class="container">
-      <div>© 2026 Sentinel Identity · <a href="/blog.html">Back to blog</a></div>
-    </div>
+    <div class="container">© 2026 Sentinel Identity · <a href="/blog.html">Blog</a></div>
   </footer>
 </body>
 </html>
