@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Recall an email using Microsoft Defender | Sentinel Identity</title>
-  <meta name="description" content="How to remove or neutralize an email using Microsoft Defender for Office 365. Find it in Explorer, take action, verify remediation, and prevent repeats." />
+  <meta name="description" content="Outlook recall is unreliable. This guide shows how to find an email in Threat Explorer (Explorer) and remediate it using Microsoft Defender for Office 365, plus AIR review/approval and alert policies." />
   <meta name="theme-color" content="#ffffff" />
 
   <style>
@@ -68,23 +68,26 @@
       border-bottom:1px solid var(--border);
     }
     .hero-inner{padding:28px 0 18px}
-    .kicker{display:flex;gap:10px;align-items:center;color:var(--muted);font-weight:800;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase}
+    .kicker{
+      display:flex;gap:10px;align-items:center;color:var(--muted);
+      font-weight:900;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;
+    }
     .dot{width:8px;height:8px;border-radius:999px;background:#2563eb}
     h1{margin:10px 0 0;font-size:clamp(1.8rem, 3.2vw, 2.35rem);letter-spacing:-.02em;line-height:1.12}
-    .subtitle{margin:10px 0 0;color:var(--muted);max-width:72ch}
+    .subtitle{margin:10px 0 0;color:var(--muted);max-width:78ch}
 
-    /* Content */
     main{padding:22px 0 52px}
     .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
     .meta span{
       background:var(--chip);
       border:1px solid var(--border);
       color:#374151;
-      font-weight:800;
+      font-weight:900;
       font-size:.82rem;
       border-radius:999px;
       padding:5px 9px;
     }
+
     .article{
       margin-top:16px;
       background:var(--card);
@@ -101,11 +104,13 @@
     }
     .cover img{width:100%;height:100%;object-fit:cover;display:block}
     .body{padding:18px}
+
     h2{margin:22px 0 10px;font-size:1.25rem;letter-spacing:-.01em}
     h3{margin:16px 0 8px;font-size:1.02rem}
-    p{margin:10px 0;color:#111827}
+    p{margin:10px 0}
     ul,ol{margin:10px 0 0;padding-left:18px}
     li{margin:7px 0}
+
     .callout{
       margin-top:14px;
       border:1px solid var(--border);
@@ -113,6 +118,7 @@
       border-radius:14px;
       padding:14px;
     }
+
     .toc{
       margin-top:14px;
       border:1px solid var(--border);
@@ -121,6 +127,7 @@
       padding:14px;
     }
     .toc a{font-weight:900}
+
     pre{
       margin:12px 0;
       padding:12px;
@@ -133,7 +140,20 @@
       font-size:.9rem;
     }
     code{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace}
+
     .divider{height:1px;background:var(--border);margin:18px 0}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+
+    .refs{
+      margin-top:18px;
+      border-top:1px solid var(--border);
+      padding-top:14px;
+      color:var(--muted);
+      font-size:.95rem;
+    }
+    .refs ul{color:var(--muted)}
+    .refs a{font-weight:800}
+
     .footer{
       border-top:1px solid var(--border);
       padding:22px 0 18px;
@@ -141,7 +161,7 @@
       font-size:.9rem;
       background:#fff;
     }
-    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+
     @media (max-width:560px){
       .btn{width:100%}
       .cover{aspect-ratio:16/9}
@@ -165,18 +185,18 @@
     </div>
   </header>
 
-  <section class="hero">
+  <section class="hero" aria-label="Article header">
     <div class="container hero-inner">
-      <div class="kicker"><span class="dot"></span> Microsoft Defender</div>
+      <div class="kicker"><span class="dot"></span> Microsoft Defender for Office 365</div>
       <h1>How to recall an email using Microsoft Defender</h1>
       <p class="subtitle">
-        Outlook recall is inconsistent. Defender remediation is the practical way: find the message everywhere, take action, and verify the result.
+        Outlook recall is inconsistent. The modern approach is remediation: find the message in Explorer (Threat Explorer) and take action (move, soft delete, hard delete).
       </p>
 
       <div class="meta" aria-label="Post metadata">
         <span>2026-03-03</span>
         <span>5 min read</span>
-        <span>Email security</span>
+        <span>Email remediation</span>
       </div>
     </div>
   </section>
@@ -185,96 +205,116 @@
     <div class="container">
       <article class="article">
         <div class="cover">
-          <img src="https://images.unsplash.com/photo-1555949963-aa79dcee981c?auto=format&fit=crop&w=1600&q=80" alt="Security monitoring dashboard on screens" />
+          <img src="https://images.unsplash.com/photo-1555949963-aa79dcee981c?auto=format&fit=crop&w=1600&q=80" alt="Security monitoring dashboard" />
         </div>
 
         <div class="body">
+
           <div class="callout">
-            <strong>Quick definition:</strong>
-            In Defender, “recall” means remediation. You locate the email and remove it (or move it) from user mailboxes.
+            <strong>Quick definition:</strong> In Defender, “recall” means you remediate delivered mail.
+            You locate the message and remove it (or move it) from recipient mailboxes.
           </div>
 
           <div class="toc" aria-label="Table of contents">
             <strong>Table of contents</strong>
             <ul>
+              <li><a href="#when-to-use">When to use Defender vs Outlook recall</a></li>
               <li><a href="#prereqs">Prerequisites</a></li>
-              <li><a href="#find">Step 1: Find the email</a></li>
-              <li><a href="#action">Step 2: Take action</a></li>
-              <li><a href="#verify">Step 3: Verify</a></li>
-              <li><a href="#when-not">When this won’t help</a></li>
-              <li><a href="#prevention">Prevent repeats</a></li>
+              <li><a href="#find">Step 1: Find the email in Explorer</a></li>
+              <li><a href="#take-action">Step 2: Take action (move / soft delete / hard delete)</a></li>
+              <li><a href="#air">If actions require approval (AIR)</a></li>
+              <li><a href="#verify">Step 3: Verify and document</a></li>
+              <li><a href="#prevention">Prevention: policies and alerting</a></li>
             </ul>
           </div>
 
-          <h2 id="prereqs">Prerequisites</h2>
+          <h2 id="when-to-use">When to use Defender vs Outlook recall</h2>
           <ul>
-            <li>Access to Microsoft Defender portal.</li>
-            <li>Permission to search and remediate email (role depends on your tenant setup).</li>
-            <li>Message details: subject, sender, recipient, time window, or Message ID.</li>
+            <li><strong>Outlook recall</strong>: best-effort, client-dependent, not reliable for incident response.</li>
+            <li><strong>Defender remediation</strong>: centralized, auditable, works even if users never opened the message.</li>
           </ul>
 
-          <h2 id="find">Step 1: Find the email</h2>
+          <h2 id="prereqs">Prerequisites</h2>
+          <ul>
+            <li>Access to Microsoft Defender portal (<code>https://security.microsoft.com</code>).</li>
+            <li>Defender for Office 365 features available in your tenant (Explorer / remediation actions vary by licensing).</li>
+            <li>At least one identifier: subject, sender, recipient, time window, or Message ID.</li>
+          </ul>
+
+          <h2 id="find">Step 1: Find the email in Explorer (Threat Explorer)</h2>
           <ol>
-            <li>Open the Defender portal.</li>
-            <li>Go to <strong>Email &amp; collaboration</strong> → <strong>Explorer</strong> (sometimes called Threat Explorer).</li>
-            <li>Search using the best identifier you have:
+            <li>Open Microsoft Defender portal.</li>
+            <li>Go to <strong>Email &amp; collaboration</strong> → <strong>Explorer</strong>.</li>
+            <li>Search using the strongest signal you have:
               <ul>
                 <li><strong>Message ID</strong> (best)</li>
-                <li>Sender address</li>
+                <li>Sender address / domain</li>
                 <li>Subject</li>
                 <li>Recipient</li>
               </ul>
             </li>
-            <li>Confirm it is the exact message (timestamp + sender domain + subject).</li>
+            <li>Open the message details to confirm it’s the correct mail.</li>
           </ol>
 
-          <h2 id="action">Step 2: Take action</h2>
-          <p>Pick the action based on the goal:</p>
+          <h2 id="take-action">Step 2: Take action (move / soft delete / hard delete)</h2>
+          <p>In Explorer, select the message(s), then choose <strong>Take action</strong>. Typical actions include:</p>
           <ul>
-            <li><strong>Move to Junk</strong>: low risk, reversible.</li>
-            <li><strong>Soft delete</strong>: remove from mailbox, recoverable by admins.</li>
-            <li><strong>Hard delete</strong>: aggressive removal. Use only when needed.</li>
+            <li><strong>Move to Junk / Inbox / Deleted Items</strong> (low risk, reversible)</li>
+            <li><strong>Soft delete</strong> (removes from mailbox, still recoverable)</li>
+            <li><strong>Hard delete</strong> (aggressive removal)</li>
           </ul>
 
+          <div class="callout">
+            <strong>Tip:</strong> Name your remediation action clearly (example: “Invoice phishing – March 2026”) so you can track it later.
+          </div>
+
+          <h2 id="air">If actions require approval (AIR)</h2>
+          <p>
+            Some environments use Automated Investigation and Response (AIR), where actions can require approval before they execute.
+            Review and approve pending actions in the Investigations workflow.
+          </p>
+
+          <h2 id="verify">Step 3: Verify and document</h2>
           <ol>
-            <li>Select the message(s) in Explorer.</li>
-            <li>Click <strong>Take action</strong>.</li>
-            <li>Choose the remediation action and submit.</li>
-            <li>Document what you did (subject, sender, time, action, scope).</li>
+            <li>Refresh Explorer results and confirm action status.</li>
+            <li>Spot-check one mailbox to confirm the message is removed/moved.</li>
+            <li>Document:
+              <ul>
+                <li>Sender, subject, time window</li>
+                <li>Scope (how many recipients)</li>
+                <li>Action taken (soft delete, hard delete, move)</li>
+                <li>Any follow-up (password reset, session revoke, sign-in investigation)</li>
+              </ul>
+            </li>
           </ol>
 
-          <h2 id="verify">Step 3: Verify</h2>
+          <h2 id="prevention">Prevention: policies and alerting</h2>
           <ul>
-            <li>Refresh Explorer results and check action status.</li>
-            <li>Spot check one recipient mailbox to confirm the message is gone or moved.</li>
-            <li>If users clicked links, treat as an incident: reset passwords, revoke sessions, investigate sign-ins.</li>
-          </ul>
-
-          <h2 id="when-not">When this won’t help</h2>
-          <ul>
-            <li>If the email was sent externally and users already copied the content elsewhere.</li>
-            <li>If the “damage” is already done (credential entry, malware execution).</li>
-            <li>If you don’t have the right licensing or permissions for remediation actions.</li>
-          </ul>
-
-          <h2 id="prevention">Prevent repeats</h2>
-          <ul>
-            <li>Tune anti-phishing and anti-spam policies.</li>
-            <li>Enable and enforce reporting (“Report message”).</li>
-            <li>Review Safe Links / Safe Attachments if available.</li>
-            <li>Run awareness training for common patterns (invoice, password reset, DocShare).</li>
+            <li>Use <strong>Alert policies</strong> to notify admins when risky email activity occurs.</li>
+            <li>Use AIR workflows to speed response and reduce manual effort.</li>
+            <li>Harden anti-phishing and anti-spam settings based on patterns you see.</li>
           </ul>
 
           <div class="divider"></div>
 
           <div class="callout">
-            <strong>Need help?</strong>
-            If you want a repeatable remediation playbook (fast and auditable), we can build one for your tenant.
+            <strong>Need help?</strong> If you want a repeatable “find → remediate → verify” runbook, we can build one for your tenant.
             <div class="actions">
               <a class="btn btn-primary" href="/index.html#contact">Request an Assessment</a>
               <a class="btn" href="/blog.html">Back to Blog</a>
             </div>
           </div>
+
+          <div class="refs">
+            <strong>Microsoft references</strong>
+            <ul>
+              <li><a href="https://learn.microsoft.com/en-us/defender-office-365/step-by-step-guides/search-for-emails-and-remediate-threats" target="_blank" rel="noopener">Search for emails and remediate threats (Threat Explorer)</a></li>
+              <li><a href="https://learn.microsoft.com/en-us/defender-office-365/remediate-malicious-email-delivered-office-365" target="_blank" rel="noopener">Remediate malicious email that was delivered</a></li>
+              <li><a href="https://learn.microsoft.com/en-us/defender-office-365/air-review-approve-pending-completed-actions" target="_blank" rel="noopener">Review and approve pending/completed actions (AIR)</a></li>
+              <li><a href="https://learn.microsoft.com/en-us/defender-office-365/alert-policies-defender-portal" target="_blank" rel="noopener">Alert policies in the Microsoft Defender portal</a></li>
+            </ul>
+          </div>
+
         </div>
       </article>
     </div>
