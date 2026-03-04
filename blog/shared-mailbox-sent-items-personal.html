@@ -3,45 +3,70 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Shared mailbox Sent Items in personal mailbox | Sentinel Identity</title>
-  <meta name="description" content="Fix sent mail from a shared mailbox saving to a user's personal Sent Items. Learn how Send As vs Send on Behalf behaves, and how to enable shared mailbox sent item copies in Exchange Online." />
-  <meta name="theme-color" content="#0b1020" />
+  <title>Shared mailbox sent mail appears in personal Sent Items | Sentinel Identity</title>
+  <meta name="description" content="Why sent mail from a shared mailbox shows up in personal Sent Items, and how to enable sent item copies in the shared mailbox using MessageCopyForSentAsEnabled and MessageCopyForSendOnBehalfEnabled." />
+  <meta name="theme-color" content="#ffffff" />
+
   <style>
-    :root{--text:#eaf1ff;--muted:#b9c6e4;--accent:linear-gradient(90deg,#7a4dff 0%, #2d6bff 50%, #24c4ff 100%);--max:980px;--radius:18px}
+    :root{
+      --bg:#ffffff; --bg2:#f6f7fb; --card:#ffffff; --border:#e6e8ef;
+      --text:#111827; --muted:#6b7280; --link:#2563eb; --chip:#f3f4f6;
+      --shadow: 0 10px 25px rgba(17,24,39,.06); --radius:16px; --max:980px;
+    }
     *{box-sizing:border-box} html,body{margin:0;padding:0}
-    body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--text);
-      background:radial-gradient(1000px 500px at 8% -5%, rgba(122,77,255,.18), transparent 60%),
-      radial-gradient(900px 500px at 95% 5%, rgba(36,196,255,.14), transparent 60%),
-      linear-gradient(180deg, #070b16 0%, #091126 45%, #0b1328 100%);line-height:1.55}
-    a{color:inherit;text-decoration:none}
+    body{font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:var(--text);background:var(--bg);line-height:1.6}
+    a{color:var(--link);text-decoration:none} a:hover{text-decoration:underline}
     .container{width:min(var(--max), calc(100% - 32px));margin:0 auto}
-    .header{position:sticky;top:0;z-index:50;backdrop-filter:blur(12px);background:rgba(7,11,22,.72);border-bottom:1px solid rgba(255,255,255,.06)}
-    .nav{min-height:76px;display:flex;align-items:center;justify-content:space-between;gap:14px}
-    .brand{display:flex;align-items:center;gap:12px}
-    .brand-badge{width:36px;height:36px;border-radius:12px;background:radial-gradient(circle at 25% 25%, rgba(255,255,255,.7), rgba(255,255,255,.1) 40%),linear-gradient(135deg,#24c4ff 0%,#2d6bff 45%,#7a4dff 100%);box-shadow:0 0 0 1px rgba(255,255,255,.12) inset,0 10px 25px rgba(45,107,255,.35)}
-    .brand-text strong{display:block;color:#fff;font-size:1rem;line-height:1.08}
-    .brand-text span{display:block;color:var(--muted);font-size:.82rem}
-    .btn{display:inline-flex;align-items:center;justify-content:center;border-radius:14px;padding:12px 18px;font-weight:800;font-size:.95rem;border:0;cursor:pointer}
-    .btn-primary{background:var(--accent);color:#fff;box-shadow:0 12px 28px rgba(45,107,255,.35)}
-    main{padding:34px 0 46px}
-    .card{background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.10);border-radius:var(--radius);padding:18px;box-shadow:0 14px 28px rgba(0,0,0,.16)}
-    .meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;color:#cfe0ff;font-size:.84rem}
-    .meta span{border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.03);border-radius:999px;padding:5px 9px}
-    h1{margin:0;font-size:2rem;line-height:1.15;letter-spacing:-.02em}
-    h2{margin:22px 0 10px;font-size:1.25rem}
-    p{margin:10px 0;color:#dce7ff}
-    ul{margin:10px 0 0;padding-left:18px;color:#dce7ff}
+    .header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+    .nav{min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+    .brand{display:flex;align-items:center;gap:12px;min-width:0;color:inherit}
+    .brand-badge{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#2563eb 0%,#7c3aed 60%,#06b6d4 100%);box-shadow:0 0 0 1px rgba(0,0,0,.06) inset}
+    .brand-text strong{display:block;font-size:.98rem;letter-spacing:.01em;color:#111827}
+    .brand-text span{display:block;font-size:.82rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:420px}
+    .btn{display:inline-flex;align-items:center;justify-content:center;padding:11px 14px;border-radius:12px;border:1px solid var(--border);background:#fff;font-weight:900;font-size:.92rem;color:#111827;cursor:pointer;transition:transform .15s ease, box-shadow .15s ease}
+    .btn:hover{transform:translateY(-1px);box-shadow:var(--shadow);text-decoration:none}
+    .btn-primary{border:0;color:#fff;background:linear-gradient(90deg,#2563eb 0%,#7c3aed 60%,#06b6d4 100%)}
+
+    .hero{background:linear-gradient(180deg,#ffffff 0%,#f7f8fc 100%);border-bottom:1px solid var(--border)}
+    .hero-inner{padding:28px 0 18px}
+    .kicker{display:flex;gap:10px;align-items:center;color:var(--muted);font-weight:900;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase}
+    .dot{width:8px;height:8px;border-radius:999px;background:#2563eb}
+    h1{margin:10px 0 0;font-size:clamp(1.8rem, 3.2vw, 2.35rem);letter-spacing:-.02em;line-height:1.12}
+    .subtitle{margin:10px 0 0;color:var(--muted);max-width:78ch}
+    .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+    .meta span{background:var(--chip);border:1px solid var(--border);color:#374151;font-weight:900;font-size:.82rem;border-radius:999px;padding:5px 9px}
+
+    main{padding:22px 0 52px}
+    .article{margin-top:16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+    .cover{width:100%;aspect-ratio:16/6;background:#e5e7eb;overflow:hidden}
+    .cover img{width:100%;height:100%;object-fit:cover;display:block}
+    .body{padding:18px}
+    h2{margin:22px 0 10px;font-size:1.25rem;letter-spacing:-.01em}
+    h3{margin:16px 0 8px;font-size:1.02rem}
+    p{margin:10px 0}
+    ul,ol{margin:10px 0 0;padding-left:18px}
     li{margin:7px 0}
-    pre{background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.10);border-radius:14px;padding:12px;overflow:auto;color:#eaf1ff;margin:12px 0;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.9rem}
-    .callout{margin-top:14px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);border-radius:14px;padding:14px;color:#dce7ff}
-    .footer{border-top:1px solid rgba(255,255,255,.06);background:rgba(5,8,16,.58);padding:28px 0 18px;margin-top:28px;color:var(--muted);font-size:.9rem}
+    .callout{margin-top:14px;border:1px solid var(--border);background:var(--bg2);border-radius:14px;padding:14px}
+    .toc{margin-top:14px;border:1px solid var(--border);background:#fff;border-radius:14px;padding:14px}
+    .toc a{font-weight:900}
+    pre{margin:12px 0;padding:12px;border-radius:14px;border:1px solid var(--border);background:#0b1220;color:#eaf1ff;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.9rem}
+    code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+    .divider{height:1px;background:var(--border);margin:18px 0}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+
+    .refs{margin-top:18px;border-top:1px solid var(--border);padding-top:14px;color:var(--muted);font-size:.95rem}
+    .refs a{font-weight:800}
+
+    .footer{border-top:1px solid var(--border);padding:22px 0 18px;color:var(--muted);font-size:.9rem;background:#fff}
+    @media (max-width:560px){.btn{width:100%}.cover{aspect-ratio:16/9}}
   </style>
 </head>
+
 <body>
   <header class="header">
     <div class="container">
-      <nav class="nav" aria-label="Main navigation">
-        <a class="brand" href="/index.html" aria-label="Sentinel Identity home">
+      <nav class="nav">
+        <a class="brand" href="/index.html">
           <div class="brand-badge" aria-hidden="true"></div>
           <div class="brand-text">
             <strong>Sentinel Identity</strong>
@@ -53,87 +78,109 @@
     </div>
   </header>
 
+  <section class="hero">
+    <div class="container hero-inner">
+      <div class="kicker"><span class="dot"></span> Exchange Online · Shared Mailbox</div>
+      <h1>Mails sent from a shared mailbox appear in personal Sent Items</h1>
+      <p class="subtitle">This is common behavior. You can configure Exchange Online to keep a copy in the shared mailbox Sent Items folder.</p>
+      <div class="meta">
+        <span>2026-03-03</span>
+        <span>6 min read</span>
+        <span>Sent Items</span>
+      </div>
+    </div>
+  </section>
+
   <main>
     <div class="container">
-      <article class="card">
-        <div class="meta">
-          <span>2026-03-02</span>
-          <span>Exchange Online</span>
-          <span>Shared Mailbox</span>
-          <span>Sent Items</span>
-          <span>Outlook</span>
+      <article class="article">
+        <div class="cover">
+          <img src="https://images.unsplash.com/photo-1560472355-536de3962603?auto=format&fit=crop&w=1600&q=80" alt="Email on a screen" />
         </div>
 
-        <h1>Mails sent from a shared mailbox are appearing in personal “Sent Items”</h1>
+        <div class="body">
 
-        <p>
-          This is one of the most common shared mailbox complaints because it looks “wrong” to users.
-          The good news: it is usually expected behavior until you explicitly configure otherwise.
-        </p>
+          <div class="toc">
+            <strong>Table of contents</strong>
+            <ul>
+              <li><a href="#why">Why this happens</a></li>
+              <li><a href="#fix">Fix: enable message copy settings</a></li>
+              <li><a href="#verify">Verify the result</a></li>
+              <li><a href="#notes">Client behavior notes</a></li>
+              <li><a href="#bulk">Bulk enabling for multiple shared mailboxes</a></li>
+            </ul>
+          </div>
 
-        <h2>Why it happens</h2>
-        <ul>
-          <li>When a user sends as a shared mailbox, the client can save the sent copy in the user’s mailbox by default.</li>
-          <li>Different clients behave differently (Outlook desktop vs OWA vs mobile).</li>
-          <li>You can tell Exchange Online to keep a copy in the shared mailbox Sent Items folder.</li>
-        </ul>
+          <h2 id="why">Why this happens</h2>
+          <ul>
+            <li>Users do not sign in as a shared mailbox directly. They sign in as themselves and access the mailbox via delegation.</li>
+            <li>By default, when a delegate sends as/on behalf, the sent copy can be stored in the delegate’s Sent Items.</li>
+          </ul>
 
-        <h2>The clean fix (Exchange Online settings)</h2>
-        <p>
-          Enable message copy settings so sent mail is stored in the shared mailbox Sent Items as well.
-          This helps shared workflows and auditability.
-        </p>
+          <div class="callout">
+            <strong>Goal:</strong> Keep a copy in the shared mailbox Sent Items folder so the team has a single source of truth.
+          </div>
 
-        <pre>### Requires Exchange Online PowerShell
-# Connect-ExchangeOnline
+          <h2 id="fix">Fix: enable message copy settings</h2>
+          <p>In Exchange Online PowerShell, enable both settings on the shared mailbox:</p>
 
-$SharedMailbox = "sharedmailbox@domain.com"
+          <pre># Connect-ExchangeOnline
+
+$SharedMailbox = "shared@domain.com"
 
 Set-Mailbox -Identity $SharedMailbox `
   -MessageCopyForSentAsEnabled $true `
   -MessageCopyForSendOnBehalfEnabled $true</pre>
 
-        <div class="callout">
-          <strong>What this does:</strong>
-          It stores a copy of sent mail in the shared mailbox when users send as it or on behalf of it.
-          Users may still have a copy in their personal Sent Items depending on client behavior and settings.
-        </div>
+          <p>
+            This instructs Exchange Online to save a copy of messages sent as the shared mailbox and sent on behalf of the shared mailbox in the shared mailbox Sent Items folder.
+          </p>
 
-        <h2>Outlook client side (when user experience matters)</h2>
-        <ul>
-          <li>In Outlook desktop, there are settings that influence where sent items are stored for shared mailboxes.</li>
-          <li>If you want one canonical “Sent Items” location for the team, enforce the Exchange mailbox copy settings above.</li>
-        </ul>
+          <h2 id="verify">Verify the result</h2>
+          <ol>
+            <li>Send a test email using <strong>Send As</strong> the shared mailbox.</li>
+            <li>Confirm a copy appears in <strong>Shared mailbox → Sent Items</strong>.</li>
+            <li>Repeat for <strong>Send on Behalf</strong> if your org uses it.</li>
+          </ol>
 
-        <h2>Verification checklist</h2>
-        <ul>
-          <li>Send a test message using <strong>Send As</strong> the shared mailbox.</li>
-          <li>Confirm a copy appears in <strong>Shared Mailbox → Sent Items</strong>.</li>
-          <li>If it does not appear, wait for replication and retest.</li>
-          <li>Confirm the user is actually sending from the shared mailbox, not their own address.</li>
-        </ul>
+          <h2 id="notes">Client behavior notes</h2>
+          <ul>
+            <li>Some clients may still store a copy in the user’s Sent Items. That is normal. The important fix is: shared mailbox gets a copy.</li>
+            <li>New Outlook behavior can differ. Follow Microsoft’s troubleshooting guidance if you see inconsistent results.</li>
+          </ul>
 
-        <h2>Common gotchas</h2>
-        <ul>
-          <li>Users confuse “From” and accidentally send as themselves.</li>
-          <li>Multiple accounts in one Outlook profile can cause From selection mistakes.</li>
-          <li>Mobile clients can behave differently than desktop Outlook.</li>
-        </ul>
+          <h2 id="bulk">Bulk enabling for multiple shared mailboxes</h2>
+          <pre># Enable message copy settings for all shared mailboxes
+Get-Mailbox -RecipientTypeDetails SharedMailbox -ResultSize Unlimited |
+  Set-Mailbox -MessageCopyForSentAsEnabled $true -MessageCopyForSendOnBehalfEnabled $true</pre>
 
-        <div class="callout">
-          <strong>Need help?</strong>
-          If shared mailbox behavior is inconsistent across clients, we can standardize delegation, sending permissions, and storage behavior so teams stop arguing about Sent Items.
-          <br /><br />
-          <a class="btn btn-primary" href="/index.html#contact">Request an Assessment</a>
+          <div class="divider"></div>
+
+          <div class="callout">
+            <strong>Need help?</strong> If shared mailbox behavior differs across Outlook versions, we can standardize settings and document the expected workflow.
+            <div class="actions">
+              <a class="btn btn-primary" href="/index.html#contact">Request an Assessment</a>
+              <a class="btn" href="/blog.html">Back to Blog</a>
+            </div>
+          </div>
+
+          <div class="refs">
+            <strong>Microsoft references</strong>
+            <ul>
+              <li><a href="https://learn.microsoft.com/en-us/troubleshoot/exchange/user-and-shared-mailboxes/sent-mail-is-not-saved" target="_blank" rel="noopener">Troubleshoot: sent mail not saved for shared mailbox (MessageCopyForSentAsEnabled)</a></li>
+              <li><a href="https://learn.microsoft.com/en-us/exchange/recipients-in-exchange-online/manage-user-mailboxes/automatically-save-sent-items-in-delegator-s-mailbox" target="_blank" rel="noopener">Automatically save sent items for delegates</a></li>
+              <li><a href="https://learn.microsoft.com/en-us/exchange/collaboration-exo/shared-mailboxes" target="_blank" rel="noopener">Shared mailboxes in Exchange Online</a></li>
+              <li><a href="https://techcommunity.microsoft.com/blog/exchange/want-more-control-over-sent-items-when-using-shared-mailboxes/611106" target="_blank" rel="noopener">Exchange team blog: control over Sent Items for shared mailboxes</a></li>
+            </ul>
+          </div>
+
         </div>
       </article>
     </div>
   </main>
 
   <footer class="footer">
-    <div class="container">
-      <div>© 2026 Sentinel Identity · <a href="/blog.html">Back to blog</a></div>
-    </div>
+    <div class="container">© 2026 Sentinel Identity · <a href="/blog.html">Blog</a></div>
   </footer>
 </body>
 </html>
