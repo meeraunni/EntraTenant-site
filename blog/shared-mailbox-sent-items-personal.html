@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Shared mailbox sent mail appears in personal Sent Items | Sentinel Identity</title>
-  <meta name="description" content="Why sent mail from a shared mailbox shows up in personal Sent Items, and how to enable sent item copies in the shared mailbox using MessageCopyForSentAsEnabled and MessageCopyForSendOnBehalfEnabled." />
+  <meta name="description" content="Engineer-level explanation of why Sent Items diverges for shared mailbox delegation and how to enforce mailbox-side copies using MessageCopyForSentAsEnabled and MessageCopyForSendOnBehalfEnabled." />
   <meta name="theme-color" content="#ffffff" />
 
   <style>
@@ -14,7 +14,7 @@
       --shadow: 0 10px 25px rgba(17,24,39,.06); --radius:16px; --max:980px;
     }
     *{box-sizing:border-box} html,body{margin:0;padding:0}
-    body{font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:var(--text);background:var(--bg);line-height:1.6}
+    body{font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:var(--text);background:var(--bg);line-height:1.65}
     a{color:var(--link);text-decoration:none} a:hover{text-decoration:underline}
     .container{width:min(var(--max), calc(100% - 32px));margin:0 auto}
     .header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
@@ -31,32 +31,26 @@
     .hero-inner{padding:28px 0 18px}
     .kicker{display:flex;gap:10px;align-items:center;color:var(--muted);font-weight:900;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase}
     .dot{width:8px;height:8px;border-radius:999px;background:#2563eb}
-    h1{margin:10px 0 0;font-size:clamp(1.8rem, 3.2vw, 2.35rem);letter-spacing:-.02em;line-height:1.12}
-    .subtitle{margin:10px 0 0;color:var(--muted);max-width:78ch}
+    h1{margin:10px 0 0;font-size:clamp(1.9rem, 3.2vw, 2.45rem);letter-spacing:-.02em;line-height:1.15}
+    .subtitle{margin:10px 0 0;color:var(--muted);max-width:95ch}
+
+    main{padding:22px 0 52px}
     .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
     .meta span{background:var(--chip);border:1px solid var(--border);color:#374151;font-weight:900;font-size:.82rem;border-radius:999px;padding:5px 9px}
 
-    main{padding:22px 0 52px}
     .article{margin-top:16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
-    .cover{width:100%;aspect-ratio:16/6;background:#e5e7eb;overflow:hidden}
+    .cover{width:100%;aspect-ratio:16/6;background:#0b1220}
     .cover img{width:100%;height:100%;object-fit:cover;display:block}
     .body{padding:18px}
-    h2{margin:22px 0 10px;font-size:1.25rem;letter-spacing:-.01em}
-    h3{margin:16px 0 8px;font-size:1.02rem}
-    p{margin:10px 0}
-    ul,ol{margin:10px 0 0;padding-left:18px}
-    li{margin:7px 0}
-    .callout{margin-top:14px;border:1px solid var(--border);background:var(--bg2);border-radius:14px;padding:14px}
-    .toc{margin-top:14px;border:1px solid var(--border);background:#fff;border-radius:14px;padding:14px}
-    .toc a{font-weight:900}
-    pre{margin:12px 0;padding:12px;border-radius:14px;border:1px solid var(--border);background:#0b1220;color:#eaf1ff;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.9rem}
-    code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-    .divider{height:1px;background:var(--border);margin:18px 0}
-    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
 
+    h2{margin:22px 0 10px;font-size:1.25rem;letter-spacing:-.01em}
+    p{margin:10px 0}
+    .callout{margin-top:14px;border:1px solid var(--border);background:var(--bg2);border-radius:14px;padding:14px}
+    pre{margin:12px 0;padding:12px;border-radius:14px;border:1px solid var(--border);background:#0b1220;color:#eaf1ff;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.9rem}
+
+    .divider{height:1px;background:var(--border);margin:18px 0}
     .refs{margin-top:18px;border-top:1px solid var(--border);padding-top:14px;color:var(--muted);font-size:.95rem}
     .refs a{font-weight:800}
-
     .footer{border-top:1px solid var(--border);padding:22px 0 18px;color:var(--muted);font-size:.9rem;background:#fff}
     @media (max-width:560px){.btn{width:100%}.cover{aspect-ratio:16/9}}
   </style>
@@ -80,13 +74,13 @@
 
   <section class="hero">
     <div class="container hero-inner">
-      <div class="kicker"><span class="dot"></span> Exchange Online · Shared Mailbox</div>
-      <h1>Mails sent from a shared mailbox appear in personal Sent Items</h1>
-      <p class="subtitle">This is common behavior. You can configure Exchange Online to keep a copy in the shared mailbox Sent Items folder.</p>
+      <div class="kicker"><span class="dot"></span> Exchange Online · Delegation</div>
+      <h1>Shared mailbox sent mail appears in personal Sent Items</h1>
+      <p class="subtitle">
+        This is expected unless you explicitly enable mailbox-side sent item copying for delegated sends. Treat it as a configuration decision: what is your system of record for outbound mail from a shared identity?
+      </p>
       <div class="meta">
-        <span>2026-03-03</span>
-        <span>6 min read</span>
-        <span>Sent Items</span>
+        <span>2026-03-03</span><span>8 min read</span><span>Sent Items</span><span>Shared mailbox</span>
       </div>
     </div>
   </section>
@@ -95,34 +89,28 @@
     <div class="container">
       <article class="article">
         <div class="cover">
-          <img src="https://images.unsplash.com/photo-1560472355-536de3962603?auto=format&fit=crop&w=1600&q=80" alt="Email on a screen" />
+          <img alt="" src="data:image/svg+xml;charset=UTF-8,<?xml version='1.0'?><svg xmlns='http://www.w3.org/2000/svg' width='1200' height='675' viewBox='0 0 1200 675'><defs><linearGradient id='g' x1='0' x2='1'><stop offset='0' stop-color='%232563eb'/><stop offset='0.55' stop-color='%237c3aed'/><stop offset='1' stop-color='%2306b6d4'/></linearGradient></defs><rect width='1200' height='675' fill='%230b1220'/><circle cx='240' cy='520' r='300' fill='url(%23g)' opacity='0.18'/><rect x='160' y='220' width='720' height='300' rx='24' fill='%230f1a2f' stroke='rgba(255,255,255,0.18)'/><path d='M240 420l520-140-180 220-40-92z' fill='url(%23g)' opacity='0.9'/><rect x='920' y='240' width='220' height='260' rx='22' fill='rgba(255,255,255,0.08)' stroke='rgba(255,255,255,0.18)'/><text x='950' y='290' fill='rgba(255,255,255,0.75)' font-family='Segoe UI, Arial' font-size='18' font-weight='700'>Sent Items</text><path d='M950 330h160M950 368h160M950 406h130' stroke='rgba(255,255,255,0.25)' stroke-width='10' stroke-linecap='round'/><text x='160' y='140' fill='rgba(255,255,255,0.85)' font-family='Segoe UI, Arial' font-size='34' font-weight='700'>Shared Mailbox %E2%80%A2 Sent Items</text></svg>">
         </div>
 
         <div class="body">
-
-          <div class="toc">
-            <strong>Table of contents</strong>
-            <ul>
-              <li><a href="#why">Why this happens</a></li>
-              <li><a href="#fix">Fix: enable message copy settings</a></li>
-              <li><a href="#verify">Verify the result</a></li>
-              <li><a href="#notes">Client behavior notes</a></li>
-              <li><a href="#bulk">Bulk enabling for multiple shared mailboxes</a></li>
-            </ul>
-          </div>
-
-          <h2 id="why">Why this happens</h2>
-          <ul>
-            <li>Users do not sign in as a shared mailbox directly. They sign in as themselves and access the mailbox via delegation.</li>
-            <li>By default, when a delegate sends as/on behalf, the sent copy can be stored in the delegate’s Sent Items.</li>
-          </ul>
-
           <div class="callout">
-            <strong>Goal:</strong> Keep a copy in the shared mailbox Sent Items folder so the team has a single source of truth.
+            What’s actually happening: the user is authenticated as themselves, sending under delegated rights. Without explicit mailbox-side copy settings, Exchange can store the sent copy in the delegate’s mailbox.
           </div>
 
-          <h2 id="fix">Fix: enable message copy settings</h2>
-          <p>In Exchange Online PowerShell, enable both settings on the shared mailbox:</p>
+          <h2>Why the Sent Items location diverges</h2>
+          <p>
+            Shared mailboxes aren’t “logged into” like a user mailbox. Users access them via delegation. When a user sends as the shared mailbox, Exchange has to decide where to store the sent item. Historically, many clients kept the sent item in the delegate mailbox. This is not a bug. It’s a default behavior that becomes a governance problem when teams expect the shared mailbox to be the system of record.
+          </p>
+
+          <h2>Engineering requirement: define the system of record</h2>
+          <p>
+            If multiple people use a shared mailbox identity (support@, billing@, info@), you need sent items in the shared mailbox for audit and operational continuity. If sent items are scattered across personal mailboxes, you lose visibility, continuity, and forensic traceability. You can still keep a personal copy, but the shared mailbox must receive a copy.
+          </p>
+
+          <h2>Remediation: enable mailbox-side sent item copy controls</h2>
+          <p>
+            Exchange Online provides mailbox properties that force a copy of sent messages to be saved in the shared mailbox Sent Items folder for delegated sends. Enable both Send As and Send on Behalf copy settings to cover both patterns.
+          </p>
 
           <pre># Connect-ExchangeOnline
 
@@ -132,48 +120,34 @@ Set-Mailbox -Identity $SharedMailbox `
   -MessageCopyForSentAsEnabled $true `
   -MessageCopyForSendOnBehalfEnabled $true</pre>
 
+          <h2>Verification (prove it’s working)</h2>
           <p>
-            This instructs Exchange Online to save a copy of messages sent as the shared mailbox and sent on behalf of the shared mailbox in the shared mailbox Sent Items folder.
+            Verify using both patterns if your org uses both. Send a test email using Send As and confirm a copy lands in the shared mailbox Sent Items folder. Repeat for Send on Behalf if applicable. If users still see a personal copy, that can be client behavior. Your objective is the shared mailbox copy being present consistently.
           </p>
 
-          <h2 id="verify">Verify the result</h2>
-          <ol>
-            <li>Send a test email using <strong>Send As</strong> the shared mailbox.</li>
-            <li>Confirm a copy appears in <strong>Shared mailbox → Sent Items</strong>.</li>
-            <li>Repeat for <strong>Send on Behalf</strong> if your org uses it.</li>
-          </ol>
+          <h2>Bulk enablement (standardize across shared mailboxes)</h2>
+          <p>
+            If this is policy, apply it consistently instead of handling mailbox-by-mailbox. Bulk enablement reduces drift and avoids “this shared mailbox works, that one doesn’t.”
+          </p>
 
-          <h2 id="notes">Client behavior notes</h2>
-          <ul>
-            <li>Some clients may still store a copy in the user’s Sent Items. That is normal. The important fix is: shared mailbox gets a copy.</li>
-            <li>New Outlook behavior can differ. Follow Microsoft’s troubleshooting guidance if you see inconsistent results.</li>
-          </ul>
-
-          <h2 id="bulk">Bulk enabling for multiple shared mailboxes</h2>
-          <pre># Enable message copy settings for all shared mailboxes
+          <pre># Enable on all shared mailboxes
 Get-Mailbox -RecipientTypeDetails SharedMailbox -ResultSize Unlimited |
   Set-Mailbox -MessageCopyForSentAsEnabled $true -MessageCopyForSendOnBehalfEnabled $true</pre>
 
           <div class="divider"></div>
 
-          <div class="callout">
-            <strong>Need help?</strong> If shared mailbox behavior differs across Outlook versions, we can standardize settings and document the expected workflow.
-            <div class="actions">
-              <a class="btn btn-primary" href="/index.html#contact">Request an Assessment</a>
-              <a class="btn" href="/blog.html">Back to Blog</a>
-            </div>
-          </div>
-
           <div class="refs">
             <strong>Microsoft references</strong>
             <ul>
-              <li><a href="https://learn.microsoft.com/en-us/troubleshoot/exchange/user-and-shared-mailboxes/sent-mail-is-not-saved" target="_blank" rel="noopener">Troubleshoot: sent mail not saved for shared mailbox (MessageCopyForSentAsEnabled)</a></li>
+              <li><a href="https://learn.microsoft.com/en-us/troubleshoot/exchange/user-and-shared-mailboxes/sent-mail-is-not-saved" target="_blank" rel="noopener">Troubleshoot: sent mail isn’t saved (shared mailbox scenarios)</a></li>
               <li><a href="https://learn.microsoft.com/en-us/exchange/recipients-in-exchange-online/manage-user-mailboxes/automatically-save-sent-items-in-delegator-s-mailbox" target="_blank" rel="noopener">Automatically save sent items for delegates</a></li>
               <li><a href="https://learn.microsoft.com/en-us/exchange/collaboration-exo/shared-mailboxes" target="_blank" rel="noopener">Shared mailboxes in Exchange Online</a></li>
-              <li><a href="https://techcommunity.microsoft.com/blog/exchange/want-more-control-over-sent-items-when-using-shared-mailboxes/611106" target="_blank" rel="noopener">Exchange team blog: control over Sent Items for shared mailboxes</a></li>
             </ul>
           </div>
 
+          <div class="callout">
+            If you want consistent shared mailbox behavior across Outlook versions and devices, the fix is a combination of mailbox-side settings plus a documented delegation pattern (Send As vs on-behalf). One without the other keeps this problem alive.
+          </div>
         </div>
       </article>
     </div>
