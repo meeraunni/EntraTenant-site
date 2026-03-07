@@ -1,180 +1,61 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AADSTS76026: The request has expired | Sentinel Identity</title>
-  <meta name="description" content="Fix AADSTS76026 (RequestIssueTimeExpired) for SAML SSO. Common fix: set the Sign-on URL in the Enterprise App SAML configuration so My Apps launches generate a fresh request." />
+  <meta name="description" content="Engineer-level analysis of AADSTS76026 in SAML flows. How to validate in Entra sign-in logs, why IdP-initiated launches fail, and how Sign-on URL stabilizes the flow." />
   <meta name="theme-color" content="#ffffff" />
 
   <style>
     :root{
-      --bg:#ffffff;
-      --bg2:#f6f7fb;
-      --card:#ffffff;
-      --border:#e6e8ef;
-      --text:#111827;
-      --muted:#6b7280;
-      --link:#2563eb;
-      --chip:#f3f4f6;
-      --shadow: 0 10px 25px rgba(17,24,39,.06);
-      --radius:16px;
-      --max:980px;
+      --bg:#ffffff; --bg2:#f6f7fb; --card:#ffffff; --border:#e6e8ef;
+      --text:#111827; --muted:#6b7280; --link:#2563eb; --chip:#f3f4f6;
+      --shadow: 0 10px 25px rgba(17,24,39,.06); --radius:16px; --max:980px;
     }
-    *{box-sizing:border-box}
-    html,body{margin:0;padding:0}
-    body{
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      color:var(--text);
-      background:var(--bg);
-      line-height:1.6;
-    }
-    a{color:var(--link);text-decoration:none}
-    a:hover{text-decoration:underline}
+    *{box-sizing:border-box} html,body{margin:0;padding:0}
+    body{font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:var(--text);background:var(--bg);line-height:1.65}
+    a{color:var(--link);text-decoration:none} a:hover{text-decoration:underline}
     .container{width:min(var(--max), calc(100% - 32px));margin:0 auto}
-
-    /* Header */
-    .header{
-      position:sticky; top:0; z-index:50;
-      background:rgba(255,255,255,.92);
-      backdrop-filter: blur(10px);
-      border-bottom:1px solid var(--border);
-    }
+    .header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
     .nav{min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:16px}
     .brand{display:flex;align-items:center;gap:12px;min-width:0;color:inherit}
-    .brand-badge{
-      width:34px;height:34px;border-radius:10px;
-      background: linear-gradient(135deg, #2563eb 0%, #7c3aed 60%, #06b6d4 100%);
-      box-shadow: 0 0 0 1px rgba(0,0,0,.06) inset;
-      flex:0 0 auto;
-    }
+    .brand-badge{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#2563eb 0%,#7c3aed 60%,#06b6d4 100%);box-shadow:0 0 0 1px rgba(0,0,0,.06) inset}
     .brand-text strong{display:block;font-size:.98rem;letter-spacing:.01em;color:#111827}
     .brand-text span{display:block;font-size:.82rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:420px}
-    .btn{
-      display:inline-flex;align-items:center;justify-content:center;
-      padding:11px 14px;border-radius:12px;border:1px solid var(--border);
-      background:#fff;font-weight:900;font-size:.92rem;color:#111827;
-      cursor:pointer;transition:transform .15s ease, box-shadow .15s ease;
-      white-space:nowrap;
-    }
+    .btn{display:inline-flex;align-items:center;justify-content:center;padding:11px 14px;border-radius:12px;border:1px solid var(--border);background:#fff;font-weight:900;font-size:.92rem;color:#111827;cursor:pointer;transition:transform .15s ease, box-shadow .15s ease}
     .btn:hover{transform:translateY(-1px);box-shadow:var(--shadow);text-decoration:none}
-    .btn-primary{
-      border:0;color:#fff;
-      background: linear-gradient(90deg, #2563eb 0%, #7c3aed 60%, #06b6d4 100%);
-    }
-
-    /* Hero */
-    .hero{
-      background: linear-gradient(180deg, #ffffff 0%, #f7f8fc 100%);
-      border-bottom:1px solid var(--border);
-    }
+    .btn-primary{border:0;color:#fff;background:linear-gradient(90deg,#2563eb 0%,#7c3aed 60%,#06b6d4 100%)}
+    .hero{background:linear-gradient(180deg,#ffffff 0%,#f7f8fc 100%);border-bottom:1px solid var(--border)}
     .hero-inner{padding:28px 0 18px}
-    .kicker{
-      display:flex;gap:10px;align-items:center;color:var(--muted);
-      font-weight:900;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;
-    }
+    .kicker{display:flex;gap:10px;align-items:center;color:var(--muted);font-weight:900;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase}
     .dot{width:8px;height:8px;border-radius:999px;background:#2563eb}
-    h1{margin:10px 0 0;font-size:clamp(1.8rem, 3.2vw, 2.35rem);letter-spacing:-.02em;line-height:1.12}
-    .subtitle{margin:10px 0 0;color:var(--muted);max-width:78ch}
-
+    h1{margin:10px 0 0;font-size:clamp(1.9rem, 3.2vw, 2.45rem);letter-spacing:-.02em;line-height:1.15}
+    .subtitle{margin:10px 0 0;color:var(--muted);max-width:85ch}
     main{padding:22px 0 52px}
     .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
-    .meta span{
-      background:var(--chip);
-      border:1px solid var(--border);
-      color:#374151;
-      font-weight:900;
-      font-size:.82rem;
-      border-radius:999px;
-      padding:5px 9px;
-    }
-
-    .article{
-      margin-top:16px;
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      overflow:hidden;
-    }
-    .cover{
-      width:100%;
-      aspect-ratio: 16/6;
-      background:#e5e7eb;
-      overflow:hidden;
-    }
+    .meta span{background:var(--chip);border:1px solid var(--border);color:#374151;font-weight:900;font-size:.82rem;border-radius:999px;padding:5px 9px}
+    .article{margin-top:16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+    .cover{width:100%;aspect-ratio:16/6;background:#0b1220}
     .cover img{width:100%;height:100%;object-fit:cover;display:block}
     .body{padding:18px}
-
     h2{margin:22px 0 10px;font-size:1.25rem;letter-spacing:-.01em}
-    h3{margin:16px 0 8px;font-size:1.02rem}
     p{margin:10px 0}
-    ul,ol{margin:10px 0 0;padding-left:18px}
-    li{margin:7px 0}
-
-    .callout{
-      margin-top:14px;
-      border:1px solid var(--border);
-      background:var(--bg2);
-      border-radius:14px;
-      padding:14px;
-    }
-
-    .toc{
-      margin-top:14px;
-      border:1px solid var(--border);
-      background:#fff;
-      border-radius:14px;
-      padding:14px;
-    }
-    .toc a{font-weight:900}
-
-    pre{
-      margin:12px 0;
-      padding:12px;
-      border-radius:14px;
-      border:1px solid var(--border);
-      background:#0b1220;
-      color:#eaf1ff;
-      overflow:auto;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size:.9rem;
-    }
-    code{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace}
-
+    .callout{margin-top:14px;border:1px solid var(--border);background:var(--bg2);border-radius:14px;padding:14px}
+    pre{margin:12px 0;padding:12px;border-radius:14px;border:1px solid var(--border);background:#0b1220;color:#eaf1ff;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.9rem}
     .divider{height:1px;background:var(--border);margin:18px 0}
-    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
-
-    .refs{
-      margin-top:18px;
-      border-top:1px solid var(--border);
-      padding-top:14px;
-      color:var(--muted);
-      font-size:.95rem;
-    }
+    .refs{margin-top:18px;border-top:1px solid var(--border);padding-top:14px;color:var(--muted);font-size:.95rem}
     .refs a{font-weight:800}
-    .refs ul{color:var(--muted)}
-
-    .footer{
-      border-top:1px solid var(--border);
-      padding:22px 0 18px;
-      color:var(--muted);
-      font-size:.9rem;
-      background:#fff;
-    }
-
-    @media (max-width:560px){
-      .btn{width:100%}
-      .cover{aspect-ratio:16/9}
-    }
+    .footer{border-top:1px solid var(--border);padding:22px 0 18px;color:var(--muted);font-size:.9rem;background:#fff}
+    @media (max-width:560px){.btn{width:100%}.cover{aspect-ratio:16/9}}
   </style>
 </head>
 
 <body>
   <header class="header">
     <div class="container">
-      <nav class="nav" aria-label="Main navigation">
-        <a class="brand" href="/index.html" aria-label="Sentinel Identity home">
+      <nav class="nav">
+        <a class="brand" href="/index.html">
           <div class="brand-badge" aria-hidden="true"></div>
           <div class="brand-text">
             <strong>Sentinel Identity</strong>
@@ -186,18 +67,15 @@
     </div>
   </header>
 
-  <section class="hero" aria-label="Article header">
+  <section class="hero">
     <div class="container hero-inner">
       <div class="kicker"><span class="dot"></span> Entra ID · SAML SSO</div>
       <h1>AADSTS76026: The request has expired</h1>
       <p class="subtitle">
-        Common SAML fix: set the <strong>Sign-on URL</strong> in the Enterprise App SAML configuration so My Apps launches create a fresh request.
+        This error is almost never “a random outage.” It’s a request validity problem in the SAML authentication pipeline. The fix depends on where the request is generated and whether the flow is IdP-initiated or SP-initiated.
       </p>
-
-      <div class="meta" aria-label="Post metadata">
-        <span>2026-03-03</span>
-        <span>6 min read</span>
-        <span>AADSTS</span>
+      <div class="meta">
+        <span>2026-03-03</span><span>8 min read</span><span>SAML</span><span>AADSTS</span>
       </div>
     </div>
   </section>
@@ -206,102 +84,57 @@
     <div class="container">
       <article class="article">
         <div class="cover">
-          <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1600&q=80" alt="Cybersecurity concept" />
+          <img alt="" src="data:image/svg+xml;charset=UTF-8,<?xml version='1.0'?><svg xmlns='http://www.w3.org/2000/svg' width='1200' height='675' viewBox='0 0 1200 675'><defs><linearGradient id='g' x1='0' x2='1'><stop offset='0' stop-color='%232563eb'/><stop offset='0.55' stop-color='%237c3aed'/><stop offset='1' stop-color='%2306b6d4'/></linearGradient></defs><rect width='1200' height='675' fill='%230b1220'/><circle cx='230' cy='150' r='260' fill='url(%23g)' opacity='0.25'/><circle cx='1080' cy='560' r='320' fill='url(%23g)' opacity='0.18'/><rect x='120' y='170' width='520' height='340' rx='24' fill='%230f1a2f' stroke='rgba(255,255,255,0.18)'/><rect x='120' y='170' width='520' height='60' rx='24' fill='%230f1a2f'/><circle cx='165' cy='200' r='8' fill='%23ff5f57'/><circle cx='195' cy='200' r='8' fill='%23febc2e'/><circle cx='225' cy='200' r='8' fill='%2328c840'/><rect x='170' y='270' width='360' height='44' rx='12' fill='rgba(255,255,255,0.08)'/><rect x='170' y='334' width='320' height='44' rx='12' fill='rgba(255,255,255,0.08)'/><rect x='170' y='408' width='220' height='44' rx='12' fill='url(%23g)'/><path d='M860 210c-96 0-174 78-174 174 0 116 98 214 174 240 76-26 174-124 174-240 0-96-78-174-174-174z' fill='rgba(255,255,255,0.08)' stroke='rgba(255,255,255,0.18)'/><path d='M860 285l78 34v64c0 58-42 114-78 130-36-16-78-72-78-130v-64l78-34z' fill='url(%23g)' opacity='0.9'/><text x='120' y='120' fill='rgba(255,255,255,0.85)' font-family='Segoe UI, Arial' font-size='34' font-weight='700'>SAML SSO %E2%80%A2 Request Expired</text></svg>">
         </div>
 
         <div class="body">
-
           <div class="callout">
-            <strong>What the error means:</strong>
-            Microsoft maps <strong>AADSTS76026</strong> to <strong>RequestIssueTimeExpired</strong>, meaning the SAML request timestamp is expired.
-            This is common when sign-in requests are replayed or started from the wrong entry point.
+            Engineer translation: Entra received a SAML authentication request whose timestamp window was no longer acceptable (or the request was effectively replayed). The platform returns AADSTS76026 (RequestIssueTimeExpired) when the request issue time is outside the allowed validity window.
           </div>
 
-          <div class="toc" aria-label="Table of contents">
-            <strong>Table of contents</strong>
-            <ul>
-              <li><a href="#symptoms">Typical symptoms</a></li>
-              <li><a href="#why">Why it happens (plain English)</a></li>
-              <li><a href="#fix">Main fix: set the Sign-on URL (My Apps launch)</a></li>
-              <li><a href="#verify">Verify the fix</a></li>
-              <li><a href="#other">Other causes to check</a></li>
-              <li><a href="#notes">Admin notes</a></li>
-            </ul>
-          </div>
-
-          <h2 id="symptoms">Typical symptoms</h2>
-          <ul>
-            <li>SP-initiated login (starting from the app) works.</li>
-            <li>IdP-initiated login (My Apps tile) fails with AADSTS76026.</li>
-            <li>Users retry and it “randomly” works sometimes (fresh vs stale request).</li>
-          </ul>
-
-          <h2 id="why">Why it happens (plain English)</h2>
+          <h2>How this breaks in real architectures</h2>
           <p>
-            SAML requests contain time-based values (IssueInstant / IssueTime). Entra validates that the request is fresh.
-            If the request is stale, replayed, or generated from an outdated path, Entra rejects it as expired.
+            In SAML, the service provider (the application) generates an AuthnRequest. That request contains time-bound fields (IssueInstant / IssueTime), and the IdP (Entra ID) validates freshness to prevent replay. If the request is old, duplicated, cached by an intermediary, or generated from an entry point that reuses a previous request, the IdP rejects it.
+          </p>
+          <p>
+            The pattern you described is a common one: SP-initiated login works when users start from the application, but IdP-initiated login fails when users launch the app from My Apps. In IdP-initiated mode, Entra needs a stable entry URL to send users into the app’s SAML start logic so the app generates a fresh request every time. If that entry point is missing or wrong, you get stale or malformed requests and the expiry shows up as AADSTS76026.
           </p>
 
-          <h2 id="fix">Main fix: set the Sign-on URL (Enterprise App SAML config)</h2>
+          <h2>Validation: prove the failure mode instead of guessing</h2>
           <p>
-            If users launch the app from <strong>My Apps</strong>, Entra needs a correct entry point to start the app’s SAML flow.
-            Set the <strong>Sign-on URL</strong> to the app’s SP-initiated login URL so launches generate a fresh SAML request.
+            Start with Entra sign-in logs and treat them like a trace. Filter by the user and the application, then open a failure and capture three things: the protocol (SAML), the client (browser vs brokered client), and the exact error code. You are checking whether failures correlate with IdP-initiated launches (My Apps tile) versus SP-initiated launches (application URL).
+          </p>
+          <p>
+            The second validation is time consistency. If the application server or any front-door component generating requests has clock skew, the IssueInstant can be interpreted as “already expired.” This is less common than the My Apps entry-point issue, but when it happens it is brutal because it looks intermittent and user-specific.
           </p>
 
-          <ol>
-            <li>Open <strong>Entra admin center</strong> → <strong>Enterprise applications</strong>.</li>
-            <li>Select your application.</li>
-            <li>Go to <strong>Single sign-on</strong> → <strong>SAML</strong>.</li>
-            <li>Under <strong>Basic SAML Configuration</strong>, click <strong>Edit</strong>.</li>
-            <li>Set <strong>Sign-on URL</strong> to the app’s login/start URL (SP-initiated login URL).</li>
-            <li>Save.</li>
-          </ol>
+          <h2>Remediation: set the Sign-on URL for IdP-initiated launches</h2>
+          <p>
+            For SAML enterprise apps in Entra, the Sign-on URL is the entry point Entra can use to launch the app. When users click the tile in My Apps, Entra can redirect them to this URL so the app runs its SP-initiated SAML logic and generates a fresh AuthnRequest. That avoids stale requests and stops the “request expired” loop.
+          </p>
+          <p>
+            Implementation in Entra admin center: go to Enterprise applications, open the app, select Single sign-on, choose SAML, edit Basic SAML Configuration, and set Sign-on URL to the application’s SP-initiated login/start endpoint (the URL the app expects users to hit to start SSO). Save, then test from an InPrivate session via myapps.microsoft.com.
+          </p>
 
-          <div class="callout">
-            <strong>What should Sign-on URL be?</strong>
-            Use the URL your application expects users to land on to start SAML login (the app’s own login page or SSO start endpoint).
-          </div>
-
-          <h2 id="verify">Verify the fix</h2>
-          <ol>
-            <li>Open an InPrivate/Incognito window.</li>
-            <li>Go to <strong>myapps.microsoft.com</strong>.</li>
-            <li>Click the application tile.</li>
-            <li>Confirm you are redirected to the Sign-on URL and the login succeeds.</li>
-          </ol>
-
-          <h2 id="other">Other causes to check</h2>
-          <ul>
-            <li><strong>Clock skew</strong>: if client or app servers are out of sync, the SAML request can appear expired.</li>
-            <li><strong>Replay/caching</strong>: proxies or gateways caching auth pages can replay stale requests.</li>
-            <li><strong>Bad redirect URI logic</strong> in the app: the app may be reusing an old request instead of creating a new one.</li>
-          </ul>
-
-          <h2 id="notes">Admin notes</h2>
-          <ul>
-            <li>Use Entra <strong>Sign-in logs</strong> to confirm the failure stops after the change.</li>
-            <li>If only My Apps fails, start with Sign-on URL. If everything fails, check time sync and replay behavior first.</li>
-          </ul>
+          <h2>Hardening: stop this from returning</h2>
+          <p>
+            Treat this as a design problem, not a user problem. Ensure the application has a single canonical SP-initiated entry URL and that My Apps launches route into it. Validate that no reverse proxy or WAF is caching authentication requests or redirect responses. Ensure NTP is correct on the app tier. Finally, document the supported launch paths so helpdesk doesn’t distribute a “deep link” that fails later due to validity windows.
+          </p>
 
           <div class="divider"></div>
-
-          <div class="callout">
-            <strong>Need help?</strong> If you want a clean end-to-end SAML review (Identifier, Reply URL, Sign-on URL, claims, certs, testing), we can stabilize it without breaking users.
-            <div class="actions">
-              <a class="btn btn-primary" href="/index.html#contact">Request an Assessment</a>
-              <a class="btn" href="/blog.html">Back to Blog</a>
-            </div>
-          </div>
 
           <div class="refs">
             <strong>Microsoft references</strong>
             <ul>
-              <li><a href="https://learn.microsoft.com/en-us/entra/identity-platform/reference-error-codes" target="_blank" rel="noopener">Entra ID error codes (AADSTS76026: RequestIssueTimeExpired)</a></li>
-              <li><a href="https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/add-application-portal-setup-sso" target="_blank" rel="noopener">Set up SSO for enterprise apps (SAML basics)</a></li>
+              <li><a href="https://learn.microsoft.com/en-us/entra/identity-platform/reference-error-codes" target="_blank" rel="noopener">Entra ID error codes (AADSTS76026 / RequestIssueTimeExpired)</a></li>
               <li><a href="https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/configure-saml-single-sign-on" target="_blank" rel="noopener">Configure SAML-based single sign-on</a></li>
+              <li><a href="https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/add-application-portal-setup-sso" target="_blank" rel="noopener">Set up SSO for enterprise apps</a></li>
             </ul>
           </div>
 
+          <div class="callout">
+            If your environment has multiple IdP entry points, custom domains, reverse proxies, or legacy federation, this error can be a symptom of request replay or mis-ordered redirects. If you want a clean SAML flow review (Identifier, Reply URL, Sign-on URL, claims, signing cert, and launch modes), use the assessment form.
+          </div>
         </div>
       </article>
     </div>
