@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Distribution List vs Shared Mailbox | Sentinel Identity</title>
-  <meta name="description" content="A clean, practical comparison: Distribution List vs Shared Mailbox in Microsoft 365. Use cases, external email, governance, and the common admin mistakes." />
+  <meta name="description" content="Architecture decision guide: when to use a distribution list vs a shared mailbox in Microsoft 365, including operational workflow, governance, and security implications." />
   <meta name="theme-color" content="#ffffff" />
 
   <style>
@@ -14,7 +14,7 @@
       --shadow: 0 10px 25px rgba(17,24,39,.06); --radius:16px; --max:980px;
     }
     *{box-sizing:border-box} html,body{margin:0;padding:0}
-    body{font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:var(--text);background:var(--bg);line-height:1.6}
+    body{font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:var(--text);background:var(--bg);line-height:1.65}
     a{color:var(--link);text-decoration:none} a:hover{text-decoration:underline}
     .container{width:min(var(--max), calc(100% - 32px));margin:0 auto}
     .header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
@@ -31,36 +31,24 @@
     .hero-inner{padding:28px 0 18px}
     .kicker{display:flex;gap:10px;align-items:center;color:var(--muted);font-weight:900;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase}
     .dot{width:8px;height:8px;border-radius:999px;background:#2563eb}
-    h1{margin:10px 0 0;font-size:clamp(1.8rem, 3.2vw, 2.35rem);letter-spacing:-.02em;line-height:1.12}
-    .subtitle{margin:10px 0 0;color:var(--muted);max-width:78ch}
+    h1{margin:10px 0 0;font-size:clamp(1.9rem, 3.2vw, 2.45rem);letter-spacing:-.02em;line-height:1.15}
+    .subtitle{margin:10px 0 0;color:var(--muted);max-width:95ch}
+
+    main{padding:22px 0 52px}
     .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
     .meta span{background:var(--chip);border:1px solid var(--border);color:#374151;font-weight:900;font-size:.82rem;border-radius:999px;padding:5px 9px}
 
-    main{padding:22px 0 52px}
     .article{margin-top:16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
-    .cover{width:100%;aspect-ratio:16/6;background:#e5e7eb;overflow:hidden}
+    .cover{width:100%;aspect-ratio:16/6;background:#0b1220}
     .cover img{width:100%;height:100%;object-fit:cover;display:block}
     .body{padding:18px}
+
     h2{margin:22px 0 10px;font-size:1.25rem;letter-spacing:-.01em}
     p{margin:10px 0}
-    ul,ol{margin:10px 0 0;padding-left:18px}
-    li{margin:7px 0}
     .callout{margin-top:14px;border:1px solid var(--border);background:var(--bg2);border-radius:14px;padding:14px}
-    .toc{margin-top:14px;border:1px solid var(--border);background:#fff;border-radius:14px;padding:14px}
-    .toc a{font-weight:900}
-
-    .table-wrap{margin-top:10px;border:1px solid var(--border);border-radius:14px;overflow:auto}
-    table{width:100%;border-collapse:collapse;min-width:760px;background:#fff}
-    th,td{padding:12px;border-bottom:1px solid var(--border);vertical-align:top}
-    th{background:var(--bg2);text-align:left;font-size:.9rem}
-    td{font-size:.92rem}
-
     .divider{height:1px;background:var(--border);margin:18px 0}
-    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
-
     .refs{margin-top:18px;border-top:1px solid var(--border);padding-top:14px;color:var(--muted);font-size:.95rem}
     .refs a{font-weight:800}
-
     .footer{border-top:1px solid var(--border);padding:22px 0 18px;color:var(--muted);font-size:.9rem;background:#fff}
     @media (max-width:560px){.btn{width:100%}.cover{aspect-ratio:16/9}}
   </style>
@@ -84,13 +72,13 @@
 
   <section class="hero">
     <div class="container hero-inner">
-      <div class="kicker"><span class="dot"></span> Microsoft 365 · Exchange Online</div>
-      <h1>Key differences between Distribution Lists and Shared Mailboxes</h1>
-      <p class="subtitle">A simple decision guide: choose the right object and avoid messy mail workflows.</p>
+      <div class="kicker"><span class="dot"></span> Exchange Online · Architecture</div>
+      <h1>Distribution List vs Shared Mailbox</h1>
+      <p class="subtitle">
+        This is an architecture decision, not a preference. If you choose the wrong object, you create operational debt: unclear ownership, inconsistent replies, missing audit trail, and accidental data exposure through membership sprawl.
+      </p>
       <div class="meta">
-        <span>2026-03-03</span>
-        <span>8 min read</span>
-        <span>Mail flow</span>
+        <span>2026-03-03</span><span>10 min read</span><span>Mail objects</span><span>Governance</span>
       </div>
     </div>
   </section>
@@ -99,117 +87,48 @@
     <div class="container">
       <article class="article">
         <div class="cover">
-          <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1600&q=80" alt="Team collaboration" />
+          <img alt="" src="data:image/svg+xml;charset=UTF-8,<?xml version='1.0'?><svg xmlns='http://www.w3.org/2000/svg' width='1200' height='675' viewBox='0 0 1200 675'><defs><linearGradient id='g' x1='0' x2='1'><stop offset='0' stop-color='%232563eb'/><stop offset='0.55' stop-color='%237c3aed'/><stop offset='1' stop-color='%2306b6d4'/></linearGradient></defs><rect width='1200' height='675' fill='%230b1220'/><circle cx='1040' cy='520' r='320' fill='url(%23g)' opacity='0.2'/><rect x='140' y='210' width='520' height='320' rx='24' fill='%230f1a2f' stroke='rgba(255,255,255,0.18)'/><text x='170' y='260' fill='rgba(255,255,255,0.8)' font-family='Segoe UI, Arial' font-size='20' font-weight='700'>Distribution List</text><circle cx='220' cy='330' r='34' fill='rgba(255,255,255,0.10)'/><circle cx='320' cy='330' r='34' fill='rgba(255,255,255,0.10)'/><circle cx='420' cy='330' r='34' fill='rgba(255,255,255,0.10)'/><rect x='190' y='380' width='300' height='14' rx='8' fill='rgba(255,255,255,0.12)'/><rect x='720' y='210' width='340' height='320' rx='24' fill='%230f1a2f' stroke='rgba(255,255,255,0.18)'/><text x='750' y='260' fill='rgba(255,255,255,0.8)' font-family='Segoe UI, Arial' font-size='20' font-weight='700'>Shared Mailbox</text><rect x='760' y='300' width='260' height='170' rx='18' fill='rgba(255,255,255,0.06)'/><path d='M780 332h220M780 370h200M780 408h180' stroke='rgba(255,255,255,0.25)' stroke-width='10' stroke-linecap='round'/><text x='140' y='140' fill='rgba(255,255,255,0.85)' font-family='Segoe UI, Arial' font-size='34' font-weight='700'>Mail Objects %E2%80%A2 DL vs Shared</text></svg>">
         </div>
 
         <div class="body">
-
-          <div class="toc">
-            <strong>Table of contents</strong>
-            <ul>
-              <li><a href="#definitions">Definitions</a></li>
-              <li><a href="#rules">Fast decision rules</a></li>
-              <li><a href="#comparison">Comparison table</a></li>
-              <li><a href="#external">External email notes</a></li>
-              <li><a href="#governance">Governance checklist</a></li>
-              <li><a href="#mistakes">Common mistakes</a></li>
-            </ul>
+          <div class="callout">
+            Decision rule: if you need a shared workflow and visibility, build a shared mailbox. If you need broadcast distribution, build a distribution group. Anything else is you inventing pain.
           </div>
 
-          <h2 id="definitions">Definitions</h2>
-          <ul>
-            <li><strong>Distribution List (Distribution group)</strong>: broadcasts email to members.</li>
-            <li><strong>Shared Mailbox</strong>: a central mailbox multiple people access and manage.</li>
-          </ul>
+          <h2>What a distribution list actually gives you</h2>
+          <p>
+            A distribution list (distribution group) is message replication. Each member receives a copy into their own mailbox. Operationally, this is good for announcements and simple routing. It is not good for coordinated handling of a shared inbox because there is no shared state. “Someone handle this” becomes a human process problem with no built-in enforcement.
+          </p>
 
-          <h2 id="rules">Fast decision rules</h2>
-          <ul>
-            <li><strong>Everyone needs a copy</strong> → Distribution List.</li>
-            <li><strong>One shared workflow</strong> (triage, assign, reply) → Shared Mailbox.</li>
-            <li><strong>Need auditability</strong> for a team inbox → Shared Mailbox with clear delegation and sent-item behavior.</li>
-          </ul>
+          <h2>What a shared mailbox actually gives you</h2>
+          <p>
+            A shared mailbox is a shared state container. Messages land in one place, multiple people can access it, and replies can be sent under a shared identity (Send As) or as individual attribution (Send on Behalf). This structure supports triage and ownership patterns, but it also creates delegation and governance requirements.
+          </p>
 
-          <h2 id="comparison">Comparison table</h2>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Feature</th>
-                  <th>Distribution List</th>
-                  <th>Shared Mailbox</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Where messages live</td>
-                  <td>In each member mailbox</td>
-                  <td>In shared mailbox folders</td>
-                </tr>
-                <tr>
-                  <td>Reply identity</td>
-                  <td>Typically replies as user</td>
-                  <td>Can reply as mailbox (Send As / On Behalf)</td>
-                </tr>
-                <tr>
-                  <td>Best for</td>
-                  <td>Announcements, broadcast communication</td>
-                  <td>Support, reception, finance, bookings</td>
-                </tr>
-                <tr>
-                  <td>Ownership</td>
-                  <td>Membership management</td>
-                  <td>Permissions + workflow ownership</td>
-                </tr>
-                <tr>
-                  <td>External email</td>
-                  <td>Optional, admin-controlled</td>
-                  <td>Standard mailbox behavior</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <h2>Operational risk and governance</h2>
+          <p>
+            DLs drift through membership creep. Shared mailboxes drift through permission creep. Both become security problems when nobody owns them. Your goal should be to treat these objects like managed resources: clear owners, periodic reviews, documented intent, and predictable client behavior.
+          </p>
 
-          <h2 id="external">External email notes</h2>
-          <ul>
-            <li>Allowing external senders to DLs can increase spam. Restrict senders when needed.</li>
-            <li>Shared mailboxes used publicly should be protected by anti-spam/phishing policy and monitored.</li>
-          </ul>
-
-          <h2 id="governance">Governance checklist</h2>
-          <ul>
-            <li>Assign an owner (one accountable person/team).</li>
-            <li>Document allowed senders (especially for restricted DLs).</li>
-            <li>For shared mailboxes: standardize Send As vs Send on Behalf and sent-item behavior.</li>
-            <li>Review membership/permissions quarterly.</li>
-          </ul>
-
-          <h2 id="mistakes">Common mistakes</h2>
-          <ul>
-            <li>Using a shared mailbox when a simple group broadcast was needed.</li>
-            <li>Using a DL when the business actually needed a shared workflow and visibility.</li>
-            <li>No owner. Objects become abandoned and “mysteriously broken.”</li>
-          </ul>
+          <h2>External email considerations</h2>
+          <p>
+            Allowing external senders to DLs can increase spam exposure. Shared mailboxes used as public contact points should be protected by anti-spam and anti-phishing controls, and monitored like an intake channel. The “object choice” affects the blast radius and the monitoring you need.
+          </p>
 
           <div class="divider"></div>
-
-          <div class="callout">
-            <strong>Need help?</strong> If your tenant has mail-object sprawl, we can standardize the patterns.
-            <div class="actions">
-              <a class="btn btn-primary" href="/index.html#contact">Request an Assessment</a>
-              <a class="btn" href="/blog.html">Back to Blog</a>
-            </div>
-          </div>
 
           <div class="refs">
             <strong>Microsoft references</strong>
             <ul>
-              <li><a href="https://learn.microsoft.com/en-us/microsoft-365/admin/create-groups/compare-groups?view=o365-worldwide" target="_blank" rel="noopener">Compare types of groups in Microsoft 365 (distribution groups)</a></li>
               <li><a href="https://learn.microsoft.com/en-us/exchange/recipients-in-exchange-online/manage-distribution-groups/manage-distribution-groups" target="_blank" rel="noopener">Create and manage distribution groups in Exchange Online</a></li>
               <li><a href="https://learn.microsoft.com/en-us/exchange/collaboration-exo/shared-mailboxes" target="_blank" rel="noopener">Shared mailboxes in Exchange Online</a></li>
-              <li><a href="https://learn.microsoft.com/en-us/microsoft-365/admin/email/about-shared-mailboxes?view=o365-worldwide" target="_blank" rel="noopener">About shared mailboxes (Microsoft 365 admin)</a></li>
+              <li><a href="https://learn.microsoft.com/en-us/microsoft-365/admin/create-groups/compare-groups?view=o365-worldwide" target="_blank" rel="noopener">Compare group types in Microsoft 365</a></li>
             </ul>
           </div>
 
+          <div class="callout">
+            If you want a tenant-wide mail object standard (naming, ownership, permissions, and review cadence), that’s a short engagement and it pays for itself.
+          </div>
         </div>
       </article>
     </div>
