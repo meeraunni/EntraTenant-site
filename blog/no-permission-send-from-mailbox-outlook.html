@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>You don’t have permission to send from this mailbox (Outlook) | Sentinel Identity</title>
-  <meta name="description" content="Fix the Outlook error 'You don’t have permission to send messages from this mailbox'. Learn Send As vs Send on Behalf vs Full Access, how to verify permissions, and common Outlook cache issues." />
+  <meta name="description" content="Engineer-level breakdown of Outlook send permission failures: how Exchange evaluates Send As vs Send on Behalf, why Full Access is not enough, and how Outlook caching creates false negatives." />
   <meta name="theme-color" content="#ffffff" />
 
   <style>
@@ -14,10 +14,9 @@
       --shadow: 0 10px 25px rgba(17,24,39,.06); --radius:16px; --max:980px;
     }
     *{box-sizing:border-box} html,body{margin:0;padding:0}
-    body{font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:var(--text);background:var(--bg);line-height:1.6}
+    body{font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:var(--text);background:var(--bg);line-height:1.65}
     a{color:var(--link);text-decoration:none} a:hover{text-decoration:underline}
     .container{width:min(var(--max), calc(100% - 32px));margin:0 auto}
-
     .header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
     .nav{min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:16px}
     .brand{display:flex;align-items:center;gap:12px;min-width:0;color:inherit}
@@ -32,31 +31,25 @@
     .hero-inner{padding:28px 0 18px}
     .kicker{display:flex;gap:10px;align-items:center;color:var(--muted);font-weight:900;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase}
     .dot{width:8px;height:8px;border-radius:999px;background:#2563eb}
-    h1{margin:10px 0 0;font-size:clamp(1.8rem, 3.2vw, 2.35rem);letter-spacing:-.02em;line-height:1.12}
-    .subtitle{margin:10px 0 0;color:var(--muted);max-width:78ch}
+    h1{margin:10px 0 0;font-size:clamp(1.9rem, 3.2vw, 2.45rem);letter-spacing:-.02em;line-height:1.15}
+    .subtitle{margin:10px 0 0;color:var(--muted);max-width:92ch}
+
+    main{padding:22px 0 52px}
     .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
     .meta span{background:var(--chip);border:1px solid var(--border);color:#374151;font-weight:900;font-size:.82rem;border-radius:999px;padding:5px 9px}
 
-    main{padding:22px 0 52px}
     .article{margin-top:16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
-    .cover{width:100%;aspect-ratio:16/6;background:#e5e7eb;overflow:hidden}
+    .cover{width:100%;aspect-ratio:16/6;background:#0b1220}
     .cover img{width:100%;height:100%;object-fit:cover;display:block}
     .body{padding:18px}
+
     h2{margin:22px 0 10px;font-size:1.25rem;letter-spacing:-.01em}
-    h3{margin:16px 0 8px;font-size:1.02rem}
     p{margin:10px 0}
-    ul,ol{margin:10px 0 0;padding-left:18px}
-    li{margin:7px 0}
     .callout{margin-top:14px;border:1px solid var(--border);background:var(--bg2);border-radius:14px;padding:14px}
-    .toc{margin-top:14px;border:1px solid var(--border);background:#fff;border-radius:14px;padding:14px}
-    .toc a{font-weight:900}
     pre{margin:12px 0;padding:12px;border-radius:14px;border:1px solid var(--border);background:#0b1220;color:#eaf1ff;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.9rem}
     .divider{height:1px;background:var(--border);margin:18px 0}
-    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
-
     .refs{margin-top:18px;border-top:1px solid var(--border);padding-top:14px;color:var(--muted);font-size:.95rem}
     .refs a{font-weight:800}
-
     .footer{border-top:1px solid var(--border);padding:22px 0 18px;color:var(--muted);font-size:.9rem;background:#fff}
     @media (max-width:560px){.btn{width:100%}.cover{aspect-ratio:16/9}}
   </style>
@@ -65,7 +58,7 @@
 <body>
   <header class="header">
     <div class="container">
-      <nav class="nav" aria-label="Main navigation">
+      <nav class="nav">
         <a class="brand" href="/index.html">
           <div class="brand-badge" aria-hidden="true"></div>
           <div class="brand-text">
@@ -82,11 +75,11 @@
     <div class="container hero-inner">
       <div class="kicker"><span class="dot"></span> Exchange Online · Outlook</div>
       <h1>You don’t have permission to send messages from this mailbox</h1>
-      <p class="subtitle">Most cases are one of three issues: missing Send As, missing Send on Behalf, or Outlook caching stale permissions.</p>
+      <p class="subtitle">
+        This is a permission evaluation failure somewhere between Outlook, Exchange delegation, and directory replication. The correct fix is to verify which sender identity Outlook is using, which permission model is required (Send As vs Send on Behalf), and whether the client is operating with stale cached permissions.
+      </p>
       <div class="meta">
-        <span>2026-03-03</span>
-        <span>7 min read</span>
-        <span>Mailbox delegation</span>
+        <span>2026-03-03</span><span>10 min read</span><span>Delegation</span><span>Send As</span>
       </div>
     </div>
   </section>
@@ -95,107 +88,82 @@
     <div class="container">
       <article class="article">
         <div class="cover">
-          <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1600&q=80" alt="Work dashboard and laptop" />
+          <img alt="" src="data:image/svg+xml;charset=UTF-8,<?xml version='1.0'?><svg xmlns='http://www.w3.org/2000/svg' width='1200' height='675' viewBox='0 0 1200 675'><defs><linearGradient id='g' x1='0' x2='1'><stop offset='0' stop-color='%232563eb'/><stop offset='0.55' stop-color='%237c3aed'/><stop offset='1' stop-color='%2306b6d4'/></linearGradient></defs><rect width='1200' height='675' fill='%230b1220'/><circle cx='230' cy='160' r='260' fill='url(%23g)' opacity='0.2'/><rect x='160' y='220' width='740' height='300' rx='24' fill='%230f1a2f' stroke='rgba(255,255,255,0.18)'/><path d='M200 280h660v180H200z' fill='rgba(255,255,255,0.06)'/><path d='M200 280l330 160 330-160' fill='none' stroke='rgba(255,255,255,0.25)' stroke-width='10' stroke-linecap='round' stroke-linejoin='round'/><rect x='920' y='280' width='180' height='220' rx='22' fill='rgba(255,255,255,0.08)' stroke='rgba(255,255,255,0.18)'/><path d='M1010 330c-28 0-50 22-50 50v20h100v-20c0-28-22-50-50-50z' fill='rgba(255,255,255,0.18)'/><rect x='965' y='400' width='90' height='70' rx='14' fill='url(%23g)'/><text x='160' y='140' fill='rgba(255,255,255,0.85)' font-family='Segoe UI, Arial' font-size='34' font-weight='700'>Outlook %E2%80%A2 Send Permission</text></svg>">
         </div>
 
         <div class="body">
           <div class="callout">
-            <strong>Important:</strong> Full Access lets you open the mailbox. It does not grant sending rights.
+            Key point: Full Access allows mailbox access. It does not grant send rights. “I can open the mailbox” is not evidence you can send as it.
           </div>
 
-          <div class="toc">
-            <strong>Table of contents</strong>
-            <ul>
-              <li><a href="#meaning">What this error means</a></li>
-              <li><a href="#permissions">Full Access vs Send As vs Send on Behalf</a></li>
-              <li><a href="#user-checks">User-side checks (fast)</a></li>
-              <li><a href="#admin-checks">Admin-side checks</a></li>
-              <li><a href="#ps-verify">PowerShell: verify</a></li>
-              <li><a href="#ps-fix">PowerShell: fix</a></li>
-              <li><a href="#verify">Verify and troubleshoot</a></li>
-            </ul>
-          </div>
-
-          <h2 id="meaning">What this error means</h2>
+          <h2>How Exchange evaluates the sender</h2>
           <p>
-            Outlook attempted to send using a mailbox address. Exchange rejected the send because the user does not have the correct send permission, or Outlook is still using a cached permission state.
+            When you send email from a shared mailbox, Exchange evaluates the sender identity and the permission type. Send As means the message appears to originate from the shared mailbox and requires Send As permission. Send on Behalf means the message is sent by a user on behalf of the mailbox and requires the mailbox’s on-behalf delegation.
+          </p>
+          <p>
+            Many incidents come from a mismatch: the helpdesk assigns Full Access and expects Send As, or assigns Send on Behalf but the user selects the shared mailbox address in From, which triggers a Send As evaluation instead.
           </p>
 
-          <h2 id="permissions">Full Access vs Send As vs Send on Behalf</h2>
-          <ul>
-            <li><strong>Full Access</strong>: open/read mailbox.</li>
-            <li><strong>Send As</strong>: message appears from the mailbox.</li>
-            <li><strong>Send on Behalf</strong>: message shows “User on behalf of Mailbox”.</li>
-          </ul>
+          <h2>Why Outlook fails when OWA works</h2>
+          <p>
+            Outlook desktop caches connection state and authorization metadata. If permissions were recently changed, the mailbox was auto-mapped, or the user has multiple profiles/accounts, Outlook can operate with stale authorization data for longer than expected. In those cases, OWA succeeds (server-side evaluation with fresh state) while Outlook fails (cached state).
+          </p>
 
-          <h2 id="user-checks">User-side checks (fast)</h2>
-          <ol>
-            <li>Confirm the <strong>From</strong> field is the shared mailbox (not the user mailbox).</li>
-            <li>Try sending from <strong>Outlook on the web</strong>. If OWA works and Outlook desktop fails, it’s caching/profile.</li>
-            <li>Close Outlook completely and reopen.</li>
-            <li>If still failing, create a <strong>new Outlook profile</strong> (reliable reset).</li>
-          </ol>
+          <h2>Validation workflow (what to prove)</h2>
+          <p>
+            First, confirm which From address the client is using. That determines whether you need Send As or Send on Behalf. Second, validate the permission exists at the directory level. Third, validate propagation and client state by testing in OWA. This isolates whether you have a server-side permission gap or a client-side cache/profile issue.
+          </p>
 
-          <h2 id="admin-checks">Admin-side checks</h2>
-          <ol>
-            <li>Confirm user has <strong>Send As</strong> or <strong>Send on Behalf</strong> (not just Full Access).</li>
-            <li>Allow time for permission replication.</li>
-            <li>If mailbox is auto-mapped and recently changed, Outlook may need a profile refresh.</li>
-          </ol>
-
-          <h2 id="ps-verify">PowerShell: verify permissions</h2>
+          <h2>PowerShell verification (Exchange Online)</h2>
           <pre># Connect-ExchangeOnline
 
 $SharedMailbox = "shared@domain.com"
 $User = "user@domain.com"
 
-"Full Access"
+"Full Access (mailbox access)"
 Get-MailboxPermission -Identity $SharedMailbox |
   Where-Object { $_.User -like "*$User*" } |
   Format-Table User,AccessRights,IsInherited -Auto
 
-"Send As"
+"Send As (sender identity)"
 Get-RecipientPermission -Identity $SharedMailbox |
   Where-Object { $_.Trustee -like "*$User*" } |
   Format-Table Trustee,AccessRights,IsInherited -Auto
 
-"Send on Behalf"
+"Send on Behalf (delegation)"
 (Get-Mailbox -Identity $SharedMailbox).GrantSendOnBehalfTo</pre>
 
-          <h2 id="ps-fix">PowerShell: assign the missing permission</h2>
+          <h2>Remediation patterns (choose one and standardize)</h2>
+          <p>
+            From an operational perspective, the right move is to standardize your delegation pattern. Decide whether your org uses Send As (preferred for shared identity) or Send on Behalf (preferred when individual attribution is desired), and then configure consistently. Mixing patterns creates user confusion and intermittent failures.
+          </p>
 
-          <h3>Assign Send As</h3>
-          <pre>Add-RecipientPermission -Identity $SharedMailbox -Trustee $User -AccessRights SendAs -Confirm:$false</pre>
+          <h2>Assigning the permission (Exchange Online PowerShell)</h2>
+          <pre># Send As
+Add-RecipientPermission -Identity $SharedMailbox -Trustee $User -AccessRights SendAs -Confirm:$false
 
-          <h3>Assign Send on Behalf</h3>
-          <pre>Set-Mailbox -Identity $SharedMailbox -GrantSendOnBehalfTo @{Add=$User}</pre>
+# Send on Behalf
+Set-Mailbox -Identity $SharedMailbox -GrantSendOnBehalfTo @{Add=$User}</pre>
 
-          <h2 id="verify">Verify and troubleshoot</h2>
-          <ul>
-            <li><strong>OWA works, Outlook fails:</strong> Outlook cache/profile issue. New profile usually resolves.</li>
-            <li><strong>Both fail:</strong> permission missing or wrong From address.</li>
-            <li><strong>Only some users fail:</strong> inconsistent delegation or multiple accounts causing From confusion.</li>
-          </ul>
+          <h2>Client stabilization (when it’s Outlook cache)</h2>
+          <p>
+            If OWA works but Outlook fails after permissions are confirmed, treat Outlook as a cache problem. The most reliable fix is to create a new Outlook profile. This forces the client to rebuild mappings and tokens. This is not “turn it off and on,” it is forcing a clean state in a client that is designed to cache aggressively.
+          </p>
 
           <div class="divider"></div>
-
-          <div class="callout">
-            <strong>Need help?</strong> If shared mailbox delegation is inconsistent across users/clients, we can standardize it and reduce repeat tickets.
-            <div class="actions">
-              <a class="btn btn-primary" href="/index.html#contact">Request an Assessment</a>
-              <a class="btn" href="/blog.html">Back to Blog</a>
-            </div>
-          </div>
 
           <div class="refs">
             <strong>Microsoft references</strong>
             <ul>
-              <li><a href="https://learn.microsoft.com/en-us/exchange/recipients-in-exchange-online/manage-permissions-for-recipients" target="_blank" rel="noopener">Manage permissions for recipients (Full Access, Send As, Send on Behalf)</a></li>
               <li><a href="https://learn.microsoft.com/en-us/exchange/collaboration-exo/shared-mailboxes" target="_blank" rel="noopener">Shared mailboxes in Exchange Online</a></li>
+              <li><a href="https://learn.microsoft.com/en-us/exchange/recipients-in-exchange-online/manage-permissions-for-recipients" target="_blank" rel="noopener">Manage permissions for recipients (Full Access, Send As, Send on Behalf)</a></li>
               <li><a href="https://learn.microsoft.com/en-us/microsoft-365/admin/email/about-shared-mailboxes?view=o365-worldwide" target="_blank" rel="noopener">About shared mailboxes (Microsoft 365 admin)</a></li>
             </ul>
           </div>
 
+          <div class="callout">
+            If this is recurring across multiple shared mailboxes, the issue is governance, not one mailbox. Standardize the delegation model, document “how to send” for users, and align client configuration.
+          </div>
         </div>
       </article>
     </div>
