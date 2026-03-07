@@ -460,7 +460,6 @@
       flex-wrap:wrap;
     }
 
-    /* Responsive */
     @media (max-width: 1100px){
       .nav-links{ display:none; }
       .mobile-menu-btn{ display:block; }
@@ -532,13 +531,13 @@
       <div class="hero-inner">
         <div>
           <h1>Sentinel Identity Blog</h1>
-          <p>Entra ID and Microsoft 365 troubleshooting, simplified.</p>
+          <p>Entra ID and Microsoft 365 admin fixes, written like an engineer.</p>
         </div>
 
         <div class="hero-right">
           <div class="hero-card">
             <h3>What you’ll find here</h3>
-            <p>Short guides for identity, Exchange, Defender, and common admin issues.</p>
+            <p>Identity and messaging issues explained with root cause, validation, and remediation patterns.</p>
           </div>
         </div>
       </div>
@@ -548,13 +547,12 @@
   <main>
     <div class="container">
       <div class="layout">
-        <!-- Main -->
         <div>
           <h2 class="section-title">Recent posts</h2>
 
           <div class="controls" aria-label="Blog controls">
             <div class="search">
-              <input id="searchInput" type="text" placeholder="Search posts (e.g., AADSTS76026, shared mailbox, Defender)" />
+              <input id="searchInput" type="text" placeholder="Search posts (e.g., AADSTS76026, Send As, Explorer, Sent Items)" />
             </div>
 
             <div class="chips" aria-label="Topic filters">
@@ -569,7 +567,6 @@
           <div id="feed" class="feed" aria-label="Blog feed"></div>
         </div>
 
-        <!-- Sidebar -->
         <aside class="side" aria-label="Sidebar">
           <div class="side-card">
             <h3>Topics</h3>
@@ -601,7 +598,7 @@
             </div>
           </div>
           <div style="color:var(--muted); font-size:.92rem;">
-            Practical guidance for identity and Microsoft 365 administration.
+            Practical identity and admin guidance.
           </div>
         </div>
 
@@ -643,7 +640,6 @@
   </footer>
 
   <script>
-    // Mobile menu
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');
     const mobilePanel = document.getElementById('mobilePanel');
 
@@ -662,62 +658,169 @@
       });
     }
 
-    // Posts data (edit this when you publish new posts)
+    // Topic-matched SVG banners (self-contained)
+    const svgAADSTS = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
+        <defs>
+          <linearGradient id="g" x1="0" x2="1">
+            <stop offset="0" stop-color="#2563eb"/>
+            <stop offset="0.55" stop-color="#7c3aed"/>
+            <stop offset="1" stop-color="#06b6d4"/>
+          </linearGradient>
+        </defs>
+        <rect width="1200" height="675" fill="#0b1220"/>
+        <circle cx="230" cy="150" r="260" fill="url(#g)" opacity="0.25"/>
+        <circle cx="1080" cy="560" r="320" fill="url(#g)" opacity="0.18"/>
+        <rect x="120" y="170" width="520" height="340" rx="24" fill="#0f1a2f" stroke="rgba(255,255,255,0.18)"/>
+        <rect x="120" y="170" width="520" height="60" rx="24" fill="#0f1a2f"/>
+        <circle cx="165" cy="200" r="8" fill="#ff5f57"/><circle cx="195" cy="200" r="8" fill="#febc2e"/><circle cx="225" cy="200" r="8" fill="#28c840"/>
+        <rect x="170" y="270" width="360" height="44" rx="12" fill="rgba(255,255,255,0.08)"/>
+        <rect x="170" y="334" width="320" height="44" rx="12" fill="rgba(255,255,255,0.08)"/>
+        <rect x="170" y="408" width="220" height="44" rx="12" fill="url(#g)"/>
+        <path d="M860 210c-96 0-174 78-174 174 0 116 98 214 174 240 76-26 174-124 174-240 0-96-78-174-174-174z" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.18)"/>
+        <path d="M860 285l78 34v64c0 58-42 114-78 130-36-16-78-72-78-130v-64l78-34z" fill="url(#g)" opacity="0.9"/>
+        <text x="120" y="120" fill="rgba(255,255,255,0.85)" font-family="Segoe UI, Arial" font-size="34" font-weight="700">SAML SSO • Request Expired</text>
+      </svg>
+    `);
+
+    const svgDefender = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
+        <defs>
+          <linearGradient id="g" x1="0" x2="1">
+            <stop offset="0" stop-color="#2563eb"/>
+            <stop offset="0.55" stop-color="#7c3aed"/>
+            <stop offset="1" stop-color="#06b6d4"/>
+          </linearGradient>
+        </defs>
+        <rect width="1200" height="675" fill="#0b1220"/>
+        <circle cx="260" cy="520" r="300" fill="url(#g)" opacity="0.22"/>
+        <circle cx="980" cy="160" r="260" fill="url(#g)" opacity="0.16"/>
+        <rect x="180" y="210" width="660" height="340" rx="24" fill="#0f1a2f" stroke="rgba(255,255,255,0.18)"/>
+        <path d="M220 270h580v220H220z" fill="rgba(255,255,255,0.06)"/>
+        <path d="M220 270l290 170L800 270" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M880 240c-86 0-156 70-156 156 0 104 88 192 156 216 68-24 156-112 156-216 0-86-70-156-156-156z" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.18)"/>
+        <path d="M880 305l70 30v58c0 52-38 102-70 116-32-14-70-64-70-116v-58l70-30z" fill="url(#g)" opacity="0.9"/>
+        <text x="180" y="140" fill="rgba(255,255,255,0.85)" font-family="Segoe UI, Arial" font-size="34" font-weight="700">Defender • Email Remediation</text>
+      </svg>
+    `);
+
+    const svgSendPerm = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
+        <defs>
+          <linearGradient id="g" x1="0" x2="1">
+            <stop offset="0" stop-color="#2563eb"/>
+            <stop offset="0.55" stop-color="#7c3aed"/>
+            <stop offset="1" stop-color="#06b6d4"/>
+          </linearGradient>
+        </defs>
+        <rect width="1200" height="675" fill="#0b1220"/>
+        <circle cx="230" cy="160" r="260" fill="url(#g)" opacity="0.2"/>
+        <rect x="160" y="220" width="740" height="300" rx="24" fill="#0f1a2f" stroke="rgba(255,255,255,0.18)"/>
+        <path d="M200 280h660v180H200z" fill="rgba(255,255,255,0.06)"/>
+        <path d="M200 280l330 160 330-160" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+        <rect x="920" y="280" width="180" height="220" rx="22" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.18)"/>
+        <path d="M1010 330c-28 0-50 22-50 50v20h100v-20c0-28-22-50-50-50z" fill="rgba(255,255,255,0.18)"/>
+        <rect x="965" y="400" width="90" height="70" rx="14" fill="url(#g)"/>
+        <text x="160" y="140" fill="rgba(255,255,255,0.85)" font-family="Segoe UI, Arial" font-size="34" font-weight="700">Outlook • Send Permission</text>
+      </svg>
+    `);
+
+    const svgDLvsShared = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
+        <defs>
+          <linearGradient id="g" x1="0" x2="1">
+            <stop offset="0" stop-color="#2563eb"/>
+            <stop offset="0.55" stop-color="#7c3aed"/>
+            <stop offset="1" stop-color="#06b6d4"/>
+          </linearGradient>
+        </defs>
+        <rect width="1200" height="675" fill="#0b1220"/>
+        <circle cx="1040" cy="520" r="320" fill="url(#g)" opacity="0.2"/>
+        <rect x="140" y="210" width="520" height="320" rx="24" fill="#0f1a2f" stroke="rgba(255,255,255,0.18)"/>
+        <text x="170" y="260" fill="rgba(255,255,255,0.8)" font-family="Segoe UI, Arial" font-size="20" font-weight="700">Distribution List</text>
+        <circle cx="220" cy="330" r="34" fill="rgba(255,255,255,0.10)"/><circle cx="320" cy="330" r="34" fill="rgba(255,255,255,0.10)"/><circle cx="420" cy="330" r="34" fill="rgba(255,255,255,0.10)"/>
+        <rect x="190" y="380" width="300" height="14" rx="8" fill="rgba(255,255,255,0.12)"/>
+        <rect x="720" y="210" width="340" height="320" rx="24" fill="#0f1a2f" stroke="rgba(255,255,255,0.18)"/>
+        <text x="750" y="260" fill="rgba(255,255,255,0.8)" font-family="Segoe UI, Arial" font-size="20" font-weight="700">Shared Mailbox</text>
+        <rect x="760" y="300" width="260" height="170" rx="18" fill="rgba(255,255,255,0.06)"/>
+        <path d="M780 332h220M780 370h200M780 408h180" stroke="rgba(255,255,255,0.25)" stroke-width="10" stroke-linecap="round"/>
+        <text x="140" y="140" fill="rgba(255,255,255,0.85)" font-family="Segoe UI, Arial" font-size="34" font-weight="700">Mail Objects • DL vs Shared</text>
+      </svg>
+    `);
+
+    const svgSentItems = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
+        <defs>
+          <linearGradient id="g" x1="0" x2="1">
+            <stop offset="0" stop-color="#2563eb"/>
+            <stop offset="0.55" stop-color="#7c3aed"/>
+            <stop offset="1" stop-color="#06b6d4"/>
+          </linearGradient>
+        </defs>
+        <rect width="1200" height="675" fill="#0b1220"/>
+        <circle cx="240" cy="520" r="300" fill="url(#g)" opacity="0.18"/>
+        <rect x="160" y="220" width="720" height="300" rx="24" fill="#0f1a2f" stroke="rgba(255,255,255,0.18)"/>
+        <path d="M240 420l520-140-180 220-40-92z" fill="url(#g)" opacity="0.9"/>
+        <rect x="920" y="240" width="220" height="260" rx="22" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.18)"/>
+        <text x="950" y="290" fill="rgba(255,255,255,0.75)" font-family="Segoe UI, Arial" font-size="18" font-weight="700">Sent Items</text>
+        <path d="M950 330h160M950 368h160M950 406h130" stroke="rgba(255,255,255,0.25)" stroke-width="10" stroke-linecap="round"/>
+        <text x="160" y="140" fill="rgba(255,255,255,0.85)" font-family="Segoe UI, Arial" font-size="34" font-weight="700">Shared Mailbox • Sent Items</text>
+      </svg>
+    `);
+
     const posts = [
       {
         title: "AADSTS76026: The request has expired. Try to submit new request.",
         slug: "aadsts76026-request-expired.html",
         date: "2026-03-03",
         tags: ["Entra ID", "SAML SSO"],
-        excerpt: "Fix for SAML apps launched from My Apps. Set the Sign-on URL so Entra initiates a fresh request.",
-        minutes: 6,
-        image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1200&q=80"
+        excerpt: "Why it happens in SAML, how to prove it in logs, and how Sign-on URL fixes IdP-initiated launches.",
+        minutes: 8,
+        image: svgAADSTS
       },
       {
         title: "How to recall a message using Microsoft Defender",
         slug: "recall-message-microsoft-defender.html",
         date: "2026-03-03",
         tags: ["Microsoft Defender", "M365"],
-        excerpt: "Outlook recall is not remediation. Use Defender workflows to remove or neutralize email across mailboxes.",
-        minutes: 5,
-        image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1200&q=80"
+        excerpt: "A remediation workflow: locate, scope, execute removal, approve AIR actions, and validate outcomes.",
+        minutes: 9,
+        image: svgDefender
       },
       {
         title: "You don’t have permission to send messages from this mailbox (Outlook app)",
         slug: "no-permission-send-from-mailbox-outlook.html",
         date: "2026-03-03",
         tags: ["Exchange Online", "Outlook"],
-        excerpt: "Send As vs Send on Behalf, Full Access confusion, and why Outlook fails even when OWA works.",
-        minutes: 7,
-        image: "https://images.unsplash.com/photo-1553729459-efe14ef6055d?auto=format&fit=crop&w=1200&q=80"
+        excerpt: "A permission model breakdown: Full Access vs Send As vs Send on Behalf, plus client caching behavior.",
+        minutes: 10,
+        image: svgSendPerm
       },
       {
         title: "Key differences between Distribution List and Shared Mailbox",
         slug: "distribution-list-vs-shared-mailbox.html",
         date: "2026-03-03",
         tags: ["Exchange Online", "Mail Flow"],
-        excerpt: "A practical comparison for admins: when to use a DL vs a shared mailbox, and the common mistakes.",
-        minutes: 8,
-        image: "https://images.unsplash.com/photo-1553877522-43269d4ea984?auto=format&fit=crop&w=1200&q=80"
+        excerpt: "An architecture decision: message routing vs shared workflow, governance implications, and operational pitfalls.",
+        minutes: 10,
+        image: svgDLvsShared
       },
       {
         title: "Shared mailbox sent mail appears in personal Sent Items",
         slug: "shared-mailbox-sent-items-personal.html",
         date: "2026-03-03",
         tags: ["Exchange Online", "Outlook"],
-        excerpt: "Why it happens and how to enable sent item copies in the shared mailbox Sent Items folder.",
-        minutes: 6,
-        image: "https://images.unsplash.com/photo-1560472355-536de3962603?auto=format&fit=crop&w=1200&q=80"
+        excerpt: "Why Sent Items diverges with delegation and how to enforce mailbox-side message copy controls reliably.",
+        minutes: 8,
+        image: svgSentItems
       }
     ];
 
-    // Sort newest first
     posts.sort((a,b) => (b.date || "").localeCompare(a.date || ""));
 
     const feed = document.getElementById("feed");
     const searchInput = document.getElementById("searchInput");
     const chips = Array.from(document.querySelectorAll(".chip"));
-
     let activeTag = "All";
 
     function setActiveChip(tag) {
@@ -726,24 +829,16 @@
       render();
     }
 
-    chips.forEach(chip => {
-      chip.addEventListener("click", () => setActiveChip(chip.dataset.filterTag));
-    });
-
-    if (searchInput) {
-      searchInput.addEventListener("input", () => render());
-    }
+    chips.forEach(chip => chip.addEventListener("click", () => setActiveChip(chip.dataset.filterTag)));
+    if (searchInput) searchInput.addEventListener("input", () => render());
 
     function matchesFilter(post, q) {
       const query = (q || "").trim().toLowerCase();
       const text = `${post.title} ${post.excerpt} ${(post.tags || []).join(" ")}`.toLowerCase();
-
       const tagOk =
         activeTag === "All" ||
         (post.tags || []).some(t => t.toLowerCase() === activeTag.toLowerCase());
-
       const searchOk = !query || text.includes(query);
-
       return tagOk && searchOk;
     }
 
@@ -761,7 +856,7 @@
       return `
         <a class="post" href="blog/${escapeHtml(p.slug)}" aria-label="Read post: ${escapeHtml(p.title)}">
           <div class="post-img">
-            <img src="${escapeHtml(p.image)}" alt="" />
+            <img src="${p.image}" alt="" />
           </div>
           <div class="post-body">
             <div class="meta">
@@ -780,12 +875,10 @@
     function render() {
       const q = searchInput ? searchInput.value : "";
       const filtered = posts.filter(p => matchesFilter(p, q));
-
       if (!filtered.length) {
         feed.innerHTML = `<div class="empty">No posts found. Try a different keyword or click “All”.</div>`;
         return;
       }
-
       feed.innerHTML = filtered.map(postHtml).join("");
     }
 
