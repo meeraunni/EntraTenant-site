@@ -3,380 +3,542 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AADSTS76026: The request has expired (SAML) | Sentinel Identity</title>
-  <meta name="description" content="Root cause analysis and deterministic fix for AADSTS76026 in Microsoft Entra ID SAML SSO. Includes verification and troubleshooting using sign-in logs." />
   <meta name="theme-color" content="#ffffff" />
+
+  <!-- AdSense (blog only) -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9915553948229076"
+    crossorigin="anonymous"></script>
+
+  <title>AADSTS76026: The request has expired | Sentinel Identity</title>
+  <meta name="description" content="Fix AADSTS76026 for SAML apps launched from My Apps: why the request expires, how Entra handles IdP vs SP initiated SSO, and why setting Sign-on URL forces a fresh authentication request." />
 
   <style>
     :root{
       --bg:#ffffff;
-      --bg2:#f6f8fb;
       --text:#0f172a;
       --muted:#475569;
       --muted2:#64748b;
-      --border:rgba(15,23,42,.10);
-      --panel:#ffffff;
-      --panel2:#fbfcff;
-      --shadow:0 10px 26px rgba(15,23,42,.08);
+      --border: rgba(15, 23, 42, .10);
+      --surface:#ffffff;
+      --surface2:#f8fafc;
       --blue:#2563eb;
-      --cyan:#0891b2;
-      --violet:#7c3aed;
-      --max:1180px;
-      --radius:16px;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      --blue2:#1d4ed8;
+      --codebg:#0b1220;
+      --codefg:#e5e7eb;
+      --max: 760px;
+      --radius: 14px;
+      --shadow: 0 18px 45px rgba(2,6,23,.08);
     }
 
     *{box-sizing:border-box}
     html,body{margin:0;padding:0}
+    html{scroll-behavior:smooth}
     body{
-      font-family: "Segoe UI", Inter, system-ui, -apple-system, Roboto, Arial, sans-serif;
-      color:var(--text);
-      background: linear-gradient(180deg, var(--bg), var(--bg2));
-      line-height:1.7;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.75;
     }
 
-    a{color:var(--blue);text-decoration:none}
+    a{color:var(--blue); text-decoration:none}
     a:hover{text-decoration:underline}
-    .container{width:min(var(--max), calc(100% - 32px)); margin:0 auto;}
 
-    /* Header */
-    header{
-      position:sticky; top:0; z-index:50;
-      backdrop-filter: blur(8px);
+    .topbar{
+      position: sticky;
+      top:0;
+      z-index:30;
       background: rgba(255,255,255,.86);
-      border-bottom:1px solid var(--border);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
     }
-    .nav{
-      min-height:64px;
-      display:flex; align-items:center; justify-content:space-between; gap:12px;
+
+    .topbar-inner{
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 14px 18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
     }
-    .brand{display:flex;align-items:center;gap:10px;min-width:0}
-    .logo{
-      width:34px;height:34px;border-radius:10px;
-      background: radial-gradient(circle at 30% 30%, #93c5fd, #2563eb 60%, #1d4ed8 90%);
-      border:1px solid var(--border);
-      box-shadow: 0 10px 20px rgba(37,99,235,.18);
-      flex:0 0 auto;
+
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      font-weight:800;
+      color: var(--text);
     }
-    .brand strong{font-weight:800;white-space:nowrap}
-    .brand span{color:var(--muted2);font-size:.86rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px}
-    .navlinks{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
-    .navlinks a{
-      color:var(--text);
-      font-weight:700;
-      padding:8px 10px;
-      border-radius:10px;
+    .mark{
+      width:30px; height:30px; border-radius:10px;
+      background: linear-gradient(135deg, #2563eb, #60a5fa);
     }
-    .navlinks a:hover{background:rgba(15,23,42,.04);text-decoration:none}
+    .navlinks{
+      display:flex; gap:12px; flex-wrap:wrap;
+      color: var(--muted);
+      font-weight:650;
+      font-size:.96rem;
+    }
+    .navlinks a{color:var(--muted); padding:6px 8px; border-radius:10px}
+    .navlinks a:hover{background: rgba(37,99,235,.06); text-decoration:none; color: var(--text)}
+
     .btn{
-      display:inline-flex;align-items:center;justify-content:center;
-      padding:10px 14px;border-radius:12px;font-weight:800;
-      border:1px solid var(--border); background:#fff; color:var(--text);
-    }
-    .btn.primary{
-      border:none;
-      color:#fff;
-      background: linear-gradient(90deg, var(--violet), var(--blue), var(--cyan));
-    }
-
-    /* Title area */
-    .titlebar{padding:22px 0 10px}
-    .kicker{
-      display:inline-flex;align-items:center;gap:8px;
-      font-weight:800;font-size:.85rem;color:var(--muted);
-      padding:6px 10px;border-radius:999px;
-      border:1px solid rgba(37,99,235,.18);
-      background: rgba(37,99,235,.06);
-    }
-    .dot{width:8px;height:8px;border-radius:999px;background:var(--blue)}
-    h1{margin:12px 0 8px;font-size:clamp(1.9rem, 2.9vw, 2.6rem);line-height:1.15;letter-spacing:-.02em}
-    .subtitle{margin:0;color:var(--muted);max-width:92ch}
-    .meta{margin-top:10px;display:flex;flex-wrap:wrap;gap:8px}
-    .pill{
-      font-size:.84rem;font-weight:700;color:var(--muted);
-      border:1px solid var(--border); background:rgba(15,23,42,.03);
-      padding:6px 10px;border-radius:999px;
-    }
-
-    /* Layout */
-    main{padding:14px 0 56px}
-    .layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start}
-    .panel{
-      background:var(--panel);
+      display:inline-flex; align-items:center; justify-content:center;
+      border-radius:999px;
+      padding:10px 14px;
       border:1px solid var(--border);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
+      background: var(--surface);
+      font-weight:750;
+      color: var(--text);
+      cursor:pointer;
     }
-    article{padding:18px 18px 6px}
-    article h2{margin:22px 0 8px;font-size:1.35rem;letter-spacing:-.01em}
-    article h3{margin:16px 0 6px;font-size:1.05rem}
-    article p{margin:0 0 12px;color:var(--muted)}
-    article ul{margin:0 0 12px 18px;color:var(--muted)}
-    article li{margin:6px 0}
+    .btn-primary{
+      border: 1px solid rgba(37,99,235,.20);
+      background: rgba(37,99,235,.10);
+    }
+    .btn-primary:hover{background: rgba(37,99,235,.14); text-decoration:none}
+
+    .wrap{
+      max-width: 1080px;
+      margin:0 auto;
+      padding: 0 18px 60px;
+      display:grid;
+      grid-template-columns: 1fr 280px;
+      gap: 26px;
+      align-items:start;
+    }
+
+    main{
+      max-width: var(--max);
+      padding-top: 34px;
+    }
+
+    .kicker{
+      color: var(--muted2);
+      font-weight:700;
+      letter-spacing:.02em;
+      font-size:.92rem;
+      text-transform: uppercase;
+    }
+
+    h1{
+      margin: 8px 0 10px;
+      font-size: clamp(2.0rem, 3.5vw, 2.7rem);
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+    }
+
+    .subtitle{
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 1.08rem;
+      max-width: 68ch;
+    }
+
+    .meta{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      color: var(--muted2);
+      font-size: .95rem;
+      margin: 0 0 22px;
+    }
+    .meta span{display:inline-flex; gap:6px; align-items:center}
+    .dot{width:4px;height:4px;border-radius:99px;background:rgba(71,85,105,.7)}
+
+    .hero-image{
+      width:100%;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      overflow:hidden;
+      box-shadow: var(--shadow);
+      margin: 14px 0 26px;
+    }
+    .hero-image img{width:100%;display:block}
+
+    article p{margin: 0 0 14px}
+    article h2{
+      margin: 26px 0 10px;
+      font-size: 1.35rem;
+      letter-spacing: -0.01em;
+    }
+    article h3{
+      margin: 18px 0 8px;
+      font-size: 1.10rem;
+    }
 
     .callout{
-      margin:14px 0;
-      padding:12px;
-      border-radius:14px;
-      border:1px solid rgba(8,145,178,.20);
-      background: rgba(8,145,178,.06);
-      color:var(--text);
+      border:1px solid var(--border);
+      background: var(--surface2);
+      border-radius: var(--radius);
+      padding: 14px 14px;
+      margin: 16px 0;
     }
-    .callout strong{display:block;margin-bottom:6px}
-    .warning{
-      border-color: rgba(220,38,38,.22);
-      background: rgba(220,38,38,.06);
-    }
+    .callout strong{display:block; margin-bottom:6px}
+    .callout.warn{border-color: rgba(185,28,28,.25); background: rgba(185,28,28,.05)}
+    .callout.info{border-color: rgba(37,99,235,.22); background: rgba(37,99,235,.05)}
 
     pre{
-      margin:12px 0;
-      padding:12px;
-      border-radius:14px;
-      border:1px solid rgba(15,23,42,.12);
-      background:#0b1220;
-      color:#e8efff;
+      margin: 14px 0 18px;
+      padding: 14px;
+      border-radius: var(--radius);
+      background: var(--codebg);
+      color: var(--codefg);
       overflow:auto;
-      font-family:var(--mono);
-      font-size:.92rem;
-      line-height:1.55;
+      border: 1px solid rgba(255,255,255,.08);
+      font-size: .92rem;
+      line-height: 1.6;
     }
+    code{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace}
 
-    code{font-family:var(--mono)}
-    .inline{
-      font-family:var(--mono);
-      background:rgba(15,23,42,.06);
-      border:1px solid rgba(15,23,42,.10);
-      padding:2px 6px;border-radius:8px;
-      color:#0f172a;
-      font-size:.92rem;
+    .tocbox{
+      position: sticky;
+      top: 86px;
+      border:1px solid var(--border);
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 14px;
+      box-shadow: var(--shadow);
     }
-
-    /* Sidebar */
-    aside{position:sticky;top:86px;display:grid;gap:12px}
-    .side{padding:14px}
-    .side h4{margin:0 0 10px;font-size:1rem}
-    .toc{display:grid;gap:8px}
+    .tocbox h4{margin:0 0 10px; font-size:1rem}
+    .toc{display:grid; gap:8px}
     .toc a{
-      display:block;
-      padding:10px 10px;
-      border-radius:12px;
-      border:1px solid rgba(15,23,42,.08);
-      background: rgba(15,23,42,.03);
-      color:var(--text);
-      font-weight:700;
-      font-size:.92rem;
-      text-decoration:none;
+      color: var(--muted);
+      font-weight:650;
+      font-size:.95rem;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: rgba(15,23,42,.02);
+      border: 1px solid transparent;
     }
-    .toc a:hover{background:rgba(37,99,235,.06);border-color:rgba(37,99,235,.18)}
-    .cta{width:100%;text-align:center}
+    .toc a:hover{background: rgba(37,99,235,.06); border-color: rgba(37,99,235,.10); text-decoration:none; color: var(--text)}
 
-    /* Footer */
-    footer{
-      border-top:1px solid var(--border);
-      padding:18px 0 30px;
-      color:var(--muted2);
-      background:#fff;
+    .sidecard{
+      margin-top: 12px;
+      border:1px solid var(--border);
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 14px;
+      box-shadow: var(--shadow);
     }
-    .foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;font-size:.92rem}
+    .sidecard h4{margin:0 0 8px; font-size:1rem}
+    .sidecard p{margin:0; color: var(--muted); font-size:.95rem}
+
+    .subscribe{
+      display:flex; gap:10px; flex-wrap:wrap;
+      margin-top: 10px;
+    }
+    .input{
+      flex:1 1 160px;
+      padding:10px 12px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background: var(--surface2);
+      outline:none;
+      font-size:.98rem;
+    }
+    .solid{
+      border:none;
+      background: var(--blue);
+      color:white;
+      font-weight:800;
+      padding:10px 14px;
+      border-radius:999px;
+      cursor:pointer;
+    }
+    .solid:hover{background: var(--blue2)}
+    .status{margin-top:10px; display:none; font-size:.92rem; color: var(--muted)}
+    .status.ok{color:#0f766e}
+    .status.err{color:#b91c1c}
+
+    footer{
+      max-width: 1080px;
+      margin: 40px auto 0;
+      padding: 18px 18px 26px;
+      border-top: 1px solid var(--border);
+      color: var(--muted2);
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      font-size:.95rem;
+    }
 
     @media (max-width: 980px){
-      .layout{grid-template-columns:1fr}
-      aside{position:static}
+      .wrap{grid-template-columns: 1fr}
+      .tocbox{position: static}
     }
   </style>
 </head>
 
 <body>
-  <header>
-    <div class="container nav">
+  <div class="topbar">
+    <div class="topbar-inner">
       <a class="brand" href="../index.html" aria-label="Sentinel Identity home">
-        <div class="logo" aria-hidden="true"></div>
-        <div style="min-width:0">
-          <strong>Sentinel Identity</strong><br />
-          <span>Entra Identity & Access Management consulting</span>
-        </div>
+        <span class="mark" aria-hidden="true"></span>
+        <span>Sentinel Identity</span>
       </a>
 
-      <nav class="navlinks" aria-label="Primary navigation">
+      <nav class="navlinks" aria-label="Site navigation">
         <a href="../index.html#services">Services</a>
         <a href="../blog.html">Blog</a>
-        <a class="btn primary" href="../index.html#contact">Request an Assessment</a>
+        <a href="../index.html#assessment">Assessment</a>
       </nav>
-    </div>
-  </header>
 
-  <div class="container titlebar">
-    <div class="kicker"><span class="dot"></span>Microsoft Entra ID · SAML single sign-on</div>
-    <h1>AADSTS76026: The request has expired</h1>
-    <p class="subtitle">
-      This error indicates that Microsoft Entra ID received a SAML request outside the allowed time window. The most common cause in production is
-      an incorrect launch entry point (My Apps tile launching without a valid Sign-on URL), which results in stale or replayed requests.
-    </p>
-    <div class="meta">
-      <span class="pill">Updated: 2026-03-07</span>
-      <span class="pill">Audience: Entra / IAM admins</span>
-      <span class="pill">Applies to: Enterprise apps (SAML)</span>
+      <a class="btn btn-primary" href="../index.html#assessment">Request assessment</a>
     </div>
   </div>
 
-  <main>
-    <div class="container layout">
-      <article class="panel">
-        <div class="callout">
-          <strong>At a glance</strong>
-          If this error occurs only when launching from <span class="inline">myapps.microsoft.com</span>, set the application <strong>Sign-on URL</strong>
-          in the SAML configuration so the service provider generates a fresh request at launch.
+  <div class="wrap">
+    <main>
+      <div class="kicker">Entra ID · Enterprise Apps · SAML SSO</div>
+      <h1 id="top">AADSTS76026: The request has expired</h1>
+      <p class="subtitle">
+        This error is usually not a “random timeout.” It’s a sign the SAML authentication request Entra is trying to process is stale.
+        The reliable fix is to make Entra start a fresh SP-initiated flow by setting the application <strong>Sign-on URL</strong>.
+      </p>
+
+      <div class="meta">
+        <span>2026-03-08</span><span class="dot"></span>
+        <span>7 min read</span><span class="dot"></span>
+        <span>Sentinel Identity</span>
+      </div>
+
+      <div class="hero-image">
+        <img alt="SAML request lifecycle concept"
+          src="data:image/svg+xml;charset=UTF-8,<?xml version='1.0'?><svg xmlns='http://www.w3.org/2000/svg' width='1600' height='900' viewBox='0 0 1600 900'><defs><linearGradient id='g' x1='0' x2='1'><stop offset='0' stop-color='%232563eb'/><stop offset='1' stop-color='%2360a5fa'/></linearGradient></defs><rect width='1600' height='900' fill='%23ffffff'/><rect x='80' y='120' width='1440' height='660' rx='28' fill='%23f8fafc' stroke='rgba(15,23,42,0.12)'/><text x='120' y='190' font-family='Segoe UI, Arial' font-size='44' font-weight='700' fill='%230f172a'>SAML request lifecycle</text><rect x='140' y='260' width='420' height='190' rx='22' fill='%23ffffff' stroke='rgba(15,23,42,0.12)'/><text x='180' y='330' font-family='Segoe UI, Arial' font-size='34' font-weight='700' fill='%230f172a'>Browser</text><text x='180' y='382' font-family='Segoe UI, Arial' font-size='26' fill='%23475669'>launches app</text><rect x='590' y='260' width='420' height='190' rx='22' fill='%23ffffff' stroke='rgba(15,23,42,0.12)'/><text x='630' y='330' font-family='Segoe UI, Arial' font-size='34' font-weight='700' fill='%230f172a'>Entra STS</text><text x='630' y='382' font-family='Segoe UI, Arial' font-size='26' fill='%23475669'>validates request</text><rect x='1040' y='260' width='420' height='190' rx='22' fill='%23ffffff' stroke='rgba(15,23,42,0.12)'/><text x='1080' y='330' font-family='Segoe UI, Arial' font-size='34' font-weight='700' fill='%230f172a'>Service Provider</text><text x='1080' y='382' font-family='Segoe UI, Arial' font-size='26' fill='%23475669'>consumes assertion</text><path d='M560 355h30' stroke='%232563eb' stroke-width='10' stroke-linecap='round'/><path d='M1010 355h30' stroke='%232563eb' stroke-width='10' stroke-linecap='round'/><path d='M590 360l-22 14v-28z' fill='%232563eb'/><path d='M1040 360l-22 14v-28z' fill='%232563eb'/><rect x='140' y='500' width='1320' height='220' rx='22' fill='%23ffffff' stroke='rgba(15,23,42,0.12)'/><text x='180' y='580' font-family='Segoe UI, Arial' font-size='30' font-weight='700' fill='%230f172a'>If the request is expired</text><text x='180' y='635' font-family='Segoe UI, Arial' font-size='26' fill='%23475669'>Entra rejects it with AADSTS76026. Fix is to start a fresh request (SP-initiated).</text><rect x='1220' y='545' width='200' height='70' rx='999' fill='url(%23g)' opacity='0.92'/><text x='1260' y='592' font-family='Segoe UI, Arial' font-size='24' font-weight='700' fill='%23ffffff'>Sign-on URL</text></svg>">
+      </div>
+
+      <article id="article">
+        <div class="callout info">
+          <strong>Quick outcome</strong>
+          If users hit AADSTS76026 when launching the app from <em>My Apps</em>, set the enterprise app <strong>Sign-on URL</strong> (Basic SAML Configuration).
+          This forces Entra to start a clean SP-initiated session instead of relying on stale request context. :contentReference[oaicite:1]{index=1}
         </div>
 
         <h2 id="symptoms">Symptoms</h2>
-        <p>Typical patterns seen in sign-in incidents:</p>
-        <ul>
-          <li>Users receive <span class="inline">AADSTS76026</span> when clicking the app tile in <strong>My Apps</strong>.</li>
-          <li>The same user can often sign in successfully when starting from the application’s own sign-in page.</li>
-          <li>Failures may cluster around specific browsers or networks if caching or proxy behavior is involved.</li>
-        </ul>
-
-        <h2 id="scope">Scope and prerequisites</h2>
-        <p>This guidance assumes:</p>
-        <ul>
-          <li>The enterprise application is configured for <strong>SAML</strong> single sign-on.</li>
-          <li>You have permission to edit the enterprise app SSO configuration in the Entra admin center.</li>
-          <li>You can review <strong>Sign-in logs</strong> for the affected application.</li>
-        </ul>
-
-        <h2 id="how-saml-validates-time">How SAML requests expire</h2>
         <p>
-          In an SP-initiated SAML flow, the service provider (application) generates a SAML authentication request. That request typically includes
-          a timestamp and may also be bound to a nonce or request ID. Microsoft Entra ID validates that the request is recent enough to reduce replay.
+          You usually see this pattern:
         </p>
         <p>
-          When Entra ID receives a request that is outside the allowed window, it returns <span class="inline">AADSTS76026</span>.
-          That window can be exceeded by:
+          <strong>Scenario:</strong> User clicks the enterprise app tile in <em>My Apps</em> or the Microsoft 365 app launcher.
+          <br />
+          <strong>Result:</strong> Entra rejects sign-in and the user lands on an error page that includes:
+          <code>AADSTS76026: The request has expired. Try to submit new request.</code>
         </p>
-        <ul>
-          <li>Requests being generated too early and reused later (stale request).</li>
-          <li>Redirect chains being cached or replayed by an intermediary (proxy/WAF/caching layer).</li>
-          <li>System time skew on the SP side (application servers not NTP-synced).</li>
-        </ul>
-
-        <h2 id="root-cause">Root cause (most common in My Apps launches)</h2>
         <p>
-          When a user launches an app from <strong>My Apps</strong>, Entra needs an explicit entry point that tells it where to send the user to begin SP-initiated SSO.
-          If the enterprise application’s SAML configuration does not have a correct <strong>Sign-on URL</strong> (or it points to a non-SSO endpoint), My Apps launches can
-          lead to a stale request pattern:
+          If the same user signs in by going directly to the application URL first (the app’s own login button), it often works.
+          That difference matters because it changes which side initiates the SAML flow.
         </p>
-        <ul>
-          <li>The user reaches the application in a way that does not trigger fresh SAML request generation.</li>
-          <li>The app (or an intermediary) replays an older request.</li>
-          <li>Entra rejects it as expired.</li>
-        </ul>
 
-        <div class="callout warning">
-          <strong>Important</strong>
-          Don’t “fix” this by relaxing security controls in the identity provider. Fix the launch path so the service provider creates the request at the time of launch.
-        </div>
-
-        <h2 id="fix">Fix (deterministic)</h2>
+        <h2 id="how-saml-should-work">How SAML SSO should work (what “good” looks like)</h2>
         <p>
-          Set the <strong>Sign-on URL</strong> in the enterprise application’s SAML configuration to the application’s SSO start URL
-          (often documented by the vendor as “SP-initiated SSO URL” or “SSO start URL”).
+          Microsoft Entra ID supports SAML by acting as the Identity Provider (IdP). The application is the Service Provider (SP).
+          The SP is responsible for generating an <code>AuthnRequest</code> and sending it to Entra, and Entra responds with a SAML assertion to the SP’s ACS URL. :contentReference[oaicite:2]{index=2}
         </p>
 
-        <h3 id="fix-steps">Steps</h3>
-        <ol>
-          <li>Open <strong>Microsoft Entra admin center</strong>.</li>
-          <li>Go to <strong>Enterprise applications</strong> → select your application.</li>
-          <li>Open <strong>Single sign-on</strong> → select <strong>SAML</strong>.</li>
-          <li>In <strong>Basic SAML Configuration</strong>, select <strong>Edit</strong>.</li>
-          <li>Set <strong>Sign-on URL</strong> to the application’s SSO start URL.</li>
-          <li>Select <strong>Save</strong>.</li>
-        </ol>
+        <h3 id="sp-initiated">SP-initiated flow (preferred for predictability)</h3>
+        <p>
+          In an SP-initiated flow, the user starts at the application, the SP generates a fresh SAML AuthnRequest with current timestamps,
+          and then Entra validates and completes the flow. This tends to be stable because the request lifecycle is owned by the SP.
+        </p>
+
+        <h3 id="idp-initiated">IdP-initiated / launcher flow (common, but easier to misconfigure)</h3>
+        <p>
+          When the user launches from <em>My Apps</em>, the user is effectively starting at the IdP side.
+          Depending on configuration, Entra may attempt to redirect the user to a URL that triggers the SP to generate a new request,
+          or it may attempt to complete a flow using incomplete or stale context.
+        </p>
+
+        <h2 id="root-cause">Root cause (what Entra is actually rejecting)</h2>
+        <p>
+          AADSTS76026 shows up when Entra receives an authentication request it considers expired, invalid for the current state, or outside the acceptable time window.
+          Practically, this happens when the SAML request lifecycle does not line up with the way the user launched the application.
+        </p>
+
+        <p>
+          The most common real-world cause in enterprise apps is:
+          <strong>the app is being launched from My Apps, but the enterprise app’s “Sign-on URL” is empty or incorrect</strong>.
+          In that situation, Entra cannot reliably trigger a fresh SP-initiated AuthnRequest, and the request Entra is processing ends up stale.
+          Setting the Sign-on URL gives Entra a stable entry point that causes the SP to generate a new request. :contentReference[oaicite:3]{index=3}
+        </p>
 
         <div class="callout">
-          <strong>What to use for Sign-on URL</strong>
-          Use the vendor’s documented SP-initiated entry point. It is not always the same as the application’s generic login page.
+          <strong>Why this is not “just a workaround”</strong>
+          The Sign-on URL is the SP-initiated login URL for the application. Entra uses it to start the flow correctly.
+          If it’s missing, Entra cannot always force the SP to mint a new AuthnRequest at the moment the tile is clicked.
+          You’re not masking the error. You’re restoring the expected request lifecycle.
         </div>
 
-        <h2 id="verify">Verification</h2>
-        <p>After saving the configuration, verify using a clean session to avoid cached redirects:</p>
-        <ol>
-          <li>Open an <strong>InPrivate/Incognito</strong> browser window.</li>
-          <li>Sign in to <span class="inline">https://myapps.microsoft.com</span>.</li>
-          <li>Launch the application tile.</li>
-          <li>Confirm the sign-in completes without <span class="inline">AADSTS76026</span>.</li>
-        </ol>
-
-        <h2 id="sign-in-logs">Use sign-in logs to confirm the mechanism</h2>
-        <p>In the Entra admin center, review sign-in logs for the application and compare:</p>
-        <ul>
-          <li>A failed My Apps launch (before change)</li>
-          <li>A successful My Apps launch (after change)</li>
-        </ul>
-        <p>Look for differences in the request timing and the initiating application context.</p>
-
-        <h2 id="if-it-continues">If the issue continues</h2>
-        <p>If the correct Sign-on URL is set and the error persists, troubleshoot in this order:</p>
-
-        <h3 id="time-skew">1) Time skew on service provider infrastructure</h3>
+        <h2 id="fix">Fix: set the Sign-on URL (Basic SAML Configuration)</h2>
         <p>
-          Ensure application servers and any identity gateway components have stable time synchronization (NTP). Time drift on the SP side is a direct cause of expired SAML requests.
+          In the Microsoft Entra admin center:
+        </p>
+        <p>
+          <strong>Enterprise applications</strong> → select the app → <strong>Single sign-on</strong> → <strong>SAML</strong> →
+          under <strong>Basic SAML Configuration</strong>, set:
         </p>
 
-        <h3 id="intermediaries">2) Proxy/WAF/caching replay behavior</h3>
         <p>
-          Check whether a reverse proxy, WAF, or edge cache is caching redirects or replaying the same request. Authentication flows must not be cached.
+          <strong>Sign-on URL</strong>: the application’s SP-initiated login URL (the URL a user can visit to start sign-in at the app).
+          :contentReference[oaicite:4]{index=4}
         </p>
 
-        <h3 id="session-reuse">3) Session reuse / stuck browser state</h3>
         <p>
-          Validate from a clean browser profile. Some failures are driven by old cookies, extensions, or SSO plugins interfering with redirect chains.
+          This is explicitly documented in Microsoft’s SAML setup guidance: Sign-on URL corresponds to the SP-initiated login URL. :contentReference[oaicite:5]{index=5}
         </p>
 
-        <h2 id="references">References</h2>
-        <p>
-          Official Microsoft documentation:
-        </p>
-        <ul>
-          <li><a href="https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/configure-saml-single-sign-on" target="_blank" rel="noopener">Configure SAML-based single sign-on</a></li>
-          <li><a href="https://learn.microsoft.com/en-us/entra/identity/monitoring-health/concept-sign-ins" target="_blank" rel="noopener">Sign-in logs in Microsoft Entra ID</a></li>
-          <li><a href="https://learn.microsoft.com/en-us/entra/identity-platform/reference-error-codes" target="_blank" rel="noopener">Microsoft Entra ID error codes</a></li>
-        </ul>
+        <div class="callout warn">
+          <strong>Do not guess the Sign-on URL</strong>
+          Use the vendor documentation or confirm with the application owner. If you put the wrong URL, you can create redirect loops or break tile launch.
+        </div>
 
-        <div style="padding:12px 18px 18px; border-top:1px solid var(--border); margin-top:10px;">
-          <a class="btn" href="../blog.html">Back to Blog</a>
+        <h2 id="verify">Verify the fix (what to check, not what to hope)</h2>
+        <h3 id="sign-in-logs">1) Entra sign-in logs</h3>
+        <p>
+          Use the sign-in logs to confirm the failure stops occurring after the change and that the authentication flow is now consistent.
+          For SAML app troubleshooting, Microsoft’s guidance on SAML sign-in troubleshooting and debugging is the right reference. :contentReference[oaicite:6]{index=6}
+        </p>
+
+        <h3 id="saml-trace">2) Capture SAML request/response (trace)</h3>
+        <p>
+          If you need proof of the request lifecycle, capture the SAML request/response using the recommended methods in Microsoft’s SAML debugging guidance.
+          You’re looking for whether the AuthnRequest includes current timestamps and whether the request is being minted at the right moment. :contentReference[oaicite:7]{index=7}
+        </p>
+
+        <h2 id="edge-cases">Edge cases that can mimic “expired request”</h2>
+        <h3 id="clock-skew">Clock skew</h3>
+        <p>
+          If the user device, a proxy, or the SP infrastructure has time drift, the request may appear expired.
+          This is less common in modern environments, but it still happens in locked-down VDI or segmented networks.
+        </p>
+
+        <h3 id="acs-mismatch">ACS/Reply URL mismatch or multiple endpoints</h3>
+        <p>
+          If the Reply URL (ACS) configured in Entra doesn’t match what the app expects, retries can lead to odd “expired request” behavior because the SP never successfully consumes the assertion.
+          Validate your Basic SAML Configuration against the app’s documentation. :contentReference[oaicite:8]{index=8}
+        </p>
+
+        <h3 id="request-signing">SAML request signing requirements</h3>
+        <p>
+          Some apps require signed AuthnRequests, and certain IdP-initiated patterns are sensitive to that setup.
+          If you’re enforcing signed requests, validate your flow with a SAML trace and align with vendor guidance.
+        </p>
+
+        <h2 id="references">Microsoft references</h2>
+        <p>
+          Use these as your baseline, not random blog comments:
+        </p>
+        <p>
+          <a href="https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/add-application-portal-setup-sso">Enable SAML single sign-on for an enterprise application</a> :contentReference[oaicite:9]{index=9}
+          <br />
+          <a href="https://learn.microsoft.com/en-us/entra/identity-platform/single-sign-on-saml-protocol">SAML protocol details supported by Microsoft Entra ID</a> :contentReference[oaicite:10]{index=10}
+          <br />
+          <a href="https://learn.microsoft.com/en-us/troubleshoot/entra/entra-id/app-integration/troubleshoot-sign-in-saml-based-apps">Troubleshoot sign-in to SAML-based apps</a> :contentReference[oaicite:11]{index=11}
+          <br />
+          <a href="https://docs.azure.cn/en-us/entra/identity/enterprise-apps/debug-saml-sso-issues">Debug SAML-based single sign-on to applications</a> :contentReference[oaicite:12]{index=12}
+          <br />
+          <a href="https://learn.microsoft.com/en-us/entra/identity-platform/reference-error-codes">Microsoft Entra authentication and authorization error codes</a> :contentReference[oaicite:13]{index=13}
+        </p>
+
+        <div class="callout info">
+          <strong>For your internal runbook</strong>
+          When you document this internally, include:
+          app name, launch method (My Apps vs app URL), Sign-on URL used, ACS/Reply URL,
+          and a sign-in log timestamp that shows the before/after behavior.
         </div>
       </article>
+    </main>
 
-      <aside>
-        <div class="panel side">
-          <h4>In this article</h4>
-          <div class="toc">
-            <a href="#symptoms">Symptoms</a>
-            <a href="#scope">Scope and prerequisites</a>
-            <a href="#how-saml-validates-time">How requests expire</a>
-            <a href="#root-cause">Root cause</a>
-            <a href="#fix">Fix</a>
-            <a href="#verify">Verification</a>
-            <a href="#sign-in-logs">Sign-in logs</a>
-            <a href="#if-it-continues">If it continues</a>
-            <a href="#references">References</a>
-          </div>
-        </div>
+    <aside>
+      <div class="tocbox">
+        <h4>In this article</h4>
+        <div class="toc" id="toc"></div>
+      </div>
 
-        <a class="btn primary cta" href="../index.html#contact">Request an Assessment</a>
-      </aside>
-    </div>
-  </main>
+      <div class="sidecard">
+        <h4>Subscribe</h4>
+        <p>One email when a new post is published.</p>
+
+        <form class="subscribe" id="subscribeForm">
+          <input class="input" type="email" id="subEmail" placeholder="you@company.com" required />
+          <button class="solid" type="submit" id="subBtn">Subscribe</button>
+        </form>
+        <div class="status" id="subStatus" aria-live="polite"></div>
+      </div>
+
+      <div class="sidecard">
+        <h4>Need help?</h4>
+        <p><a class="btn" style="margin-top:10px; display:inline-flex;" href="../index.html#assessment">Request assessment</a></p>
+      </div>
+    </aside>
+  </div>
 
   <footer>
-    <div class="container foot">
-      <div>© <span id="year"></span> Sentinel Identity</div>
-      <div>Entra IAM consulting · Worldwide remote</div>
+    <div>© <span id="year"></span> Sentinel Identity</div>
+    <div>
+      <a href="../privacy.html">Privacy</a> ·
+      <a href="../terms.html">Terms</a> ·
+      <a href="../cookies.html">Cookies</a> ·
+      <a href="mailto:info@sentinelidentity.ca">Email</a>
     </div>
   </footer>
 
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
+
+    // Build TOC from h2/h3 in the article
+    const toc = document.getElementById("toc");
+    const headers = document.querySelectorAll("#article h2, #article h3");
+    headers.forEach(h => {
+      if (!h.id) h.id = h.textContent.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+      const a = document.createElement("a");
+      a.href = "#" + h.id;
+      a.textContent = h.textContent;
+      toc.appendChild(a);
+    });
+
+    // Subscribe -> /api/subscribe
+    const subForm = document.getElementById("subscribeForm");
+    const subStatus = document.getElementById("subStatus");
+    const subBtn = document.getElementById("subBtn");
+
+    function showSub(type, msg){
+      subStatus.className = "status " + (type || "");
+      subStatus.textContent = msg;
+      subStatus.style.display = "block";
+    }
+
+    if (subForm) {
+      subForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        showSub("", "Subscribing…");
+        subBtn.disabled = true;
+
+        try {
+          const email = document.getElementById("subEmail").value.trim();
+          const res = await fetch("/api/subscribe", {
+            method: "POST",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify({ email, sourcePage: window.location.href })
+          });
+
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) {
+            showSub("err", data.error || data.details || "Subscription failed.");
+            subBtn.disabled = false;
+            return;
+          }
+
+          showSub("ok", "Subscribed. Check your inbox.");
+          subForm.reset();
+          subBtn.disabled = false;
+
+        } catch (err) {
+          showSub("err", "Subscription failed. Network or /api/subscribe missing.");
+          subBtn.disabled = false;
+        }
+      });
+    }
   </script>
 </body>
 </html>
