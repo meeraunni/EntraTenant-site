@@ -3,139 +3,246 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Distribution List vs Shared Mailbox | Sentinel Identity</title>
-  <meta name="description" content="Architecture decision guide: when to use a distribution list vs a shared mailbox in Microsoft 365, including operational workflow, governance, and security implications." />
-  <meta name="theme-color" content="#ffffff" />
-
+  <title>Distribution list vs shared mailbox | Sentinel Identity</title>
+  <meta name="description" content="Choose between a distribution list and a shared mailbox in Exchange Online. This guide explains what each object is designed for, how it behaves, and what to verify before you deploy it." />
+  <meta name="theme-color" content="#071126" />
   <style>
-    :root{
-      --bg:#ffffff; --bg2:#f6f7fb; --card:#ffffff; --border:#e6e8ef;
-      --text:#111827; --muted:#6b7280; --link:#2563eb; --chip:#f3f4f6;
-      --shadow: 0 10px 25px rgba(17,24,39,.06); --radius:16px; --max:980px;
-    }
+    /* Reuse same CSS as other posts for consistency */
+    :root{--bg:#071126;--bg2:#0c1834;--panel:rgba(255,255,255,0.06);--panel-border:rgba(255,255,255,0.12);--text:#e8efff;--muted:#b8c5ea;--muted2:#93a6d6;--blue:#3b82f6;--cyan:#22d3ee;--violet:#8b5cf6;--shadow:0 20px 60px rgba(0,0,0,.35);--max:1180px}
     *{box-sizing:border-box} html,body{margin:0;padding:0}
-    body{font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:var(--text);background:var(--bg);line-height:1.65}
-    a{color:var(--link);text-decoration:none} a:hover{text-decoration:underline}
-    .container{width:min(var(--max), calc(100% - 32px));margin:0 auto}
-    .header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
-    .nav{min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:16px}
-    .brand{display:flex;align-items:center;gap:12px;min-width:0;color:inherit}
-    .brand-badge{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#2563eb 0%,#7c3aed 60%,#06b6d4 100%);box-shadow:0 0 0 1px rgba(0,0,0,.06) inset}
-    .brand-text strong{display:block;font-size:.98rem;letter-spacing:.01em;color:#111827}
-    .brand-text span{display:block;font-size:.82rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:420px}
-    .btn{display:inline-flex;align-items:center;justify-content:center;padding:11px 14px;border-radius:12px;border:1px solid var(--border);background:#fff;font-weight:900;font-size:.92rem;color:#111827;cursor:pointer;transition:transform .15s ease, box-shadow .15s ease}
-    .btn:hover{transform:translateY(-1px);box-shadow:var(--shadow);text-decoration:none}
-    .btn-primary{border:0;color:#fff;background:linear-gradient(90deg,#2563eb 0%,#7c3aed 60%,#06b6d4 100%)}
-
-    .hero{background:linear-gradient(180deg,#ffffff 0%,#f7f8fc 100%);border-bottom:1px solid var(--border)}
-    .hero-inner{padding:28px 0 18px}
-    .kicker{display:flex;gap:10px;align-items:center;color:var(--muted);font-weight:900;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase}
-    .dot{width:8px;height:8px;border-radius:999px;background:#2563eb}
-    h1{margin:10px 0 0;font-size:clamp(1.9rem, 3.2vw, 2.45rem);letter-spacing:-.02em;line-height:1.15}
-    .subtitle{margin:10px 0 0;color:var(--muted);max-width:95ch}
-
-    main{padding:22px 0 52px}
-    .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
-    .meta span{background:var(--chip);border:1px solid var(--border);color:#374151;font-weight:900;font-size:.82rem;border-radius:999px;padding:5px 9px}
-
-    .article{margin-top:16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
-    .cover{width:100%;aspect-ratio:16/6;background:#0b1220}
-    .cover img{width:100%;height:100%;object-fit:cover;display:block}
-    .body{padding:18px}
-
-    h2{margin:22px 0 10px;font-size:1.25rem;letter-spacing:-.01em}
-    p{margin:10px 0}
-    .callout{margin-top:14px;border:1px solid var(--border);background:var(--bg2);border-radius:14px;padding:14px}
-    .divider{height:1px;background:var(--border);margin:18px 0}
-    .refs{margin-top:18px;border-top:1px solid var(--border);padding-top:14px;color:var(--muted);font-size:.95rem}
-    .refs a{font-weight:800}
-    .footer{border-top:1px solid var(--border);padding:22px 0 18px;color:var(--muted);font-size:.9rem;background:#fff}
-    @media (max-width:560px){.btn{width:100%}.cover{aspect-ratio:16/9}}
+    body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--text);
+      background:radial-gradient(900px 500px at 8% -10%, rgba(59,130,246,.35), transparent 60%),
+               radial-gradient(700px 400px at 95% 10%, rgba(139,92,246,.28), transparent 60%),
+               radial-gradient(500px 300px at 80% 70%, rgba(34,211,238,.15), transparent 60%),
+               linear-gradient(180deg, var(--bg), var(--bg2));line-height:1.7}
+    a{color:inherit;text-decoration:none} img{max-width:100%;display:block}
+    .container{width:min(var(--max), calc(100% - 32px)); margin:0 auto;}
+    .site-header{position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);background:rgba(7,17,38,.75);border-bottom:1px solid rgba(255,255,255,.08)}
+    .nav{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:78px}
+    .nav-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .brand{display:flex;align-items:center;gap:12px;min-width:0}
+    .brand-badge{width:36px;height:36px;border-radius:12px;background:radial-gradient(circle at 30% 30%, #7dd3fc, #3b82f6 45%, #1d4ed8 70%, #1e1b4b);
+      box-shadow:0 8px 24px rgba(59,130,246,.45);border:1px solid rgba(255,255,255,.22);flex:0 0 auto}
+    .brand-text{display:flex;flex-direction:column;min-width:0}
+    .brand-title{font-weight:800;letter-spacing:.01em;font-size:1.05rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .brand-sub{color:var(--muted);font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px}
+    .nav-links{display:flex;align-items:center;gap:20px;flex-wrap:wrap;justify-content:flex-end}
+    .nav-links a{color:#d9e5ff;font-weight:700;opacity:.9}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;border:none;cursor:pointer;border-radius:14px;padding:12px 18px;font-weight:800;transition:.2s ease;white-space:nowrap}
+    .btn-primary{color:white;background:linear-gradient(90deg,var(--violet),var(--blue),var(--cyan));box-shadow:0 10px 30px rgba(59,130,246,.35)}
+    .btn-outline{color:#dfe9ff;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.14)}
+    .mobile-nav-toggle{display:none;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:#ecf4ff;border-radius:12px;padding:10px 12px;font-weight:800;cursor:pointer}
+    .hero{padding:34px 0 18px}
+    .hero-card{border-radius:26px;border:1px solid rgba(255,255,255,.12);background:linear-gradient(135deg, rgba(17,24,39,.85), rgba(9,14,29,.9)),radial-gradient(circle at 15% 20%, rgba(59,130,246,.22), transparent 60%);box-shadow:var(--shadow);padding:26px}
+    .hero-grid{display:grid;grid-template-columns:1.25fr .9fr;gap:22px;align-items:stretch}
+    .eyebrow{display:inline-flex;align-items:center;gap:8px;color:#dbeafe;background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.26);padding:8px 12px;border-radius:999px;font-size:.85rem;font-weight:800;margin-bottom:14px}
+    .eyebrow-dot{width:8px;height:8px;border-radius:999px;background:#60a5fa;box-shadow:0 0 16px rgba(96,165,250,.8)}
+    h1{margin:0 0 12px;font-size:clamp(2rem, 3vw, 3rem);line-height:1.08;letter-spacing:-.02em}
+    .subtitle{margin:0 0 18px;color:var(--muted);font-size:1.03rem;max-width:72ch}
+    .meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px}
+    .meta-pill{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.10);border-radius:999px;padding:8px 12px;color:#d9e6ff;font-size:.86rem;font-weight:700}
+    .hero-image{position:relative;border-radius:18px;min-height:260px;border:1px solid rgba(255,255,255,.12);overflow:hidden;background:#0b1328}
+    .hero-image img{width:100%;height:100%;object-fit:cover;opacity:.95}
+    .hero-image::after{content:"";position:absolute;inset:0;background:linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);background-size:24px 24px;opacity:.20;pointer-events:none}
+    .main-wrap{padding:10px 0 70px}
+    .content-grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:22px;align-items:start}
+    .panel{background:var(--panel);border:1px solid var(--panel-border);border-radius:20px;box-shadow:var(--shadow)}
+    .article-panel{padding:24px}
+    .article-panel h2{font-size:1.45rem;margin:28px 0 10px;line-height:1.2;letter-spacing:-.01em}
+    .article-panel h3{font-size:1.1rem;margin:22px 0 8px;line-height:1.25;color:#edf3ff}
+    .article-panel p{margin:0 0 14px;color:#dde7ff}
+    .callout{margin:18px 0;padding:14px;border-radius:14px;border:1px solid rgba(34,211,238,.22);background:rgba(34,211,238,.07)}
+    .callout strong{display:block;margin-bottom:6px}
+    .note-card{margin:18px 0;padding:16px;border-radius:14px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#dde7ff}
+    .article-footer{margin-top:26px;padding-top:18px;border-top:1px solid rgba(255,255,255,.1);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+    .tags{display:flex;flex-wrap:wrap;gap:8px}
+    .tag{padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#dbe8ff;font-size:.82rem;font-weight:700}
+    .sidebar{display:grid;gap:16px;position:sticky;top:92px}
+    .side-card{padding:16px;border-radius:18px;background:var(--panel);border:1px solid var(--panel-border);box-shadow:var(--shadow)}
+    .side-card h4{margin:0 0 10px;font-size:1rem;line-height:1.2}
+    .side-card p{margin:0 0 10px;color:var(--muted);font-size:.94rem}
+    .toc{display:grid;gap:8px}
+    .toc a{color:#dce8ff;font-size:.92rem;padding:8px 10px;border-radius:10px;border:1px solid transparent;background:rgba(255,255,255,.02);opacity:.95}
+    .toc a:hover{border-color:rgba(255,255,255,.1);background:rgba(255,255,255,.04);opacity:1}
+    .contact-box{background:radial-gradient(220px 140px at 15% 10%, rgba(59,130,246,.22), transparent 70%),radial-gradient(220px 140px at 100% 100%, rgba(139,92,246,.2), transparent 70%),rgba(255,255,255,.04)}
+    .small-muted{color:var(--muted2);font-size:.88rem}
+    .refs{margin-top:22px;padding-top:14px;border-top:1px solid rgba(255,255,255,.10)}
+    .refs h3{margin:0 0 10px}
+    .refs a{color:#dbeafe;text-decoration:underline}
+    .footer{border-top:1px solid rgba(255,255,255,.08);padding:20px 0 36px;color:var(--muted)}
+    .footer-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;font-size:.92rem}
+    @media (max-width: 980px){.hero-grid{grid-template-columns:1fr}.content-grid{grid-template-columns:1fr}.sidebar{position:static}}
+    @media (max-width: 780px){
+      .nav{align-items:flex-start;flex-direction:column;padding:12px 0}
+      .nav-top{width:100%}
+      .mobile-nav-toggle{display:inline-flex}
+      .nav-links{width:100%;display:none;flex-direction:column;align-items:flex-start;gap:12px;padding:6px 0 6px}
+      .nav-links.show{display:flex}
+      .nav-links .btn{width:100%;justify-content:center}
+      .hero-card{padding:18px}.article-panel{padding:18px}
+    }
   </style>
 </head>
 
 <body>
-  <header class="header">
-    <div class="container">
-      <nav class="nav">
-        <a class="brand" href="/index.html">
-          <div class="brand-badge" aria-hidden="true"></div>
+  <header class="site-header">
+    <div class="container nav">
+      <div class="nav-top">
+        <a href="../index.html" class="brand" aria-label="Sentinel Identity home">
+          <div class="brand-badge"></div>
           <div class="brand-text">
-            <strong>Sentinel Identity</strong>
-            <span>Entra ID & Microsoft 365 consulting</span>
+            <div class="brand-title">Sentinel Identity</div>
+            <div class="brand-sub">Entra Identity & Access Management consulting</div>
           </div>
         </a>
-        <a class="btn btn-primary" href="/index.html#contact">Request an Assessment</a>
+        <button class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Toggle menu">Menu</button>
+      </div>
+
+      <nav class="nav-links" id="navLinks" aria-label="Primary navigation">
+        <a href="../index.html#who-we-help">Who we help</a>
+        <a href="../index.html#services">Services</a>
+        <a href="../blog.html">Blog</a>
+        <a href="../index.html#contact">Contact</a>
+        <a class="btn btn-primary" href="../index.html#contact">Request an Assessment</a>
       </nav>
     </div>
   </header>
 
   <section class="hero">
-    <div class="container hero-inner">
-      <div class="kicker"><span class="dot"></span> Exchange Online · Architecture</div>
-      <h1>Distribution List vs Shared Mailbox</h1>
-      <p class="subtitle">
-        This is an architecture decision, not a preference. If you choose the wrong object, you create operational debt: unclear ownership, inconsistent replies, missing audit trail, and accidental data exposure through membership sprawl.
-      </p>
-      <div class="meta">
-        <span>2026-03-03</span><span>10 min read</span><span>Mail objects</span><span>Governance</span>
+    <div class="container">
+      <div class="hero-card">
+        <div class="hero-grid">
+          <div>
+            <div class="eyebrow"><span class="eyebrow-dot"></span><span>EXCHANGE ONLINE · DESIGN CHOICE</span></div>
+            <h1>Distribution list vs shared mailbox</h1>
+            <p class="subtitle">
+              Choose the correct object based on how you want work to happen: broadcast delivery, or a shared queue with shared history.
+            </p>
+            <div class="meta-row">
+              <span class="meta-pill">2026-03-07</span>
+              <span class="meta-pill">10 min read</span>
+              <span class="meta-pill">Exchange Online</span>
+              <span class="meta-pill">Mail objects</span>
+            </div>
+            <a class="btn btn-outline" href="../blog.html">← Back to Blog</a>
+          </div>
+
+          <div class="hero-image" aria-label="Topic banner">
+            <img
+              src="data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%271200%27%20height%3D%27675%27%20viewBox%3D%270%200%201200%20675%27%3E%3Cdefs%3E%3ClinearGradient%20id%3D%27g%27%20x1%3D%270%27%20x2%3D%271%27%3E%3Cstop%20offset%3D%270%27%20stop-color%3D%27%232563eb%27/%3E%3Cstop%20offset%3D%270.55%27%20stop-color%3D%27%237c3aed%27/%3E%3Cstop%20offset%3D%271%27%20stop-color%3D%27%2306b6d4%27/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%271200%27%20height%3D%27675%27%20fill%3D%27%230b1220%27/%3E%3Ccircle%20cx%3D%271040%27%20cy%3D%27520%27%20r%3D%27320%27%20fill%3D%27url(%2523g)%27%20opacity%3D%270.2%27/%3E%3Crect%20x%3D%27140%27%20y%3D%27210%27%20width%3D%27520%27%20height%3D%27320%27%20rx%3D%2724%27%20fill%3D%27%230f1a2f%27%20stroke%3D%27rgba(255%2C255%2C255%2C0.18)%27/%3E%3Ctext%20x%3D%27170%27%20y%3D%27260%27%20fill%3D%27rgba(255%2C255%2C255%2C0.8)%27%20font-family%3D%27Segoe%20UI%2C%20Arial%27%20font-size%3D%2720%27%20font-weight%3D%27700%27%3EDistribution%20List%3C/text%3E%3Crect%20x%3D%27720%27%20y%3D%27210%27%20width%3D%27340%27%20height%3D%27320%27%20rx%3D%2724%27%20fill%3D%27%230f1a2f%27%20stroke%3D%27rgba(255%2C255%2C255%2C0.18)%27/%3E%3Ctext%20x%3D%27750%27%20y%3D%27260%27%20fill%3D%27rgba(255%2C255%2C255%2C0.8)%27%20font-family%3D%27Segoe%20UI%2C%20Arial%27%20font-size%3D%2720%27%20font-weight%3D%27700%27%3EShared%20Mailbox%3C/text%3E%3Ctext%20x%3D%27140%27%20y%3D%27140%27%20fill%3D%27rgba(255%2C255%2C255%2C0.85)%27%20font-family%3D%27Segoe%20UI%2C%20Arial%27%20font-size%3D%2734%27%20font-weight%3D%27700%27%3EDL%20vs%20Shared%20Mailbox%3C/text%3E%3C/svg%3E"
+              alt="DL vs shared mailbox banner"
+            />
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
-  <main>
+  <main class="main-wrap">
     <div class="container">
-      <article class="article">
-        <div class="cover">
-          <img alt="" src="data:image/svg+xml;charset=UTF-8,<?xml version='1.0'?><svg xmlns='http://www.w3.org/2000/svg' width='1200' height='675' viewBox='0 0 1200 675'><defs><linearGradient id='g' x1='0' x2='1'><stop offset='0' stop-color='%232563eb'/><stop offset='0.55' stop-color='%237c3aed'/><stop offset='1' stop-color='%2306b6d4'/></linearGradient></defs><rect width='1200' height='675' fill='%230b1220'/><circle cx='1040' cy='520' r='320' fill='url(%23g)' opacity='0.2'/><rect x='140' y='210' width='520' height='320' rx='24' fill='%230f1a2f' stroke='rgba(255,255,255,0.18)'/><text x='170' y='260' fill='rgba(255,255,255,0.8)' font-family='Segoe UI, Arial' font-size='20' font-weight='700'>Distribution List</text><circle cx='220' cy='330' r='34' fill='rgba(255,255,255,0.10)'/><circle cx='320' cy='330' r='34' fill='rgba(255,255,255,0.10)'/><circle cx='420' cy='330' r='34' fill='rgba(255,255,255,0.10)'/><rect x='190' y='380' width='300' height='14' rx='8' fill='rgba(255,255,255,0.12)'/><rect x='720' y='210' width='340' height='320' rx='24' fill='%230f1a2f' stroke='rgba(255,255,255,0.18)'/><text x='750' y='260' fill='rgba(255,255,255,0.8)' font-family='Segoe UI, Arial' font-size='20' font-weight='700'>Shared Mailbox</text><rect x='760' y='300' width='260' height='170' rx='18' fill='rgba(255,255,255,0.06)'/><path d='M780 332h220M780 370h200M780 408h180' stroke='rgba(255,255,255,0.25)' stroke-width='10' stroke-linecap='round'/><text x='140' y='140' fill='rgba(255,255,255,0.85)' font-family='Segoe UI, Arial' font-size='34' font-weight='700'>Mail Objects %E2%80%A2 DL vs Shared</text></svg>">
-        </div>
+      <div class="content-grid">
 
-        <div class="body">
-          <div class="callout">
-            Decision rule: if you need a shared workflow and visibility, build a shared mailbox. If you need broadcast distribution, build a distribution group. Anything else is you inventing pain.
-          </div>
-
-          <h2>What a distribution list actually gives you</h2>
+        <article class="panel article-panel" id="article">
           <p>
-            A distribution list (distribution group) is message replication. Each member receives a copy into their own mailbox. Operationally, this is good for announcements and simple routing. It is not good for coordinated handling of a shared inbox because there is no shared state. “Someone handle this” becomes a human process problem with no built-in enforcement.
+            The quickest way to pick the wrong object is to ask “what can I create?”
+            The better question is “what workflow do I need?” A distribution list and a shared mailbox solve different problems.
           </p>
-
-          <h2>What a shared mailbox actually gives you</h2>
-          <p>
-            A shared mailbox is a shared state container. Messages land in one place, multiple people can access it, and replies can be sent under a shared identity (Send As) or as individual attribution (Send on Behalf). This structure supports triage and ownership patterns, but it also creates delegation and governance requirements.
-          </p>
-
-          <h2>Operational risk and governance</h2>
-          <p>
-            DLs drift through membership creep. Shared mailboxes drift through permission creep. Both become security problems when nobody owns them. Your goal should be to treat these objects like managed resources: clear owners, periodic reviews, documented intent, and predictable client behavior.
-          </p>
-
-          <h2>External email considerations</h2>
-          <p>
-            Allowing external senders to DLs can increase spam exposure. Shared mailboxes used as public contact points should be protected by anti-spam and anti-phishing controls, and monitored like an intake channel. The “object choice” affects the blast radius and the monitoring you need.
-          </p>
-
-          <div class="divider"></div>
-
-          <div class="refs">
-            <strong>Microsoft references</strong>
-            <ul>
-              <li><a href="https://learn.microsoft.com/en-us/exchange/recipients-in-exchange-online/manage-distribution-groups/manage-distribution-groups" target="_blank" rel="noopener">Create and manage distribution groups in Exchange Online</a></li>
-              <li><a href="https://learn.microsoft.com/en-us/exchange/collaboration-exo/shared-mailboxes" target="_blank" rel="noopener">Shared mailboxes in Exchange Online</a></li>
-              <li><a href="https://learn.microsoft.com/en-us/microsoft-365/admin/create-groups/compare-groups?view=o365-worldwide" target="_blank" rel="noopener">Compare group types in Microsoft 365</a></li>
-            </ul>
-          </div>
 
           <div class="callout">
-            If you want a tenant-wide mail object standard (naming, ownership, permissions, and review cadence), that’s a short engagement and it pays for itself.
+            <strong>Decision summary</strong>
+            Use a distribution list to deliver copies to individuals. Use a shared mailbox when multiple people need a shared inbox and shared history.
           </div>
-        </div>
-      </article>
+
+          <h2 id="dl">What a distribution list is designed to do</h2>
+          <p>
+            A distribution list (distribution group) delivers a copy of a message to each member.
+            The message exists separately in each user mailbox. That model works for announcements and simple routing, but it does not create a shared queue.
+          </p>
+
+          <h2 id="shared">What a shared mailbox is designed to do</h2>
+          <p>
+            A shared mailbox is a single mailbox that multiple users can access through delegation.
+            Mail arrives in one place. This supports triage, ownership, and continuity.
+            Sending also becomes a design choice: Send As (shared identity) or Send on Behalf (user attribution).
+          </p>
+
+          <h2 id="governance">Governance considerations</h2>
+          <p>
+            Whichever object you choose, assign an owner and review access periodically.
+            DL membership tends to expand silently. Shared mailbox permissions tend to expand quietly.
+            Both create risk if there is no clear ownership.
+          </p>
+
+          <h2 id="verify">Verify before you deploy</h2>
+          <p>
+            Before you put the address on a website or publish it externally, verify:
+            who can send to it (internal vs external), who can read it, and how replies should appear.
+            Most “mail problems” are really inconsistent expectations.
+          </p>
+
+          <section class="refs">
+            <h3>References</h3>
+            <p>
+              <a href="https://learn.microsoft.com/en-us/exchange/recipients-in-exchange-online/manage-distribution-groups/manage-distribution-groups" target="_blank" rel="noopener">
+                Manage distribution groups in Exchange Online
+              </a>
+            </p>
+            <p>
+              <a href="https://learn.microsoft.com/en-us/exchange/collaboration-exo/shared-mailboxes" target="_blank" rel="noopener">
+                Shared mailboxes in Exchange Online
+              </a>
+            </p>
+            <p>
+              <a href="https://learn.microsoft.com/en-us/microsoft-365/admin/create-groups/compare-groups?view=o365-worldwide" target="_blank" rel="noopener">
+                Compare Microsoft 365 group types
+              </a>
+            </p>
+          </section>
+
+          <div class="article-footer">
+            <div class="tags">
+              <span class="tag">Exchange Online</span>
+              <span class="tag">Distribution list</span>
+              <span class="tag">Shared mailbox</span>
+            </div>
+            <a class="btn btn-primary" href="../index.html#contact">Request an Assessment</a>
+          </div>
+        </article>
+
+        <aside class="sidebar">
+          <div class="side-card">
+            <h4>In this article</h4>
+            <div class="toc">
+              <a href="#dl">Distribution list</a>
+              <a href="#shared">Shared mailbox</a>
+              <a href="#governance">Governance</a>
+              <a href="#verify">Verify</a>
+            </div>
+          </div>
+
+          <div class="side-card contact-box">
+            <h4>Need a standard?</h4>
+            <p>If you want consistent patterns (naming, ownership, delegation), set a small baseline and apply it everywhere.</p>
+            <a class="btn btn-primary" href="../index.html#contact" style="width:100%;">Request an Assessment</a>
+          </div>
+        </aside>
+
+      </div>
     </div>
   </main>
 
   <footer class="footer">
-    <div class="container">© 2026 Sentinel Identity · <a href="/blog.html">Blog</a></div>
+    <div class="container footer-row">
+      <div>© <span id="year"></span> Sentinel Identity</div>
+      <div>Entra IAM consulting · Worldwide remote</div>
+    </div>
   </footer>
+
+  <script>
+    const mobileNavToggle = document.getElementById('mobileNavToggle');
+    const navLinks = document.getElementById('navLinks');
+    if (mobileNavToggle && navLinks) mobileNavToggle.addEventListener('click', () => navLinks.classList.toggle('show'));
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>
