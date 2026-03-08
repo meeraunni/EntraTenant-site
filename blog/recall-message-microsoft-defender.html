@@ -3,141 +3,125 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AADSTS76026: The request has expired | Sentinel Identity</title>
-  <meta name="description" content="Fix AADSTS76026 for SAML SSO in Microsoft Entra ID. Set the Sign-on URL so My Apps launches generate a fresh SAML request, then verify in sign-in logs." />
-  <meta name="theme-color" content="#f6f8fb" />
+  <title>Remove a delivered email using Microsoft Defender | Sentinel Identity</title>
+  <meta name="description" content="Engineer-level guide to removing delivered email using Microsoft Defender for Office 365. Includes scoping, remediation, AIR approvals, and verification." />
+  <meta name="theme-color" content="#ffffff" />
 
   <style>
     :root{
-      --bg:#f6f8fb;
-      --bg2:#ffffff;
-      --panel:#ffffff;
-      --panel-border:rgba(15,23,42,.10);
+      --bg:#ffffff;
+      --bg2:#f6f8fb;
       --text:#0f172a;
       --muted:#475569;
       --muted2:#64748b;
+      --border:rgba(15,23,42,.10);
+      --panel:#ffffff;
+      --shadow:0 10px 26px rgba(15,23,42,.08);
       --blue:#2563eb;
       --cyan:#0891b2;
       --violet:#7c3aed;
-      --shadow:0 12px 30px rgba(15,23,42,.08);
       --max:1180px;
+      --radius:16px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
     }
     *{box-sizing:border-box}
     html,body{margin:0;padding:0}
     body{
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      font-family: "Segoe UI", Inter, system-ui, -apple-system, Roboto, Arial, sans-serif;
       color:var(--text);
-      background:
-        radial-gradient(900px 520px at 8% -10%, rgba(37,99,235,.10), transparent 60%),
-        radial-gradient(780px 440px at 95% 8%, rgba(124,58,237,.08), transparent 60%),
-        radial-gradient(520px 320px at 80% 70%, rgba(8,145,178,.06), transparent 60%),
-        linear-gradient(180deg, var(--bg), var(--bg2));
+      background: linear-gradient(180deg, var(--bg), var(--bg2));
       line-height:1.7;
     }
-    a{color:inherit;text-decoration:none}
-    img{max-width:100%;display:block}
+    a{color:var(--blue);text-decoration:none}
+    a:hover{text-decoration:underline}
     .container{width:min(var(--max), calc(100% - 32px)); margin:0 auto;}
 
-    .site-header{
+    header{
       position:sticky; top:0; z-index:50;
-      backdrop-filter: blur(10px);
-      background:rgba(255,255,255,.85);
-      border-bottom:1px solid rgba(15,23,42,.10);
+      backdrop-filter: blur(8px);
+      background: rgba(255,255,255,.86);
+      border-bottom:1px solid var(--border);
     }
-    .nav{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:72px;}
-    .nav-top{display:flex;align-items:center;gap:12px}
-    .brand{display:flex;align-items:center;gap:12px;min-width:0}
-    .brand-badge{
-      width:36px;height:36px;border-radius:12px;flex:0 0 auto;
-      background: radial-gradient(circle at 30% 30%, #93c5fd, #2563eb 55%, #1d4ed8 85%);
-      box-shadow:0 10px 28px rgba(37,99,235,.25);
-      border:1px solid rgba(15,23,42,.10);
+    .nav{
+      min-height:64px;
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
     }
-    .brand-title{font-weight:900;letter-spacing:.01em;font-size:1.02rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .brand-sub{color:var(--muted2);font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px}
-    .nav-links{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:flex-end}
-    .nav-links a{color:#0f172a;font-weight:800;padding:10px 10px;border-radius:12px}
-    .nav-links a:hover{background:rgba(15,23,42,.04)}
-
+    .brand{display:flex;align-items:center;gap:10px;min-width:0}
+    .logo{
+      width:34px;height:34px;border-radius:10px;
+      background: radial-gradient(circle at 30% 30%, #93c5fd, #2563eb 60%, #1d4ed8 90%);
+      border:1px solid var(--border);
+      box-shadow: 0 10px 20px rgba(37,99,235,.18);
+      flex:0 0 auto;
+    }
+    .brand strong{font-weight:800;white-space:nowrap}
+    .brand span{color:var(--muted2);font-size:.86rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px}
+    .navlinks{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+    .navlinks a{
+      color:var(--text);
+      font-weight:700;
+      padding:8px 10px;
+      border-radius:10px;
+    }
+    .navlinks a:hover{background:rgba(15,23,42,.04);text-decoration:none}
     .btn{
-      display:inline-flex;align-items:center;justify-content:center;gap:10px;
-      border:none;cursor:pointer;border-radius:14px;padding:12px 16px;font-weight:900;
-      transition:transform .15s ease;white-space:nowrap;
+      display:inline-flex;align-items:center;justify-content:center;
+      padding:10px 14px;border-radius:12px;font-weight:800;
+      border:1px solid var(--border); background:#fff; color:var(--text);
     }
-    .btn:hover{transform:translateY(-1px)}
-    .btn-primary{color:#fff;background:linear-gradient(90deg, var(--violet), var(--blue), var(--cyan));}
-    .btn-outline{color:#0f172a;background:#fff;border:1px solid rgba(15,23,42,.12)}
-    .mobile-nav-toggle{display:none}
+    .btn.primary{
+      border:none;
+      color:#fff;
+      background: linear-gradient(90deg, var(--violet), var(--blue), var(--cyan));
+    }
 
-    .hero{padding:26px 0 10px}
-    .hero-card{
-      background:#fff;border:1px solid rgba(15,23,42,.10);
-      border-radius:22px;box-shadow:var(--shadow);
-      overflow:hidden;
-    }
-    .hero-inner{
-      padding:18px;
-      display:grid;
-      grid-template-columns: 1.2fr .8fr;
-      gap:14px;
-      align-items:stretch;
-    }
-    .eyebrow{
+    .titlebar{padding:22px 0 10px}
+    .kicker{
       display:inline-flex;align-items:center;gap:8px;
-      background:rgba(37,99,235,.08);
+      font-weight:800;font-size:.85rem;color:var(--muted);
+      padding:6px 10px;border-radius:999px;
       border:1px solid rgba(37,99,235,.18);
-      color:#0f172a;
-      padding:8px 12px;border-radius:999px;
-      font-size:.85rem;font-weight:900;
-      width:fit-content;
-      margin-bottom:12px;
+      background: rgba(37,99,235,.06);
     }
-    .dot{width:8px;height:8px;border-radius:999px;background:#2563eb}
-    h1{margin:0 0 10px;font-size:clamp(1.9rem, 3vw, 2.5rem);line-height:1.1;letter-spacing:-.02em}
-    .subtitle{margin:0 0 14px;color:var(--muted);max-width:78ch}
-    .meta{display:flex;flex-wrap:wrap;gap:8px}
-    .pill{border:1px solid rgba(15,23,42,.10);background:rgba(15,23,42,.03);border-radius:999px;padding:6px 10px;font-weight:800;font-size:.82rem;color:#0f172a}
-
-    .banner{
-      border:1px solid rgba(15,23,42,.10);
-      border-radius:18px;
-      overflow:hidden;
-      background:#0b1220;
-      min-height:180px;
-      position:relative;
-    }
-    .banner img{width:100%;height:100%;object-fit:cover}
-    .banner::after{
-      content:"";position:absolute;inset:0;
-      background:linear-gradient(rgba(255,255,255,.08) 1px, transparent 1px),
-               linear-gradient(90deg, rgba(255,255,255,.08) 1px, transparent 1px);
-      background-size:26px 26px;opacity:.12;pointer-events:none;
+    .dot{width:8px;height:8px;border-radius:999px;background:var(--blue)}
+    h1{margin:12px 0 8px;font-size:clamp(1.9rem, 2.9vw, 2.6rem);line-height:1.15;letter-spacing:-.02em}
+    .subtitle{margin:0;color:var(--muted);max-width:92ch}
+    .meta{margin-top:10px;display:flex;flex-wrap:wrap;gap:8px}
+    .pill{
+      font-size:.84rem;font-weight:700;color:var(--muted);
+      border:1px solid var(--border); background:rgba(15,23,42,.03);
+      padding:6px 10px;border-radius:999px;
     }
 
-    main{padding:10px 0 60px}
+    main{padding:14px 0 56px}
     .layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start}
-    .panel{background:#fff;border:1px solid rgba(15,23,42,.10);border-radius:18px;box-shadow:var(--shadow)}
-    .article{padding:18px}
-    .article h2{margin:22px 0 8px;font-size:1.35rem;letter-spacing:-.01em}
-    .article h3{margin:16px 0 6px;font-size:1.05rem}
-    .article p{margin:0 0 12px;color:var(--muted)}
+    .panel{
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+    article{padding:18px 18px 6px}
+    article h2{margin:22px 0 8px;font-size:1.35rem;letter-spacing:-.01em}
+    article h3{margin:16px 0 6px;font-size:1.05rem}
+    article p{margin:0 0 12px;color:var(--muted)}
+    article ul{margin:0 0 12px 18px;color:var(--muted)}
+    article li{margin:6px 0}
+
     .callout{
       margin:14px 0;
       padding:12px;
       border-radius:14px;
-      border:1px solid rgba(8,145,178,.22);
-      background:rgba(8,145,178,.06);
-      color:#0f172a;
+      border:1px solid rgba(8,145,178,.20);
+      background: rgba(8,145,178,.06);
+      color:var(--text);
     }
     .callout strong{display:block;margin-bottom:6px}
-    .note{
-      margin:14px 0;
-      padding:12px;
-      border-radius:14px;
-      border:1px solid rgba(15,23,42,.10);
-      background:rgba(15,23,42,.03);
-      color:var(--muted);
+    .warning{
+      border-color: rgba(220,38,38,.22);
+      background: rgba(220,38,38,.06);
     }
+
     pre{
       margin:12px 0;
       padding:12px;
@@ -146,182 +130,192 @@
       background:#0b1220;
       color:#e8efff;
       overflow:auto;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-family:var(--mono);
       font-size:.92rem;
       line-height:1.55;
     }
-    .refs{margin-top:16px;padding-top:12px;border-top:1px solid rgba(15,23,42,.10)}
-    .refs a{color:#2563eb;text-decoration:underline}
-
-    .sidebar{display:grid;gap:12px;position:sticky;top:88px}
-    .side-card{padding:14px}
-    .side-card h4{margin:0 0 10px;font-size:1rem}
-    .toc{display:grid;gap:8px}
-    .toc a{
-      padding:10px 10px;border-radius:12px;
-      border:1px solid rgba(15,23,42,.08);
-      background:rgba(15,23,42,.03);
+    .inline{
+      font-family:var(--mono);
+      background:rgba(15,23,42,.06);
+      border:1px solid rgba(15,23,42,.10);
+      padding:2px 6px;border-radius:8px;
       color:#0f172a;
-      font-weight:800;
       font-size:.92rem;
     }
-    .toc a:hover{background:rgba(37,99,235,.06);border-color:rgba(37,99,235,.18)}
-    .cta-btn{width:100%;text-align:center}
 
-    .footer{border-top:1px solid rgba(15,23,42,.10);padding:18px 0 30px;color:var(--muted2)}
-    .footer-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;font-size:.92rem}
+    aside{position:sticky;top:86px;display:grid;gap:12px}
+    .side{padding:14px}
+    .side h4{margin:0 0 10px;font-size:1rem}
+    .toc{display:grid;gap:8px}
+    .toc a{
+      display:block;padding:10px 10px;border-radius:12px;
+      border:1px solid rgba(15,23,42,.08);
+      background: rgba(15,23,42,.03);
+      color:var(--text);
+      font-weight:700;font-size:.92rem;
+      text-decoration:none;
+    }
+    .toc a:hover{background:rgba(37,99,235,.06);border-color:rgba(37,99,235,.18)}
+    .cta{width:100%;text-align:center}
+
+    footer{
+      border-top:1px solid var(--border);
+      padding:18px 0 30px;
+      color:var(--muted2);
+      background:#fff;
+    }
+    .foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;font-size:.92rem}
 
     @media (max-width: 980px){
-      .hero-inner{grid-template-columns:1fr}
       .layout{grid-template-columns:1fr}
-      .sidebar{position:static}
+      aside{position:static}
     }
   </style>
 </head>
-<body>
-  <header class="site-header">
-    <div class="container nav">
-      <div class="nav-top">
-        <a href="../index.html" class="brand">
-          <div class="brand-badge"></div>
-          <div>
-            <div class="brand-title">Sentinel Identity</div>
-            <div class="brand-sub">Entra Identity & Access Management consulting</div>
-          </div>
-        </a>
-      </div>
 
-      <nav class="nav-links">
+<body>
+  <header>
+    <div class="container nav">
+      <a class="brand" href="../index.html">
+        <div class="logo" aria-hidden="true"></div>
+        <div style="min-width:0">
+          <strong>Sentinel Identity</strong><br />
+          <span>Entra Identity & Access Management consulting</span>
+        </div>
+      </a>
+      <nav class="navlinks">
         <a href="../index.html#services">Services</a>
-        <a href="../index.html#contact">Assessment</a>
         <a href="../blog.html">Blog</a>
-        <a class="btn btn-primary" href="../index.html#contact">Request an Assessment</a>
+        <a class="btn primary" href="../index.html#contact">Request an Assessment</a>
       </nav>
     </div>
   </header>
 
-  <section class="hero">
-    <div class="container">
-      <div class="hero-card">
-        <div class="hero-inner">
-          <div>
-            <div class="eyebrow"><span class="dot"></span><span>ENTRA ID · SAML SINGLE SIGN-ON</span></div>
-            <h1>AADSTS76026: The request has expired</h1>
-            <p class="subtitle">
-              Fix AADSTS76026 for SAML apps that fail when launched from My Apps. Set the Sign-on URL so the app generates a fresh request, then verify in sign-in logs.
-            </p>
-            <div class="meta">
-              <span class="pill">2026-03-07</span>
-              <span class="pill">8 min</span>
-              <span class="pill">Entra ID</span>
-              <span class="pill">SAML</span>
-            </div>
-            <div style="margin-top:12px">
-              <a class="btn btn-outline" href="../blog.html">Back to Blog</a>
-            </div>
-          </div>
-
-          <div class="banner">
-            <img alt="" src="data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%271200%27%20height%3D%27675%27%20viewBox%3D%270%200%201200%20675%27%3E%3Cdefs%3E%3ClinearGradient%20id%3D%27g%27%20x1%3D%270%27%20x2%3D%271%27%3E%3Cstop%20offset%3D%270%27%20stop-color%3D%27%232563eb%27/%3E%3Cstop%20offset%3D%270.55%27%20stop-color%3D%27%237c3aed%27/%3E%3Cstop%20offset%3D%271%27%20stop-color%3D%27%230891b2%27/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%271200%27%20height%3D%27675%27%20fill%3D%27%230b1220%27/%3E%3Ccircle%20cx%3D%27230%27%20cy%3D%27150%27%20r%3D%27260%27%20fill%3D%27url(%2523g)%27%20opacity%3D%270.25%27/%3E%3Ccircle%20cx%3D%271080%27%20cy%3D%27560%27%20r%3D%27320%27%20fill%3D%27url(%2523g)%27%20opacity%3D%270.18%27/%3E%3Cpath%20d%3D%27M860%20210c-96%200-174%2078-174%20174%200%20116%2098%20214%20174%20240%2076-26%20174-124%20174-240%200-96-78-174-174-174z%27%20fill%3D%27rgba(255%2C255%2C255%2C0.08)%27%20stroke%3D%27rgba(255%2C255%2C255%2C0.18)%27/%3E%3Cpath%20d%3D%27M860%20285l78%2034v64c0%2058-42%20114-78%20130-36-16-78-72-78-130v-64l78-34z%27%20fill%3D%27url(%2523g)%27%20opacity%3D%270.9%27/%3E%3Ctext%20x%3D%27120%27%20y%3D%27120%27%20fill%3D%27rgba(255%2C255%2C255%2C0.85)%27%20font-family%3D%27Segoe%20UI%2C%20Arial%27%20font-size%3D%2734%27%20font-weight%3D%27700%27%3ESAML%20SSO%20%E2%80%A2%20Request%20Expired%3C/text%3E%3C/svg%3E" />
-          </div>
-        </div>
-      </div>
+  <div class="container titlebar">
+    <div class="kicker"><span class="dot"></span>Microsoft Defender for Office 365 · Remediation</div>
+    <h1>Remove a delivered email using Microsoft Defender</h1>
+    <p class="subtitle">
+      This guide covers how to remove a delivered message across mailboxes using Microsoft Defender for Office 365:
+      how to scope the message correctly, run a remediation action, handle AIR approvals, and verify completion.
+    </p>
+    <div class="meta">
+      <span class="pill">Updated: 2026-03-07</span>
+      <span class="pill">Audience: Security ops / M365 admins</span>
+      <span class="pill">Applies to: Defender for Office 365</span>
     </div>
-  </section>
+  </div>
 
   <main>
-    <div class="container">
-      <div class="layout">
-        <article class="panel article">
-          <p>
-            You might see <strong>AADSTS76026: The request has expired. Try to submit new request.</strong> when users launch a SAML app from
-            <strong>My Apps</strong>, but the same app works when users start from the application’s own sign-in page.
-          </p>
+    <div class="container layout">
+      <article class="panel">
+        <div class="callout">
+          <strong>Important distinction</strong>
+          Outlook “recall” is a client-side experience and is not a reliable control for enterprise remediation.
+          Use Defender workflows to remove or neutralize the message at the service level.
+        </div>
 
-          <div class="callout">
-            <strong>Applies to</strong>
-            Microsoft Entra ID enterprise applications configured for SAML single sign-on.
+        <h2 id="prereqs">Prerequisites</h2>
+        <ul>
+          <li>Microsoft Defender for Office 365 Plan 1 or Plan 2 (features vary by license).</li>
+          <li>Permissions to access Defender portal and run remediation actions.</li>
+          <li>At least one stable message identifier (preferred: <strong>Internet Message ID</strong>).</li>
+        </ul>
+
+        <h2 id="identify">Step 1: Identify the message deterministically</h2>
+        <p>
+          Use stable identifiers to prevent removing the wrong message. Best options, in order:
+        </p>
+        <ul>
+          <li><strong>Internet Message ID</strong> (globally unique for the message instance)</li>
+          <li>Message ID + sender + recipient + time window</li>
+          <li>Subject alone is not sufficient (subject collisions are common)</li>
+        </ul>
+
+        <div class="callout warning">
+          <strong>Do not guess</strong>
+          If you cannot uniquely identify the message, widen the investigation first. Wrong remediation is worse than delayed remediation.
+        </div>
+
+        <h2 id="scope">Step 2: Scope in Explorer</h2>
+        <p>
+          In Microsoft Defender portal, use Explorer to confirm:
+        </p>
+        <ul>
+          <li>Which recipients received the message</li>
+          <li>Delivery status (delivered, quarantined, blocked)</li>
+          <li>Current location (Inbox/Junk/Deleted Items)</li>
+          <li>User interaction (clicked URL, opened attachment) if available</li>
+        </ul>
+
+        <h2 id="action">Step 3: Run remediation action</h2>
+        <p>
+          Choose a remediation action appropriate for the incident severity. For confirmed malicious content, remove it.
+          For uncertain cases, use a containment-first approach and continue investigation.
+        </p>
+
+        <h3 id="air">AIR approvals and status</h3>
+        <p>
+          Automated Investigation and Response (AIR) can create actions that require approval depending on your configuration.
+          A “pending” action is not a remediation. Remediation is complete only when the action shows completed successfully.
+        </p>
+
+        <h2 id="verify">Step 4: Verify completion</h2>
+        <p>Verification should include both workflow status and evidence in Explorer:</p>
+        <ul>
+          <li>Action status is completed (not pending)</li>
+          <li>Explorer no longer shows the message as delivered/available in mailboxes</li>
+          <li>For targeted mailboxes, confirm the message is removed or moved as expected</li>
+        </ul>
+
+        <h2 id="troubleshoot">If removal does not complete</h2>
+        <p>Common reasons remediation “does nothing”:</p>
+        <ul>
+          <li>Message was not uniquely identified and the action targeted the wrong artifact</li>
+          <li>Action requires approval and is still pending</li>
+          <li>Mail was delivered in variants (forwarded, resent) and you targeted only one instance</li>
+          <li>Retention/hold or mailbox constraints prevent expected movement behavior (rare, but happens)</li>
+        </ul>
+
+        <h2 id="references">References</h2>
+        <ul>
+          <li><a href="https://learn.microsoft.com/en-us/defender-office-365/air-review-approve-pending-completed-actions" target="_blank" rel="noopener">Review and approve AIR actions</a></li>
+          <li><a href="https://learn.microsoft.com/en-us/defender-office-365/alert-policies-defender-portal" target="_blank" rel="noopener">Alert policies in Defender portal</a></li>
+          <li><a href="https://learn.microsoft.com/en-us/defender-office-365/remediate-malicious-email-delivered-office-365" target="_blank" rel="noopener">Remediate malicious email that was delivered</a></li>
+        </ul>
+
+        <div style="padding:12px 18px 18px; border-top:1px solid var(--border); margin-top:10px;">
+          <a class="btn" href="../blog.html">Back to Blog</a>
+        </div>
+      </article>
+
+      <aside>
+        <div class="panel side">
+          <h4>In this article</h4>
+          <div class="toc">
+            <a href="#prereqs">Prerequisites</a>
+            <a href="#identify">Identify the message</a>
+            <a href="#scope">Scope in Explorer</a>
+            <a href="#action">Run remediation</a>
+            <a href="#verify">Verify</a>
+            <a href="#troubleshoot">If it does not complete</a>
+            <a href="#references">References</a>
           </div>
+        </div>
 
-          <h2 id="cause">Why this error happens</h2>
-          <p>
-            In a SAML flow, the application generates a sign-in request that includes a timestamp. Entra validates that timestamp to reduce replay.
-            If Entra receives an older request, it rejects it as expired.
-          </p>
-          <p>
-            This often occurs when the My Apps launch path does not send users to the right SSO entry point. Without a correct entry point, the app can reuse a stale request
-            or fail to generate a fresh request at the time of launch.
-          </p>
-
-          <h2 id="fix">Fix</h2>
-          <p>
-            Set the <strong>Sign-on URL</strong> in the enterprise app’s SAML configuration. This ensures My Apps sends users to the application’s SSO start URL
-            so the app generates a new SAML request.
-          </p>
-
-          <h3 id="steps">Steps</h3>
-          <p>
-            In the Entra admin center:
-            go to <strong>Enterprise applications</strong>, select the app, open <strong>Single sign-on</strong>, select <strong>SAML</strong>, and edit
-            <strong>Basic SAML Configuration</strong>. Set <strong>Sign-on URL</strong> to the application’s SSO start URL, then save.
-          </p>
-
-          <div class="note">
-            If you do not know the SSO start URL, check the vendor documentation for “SP-initiated SSO URL” or “SSO start URL.”
-          </div>
-
-          <h2 id="verify">Verify</h2>
-          <p>
-            Open an InPrivate/Incognito window, sign in to <strong>myapps.microsoft.com</strong>, and launch the app tile. Confirm the sign-in completes
-            without AADSTS76026.
-          </p>
-
-          <h2 id="still-fails">If the issue continues</h2>
-          <p>
-            If the Sign-on URL is correct and the error continues, focus on time consistency and request replay. Confirm app servers and any proxy/federation components
-            have reliable time sync. Review gateway and WAF rules that might cache or replay authentication redirects.
-          </p>
-
-          <h3 id="logs">Sign-in logs</h3>
-          <p>
-            Compare a failed My Apps launch with a successful app-initiated launch in Entra sign-in logs. This helps confirm the issue is launch-path specific.
-          </p>
-
-          <div class="refs">
-            <h3>References</h3>
-            <p><a href="https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/configure-saml-single-sign-on" target="_blank" rel="noopener">Configure SAML-based single sign-on</a></p>
-            <p><a href="https://learn.microsoft.com/en-us/entra/identity-platform/reference-error-codes" target="_blank" rel="noopener">Microsoft Entra ID error codes</a></p>
-            <p><a href="https://learn.microsoft.com/en-us/entra/identity/monitoring-health/concept-sign-ins" target="_blank" rel="noopener">Sign-in logs in Microsoft Entra ID</a></p>
-          </div>
-        </article>
-
-        <aside class="sidebar">
-          <div class="panel side-card">
-            <h4>In this article</h4>
-            <div class="toc">
-              <a href="#cause">Why this error happens</a>
-              <a href="#fix">Fix</a>
-              <a href="#verify">Verify</a>
-              <a href="#still-fails">If the issue continues</a>
-              <a href="#logs">Sign-in logs</a>
-            </div>
-          </div>
-
-          <a class="btn btn-primary cta-btn" href="../index.html#contact">Request an Assessment</a>
-        </aside>
-      </div>
+        <a class="btn primary cta" href="../index.html#contact">Request an Assessment</a>
+      </aside>
     </div>
   </main>
 
-  <footer class="footer">
-    <div class="container footer-row">
+  <footer>
+    <div class="container foot">
       <div>© <span id="year"></span> Sentinel Identity</div>
       <div>Entra IAM consulting · Worldwide remote</div>
     </div>
   </footer>
 
   <script>
-    document.getElementById('year').textContent = new Date().getFullYear();
+    document.getElementById("year").textContent = new Date().getFullYear();
   </script>
 </body>
 </html>
