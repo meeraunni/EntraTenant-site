@@ -3,161 +3,353 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Recall an email using Microsoft Defender | Sentinel Identity</title>
-  <meta name="description" content="Engineer-level workflow to remove or neutralize an email using Microsoft Defender for Office 365: investigation, scoping, remediation actions, AIR approvals, verification, and policy hardening." />
-  <meta name="theme-color" content="#ffffff" />
+  <title>Remove or “recall” email using Microsoft Defender | Sentinel Identity</title>
+  <meta name="description" content="Use Microsoft Defender for Office 365 to remove a delivered email across mailboxes. This guide covers scoping in Explorer, running remediation actions, reviewing AIR approvals, and verifying results." />
+  <meta name="theme-color" content="#071126" />
 
   <style>
     :root{
-      --bg:#ffffff; --bg2:#f6f7fb; --card:#ffffff; --border:#e6e8ef;
-      --text:#111827; --muted:#6b7280; --link:#2563eb; --chip:#f3f4f6;
-      --shadow: 0 10px 25px rgba(17,24,39,.06); --radius:16px; --max:980px;
+      --bg:#071126; --bg2:#0c1834;
+      --panel:rgba(255,255,255,0.06); --panel-border:rgba(255,255,255,0.12);
+      --text:#e8efff; --muted:#b8c5ea; --muted2:#93a6d6;
+      --blue:#3b82f6; --cyan:#22d3ee; --violet:#8b5cf6;
+      --shadow:0 20px 60px rgba(0,0,0,.35);
+      --max:1180px;
     }
     *{box-sizing:border-box} html,body{margin:0;padding:0}
-    body{font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:var(--text);background:var(--bg);line-height:1.65}
-    a{color:var(--link);text-decoration:none} a:hover{text-decoration:underline}
-    .container{width:min(var(--max), calc(100% - 32px));margin:0 auto}
-    .header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
-    .nav{min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:16px}
-    .brand{display:flex;align-items:center;gap:12px;min-width:0;color:inherit}
-    .brand-badge{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#2563eb 0%,#7c3aed 60%,#06b6d4 100%);box-shadow:0 0 0 1px rgba(0,0,0,.06) inset}
-    .brand-text strong{display:block;font-size:.98rem;letter-spacing:.01em;color:#111827}
-    .brand-text span{display:block;font-size:.82rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:420px}
-    .btn{display:inline-flex;align-items:center;justify-content:center;padding:11px 14px;border-radius:12px;border:1px solid var(--border);background:#fff;font-weight:900;font-size:.92rem;color:#111827;cursor:pointer;transition:transform .15s ease, box-shadow .15s ease}
-    .btn:hover{transform:translateY(-1px);box-shadow:var(--shadow);text-decoration:none}
-    .btn-primary{border:0;color:#fff;background:linear-gradient(90deg,#2563eb 0%,#7c3aed 60%,#06b6d4 100%)}
+    body{
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(900px 500px at 8% -10%, rgba(59,130,246,.35), transparent 60%),
+        radial-gradient(700px 400px at 95% 10%, rgba(139,92,246,.28), transparent 60%),
+        radial-gradient(500px 300px at 80% 70%, rgba(34,211,238,.15), transparent 60%),
+        linear-gradient(180deg, var(--bg), var(--bg2));
+      line-height:1.7;
+    }
+    a{color:inherit;text-decoration:none}
+    img{max-width:100%;display:block}
+    .container{width:min(var(--max), calc(100% - 32px)); margin:0 auto;}
 
-    .hero{background:linear-gradient(180deg,#ffffff 0%,#f7f8fc 100%);border-bottom:1px solid var(--border)}
-    .hero-inner{padding:28px 0 18px}
-    .kicker{display:flex;gap:10px;align-items:center;color:var(--muted);font-weight:900;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase}
-    .dot{width:8px;height:8px;border-radius:999px;background:#2563eb}
-    h1{margin:10px 0 0;font-size:clamp(1.9rem, 3.2vw, 2.45rem);letter-spacing:-.02em;line-height:1.15}
-    .subtitle{margin:10px 0 0;color:var(--muted);max-width:90ch}
+    .site-header{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter: blur(10px);
+      background:rgba(7,17,38,.75);
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+    .nav{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:78px;}
+    .nav-top{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+    .brand{display:flex;align-items:center;gap:12px;min-width:0;}
+    .brand-badge{
+      width:36px;height:36px;border-radius:12px;
+      background: radial-gradient(circle at 30% 30%, #7dd3fc, #3b82f6 45%, #1d4ed8 70%, #1e1b4b);
+      box-shadow: 0 8px 24px rgba(59,130,246,.45);
+      border:1px solid rgba(255,255,255,.22);
+      flex:0 0 auto;
+    }
+    .brand-text{display:flex;flex-direction:column;min-width:0;}
+    .brand-title{font-weight:800;letter-spacing:.01em;font-size:1.05rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .brand-sub{color:var(--muted);font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px;}
+    .nav-links{display:flex;align-items:center;gap:20px;flex-wrap:wrap;justify-content:flex-end;}
+    .nav-links a{color:#d9e5ff;font-weight:700;opacity:.9;}
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;gap:10px;
+      border:none;cursor:pointer;border-radius:14px;padding:12px 18px;font-weight:800;
+      transition:.2s ease;white-space:nowrap;
+    }
+    .btn-primary{
+      color:white;background:linear-gradient(90deg, var(--violet), var(--blue), var(--cyan));
+      box-shadow: 0 10px 30px rgba(59,130,246,.35);
+    }
+    .btn-outline{color:#dfe9ff;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.14);}
+    .mobile-nav-toggle{
+      display:none;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);
+      color:#ecf4ff;border-radius:12px;padding:10px 12px;font-weight:800;cursor:pointer;
+    }
 
-    main{padding:22px 0 52px}
-    .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
-    .meta span{background:var(--chip);border:1px solid var(--border);color:#374151;font-weight:900;font-size:.82rem;border-radius:999px;padding:5px 9px}
+    .hero{padding:34px 0 18px}
+    .hero-card{
+      border-radius:26px;border:1px solid rgba(255,255,255,.12);
+      background: linear-gradient(135deg, rgba(17,24,39,.85), rgba(9,14,29,.9)),
+                  radial-gradient(circle at 15% 20%, rgba(59,130,246,.22), transparent 60%);
+      box-shadow:var(--shadow);
+      padding:26px;
+    }
+    .hero-grid{display:grid;grid-template-columns:1.25fr .9fr;gap:22px;align-items:stretch;}
+    .eyebrow{
+      display:inline-flex;align-items:center;gap:8px;color:#dbeafe;
+      background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.26);
+      padding:8px 12px;border-radius:999px;font-size:.85rem;font-weight:800;margin-bottom:14px;
+    }
+    .eyebrow-dot{width:8px;height:8px;border-radius:999px;background:#60a5fa;box-shadow:0 0 16px rgba(96,165,250,.8);}
+    h1{margin:0 0 12px;font-size:clamp(2rem, 3vw, 3rem);line-height:1.08;letter-spacing:-.02em;}
+    .subtitle{margin:0 0 18px;color:var(--muted);font-size:1.03rem;max-width:72ch;}
+    .meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px;}
+    .meta-pill{
+      background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.10);border-radius:999px;
+      padding:8px 12px;color:#d9e6ff;font-size:.86rem;font-weight:700;
+    }
+    .hero-image{position:relative;border-radius:18px;min-height:260px;border:1px solid rgba(255,255,255,.12);overflow:hidden;background:#0b1328;}
+    .hero-image img{width:100%;height:100%;object-fit:cover;opacity:.95;}
+    .hero-image::after{
+      content:"";position:absolute;inset:0;
+      background: linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
+                  linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+      background-size:24px 24px;opacity:.20;pointer-events:none;
+    }
 
-    .article{margin-top:16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
-    .cover{width:100%;aspect-ratio:16/6;background:#0b1220}
-    .cover img{width:100%;height:100%;object-fit:cover;display:block}
-    .body{padding:18px}
+    .main-wrap{padding:10px 0 70px}
+    .content-grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:22px;align-items:start;}
+    .panel{background:var(--panel);border:1px solid var(--panel-border);border-radius:20px;box-shadow:var(--shadow);}
+    .article-panel{padding:24px}
+    .article-panel h2{font-size:1.45rem;margin:28px 0 10px;line-height:1.2;letter-spacing:-.01em;}
+    .article-panel h3{font-size:1.1rem;margin:22px 0 8px;line-height:1.25;color:#edf3ff;}
+    .article-panel p{margin:0 0 14px;color:#dde7ff;}
+    .callout{margin:18px 0;padding:14px;border-radius:14px;border:1px solid rgba(34,211,238,.22);background:rgba(34,211,238,.07);}
+    .callout strong{display:block;margin-bottom:6px}
+    .note-card{margin:18px 0;padding:16px;border-radius:14px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#dde7ff;}
+    pre{
+      margin:14px 0;padding:14px;border-radius:14px;border:1px solid rgba(255,255,255,.12);
+      background:rgba(0,0,0,.35);overflow:auto;color:#eaf1ff;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.92rem;line-height:1.55;
+    }
+    .article-footer{
+      margin-top:26px;padding-top:18px;border-top:1px solid rgba(255,255,255,.1);
+      display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;
+    }
+    .tags{display:flex;flex-wrap:wrap;gap:8px}
+    .tag{padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#dbe8ff;font-size:.82rem;font-weight:700;}
 
-    h2{margin:22px 0 10px;font-size:1.25rem;letter-spacing:-.01em}
-    h3{margin:16px 0 8px;font-size:1.02rem}
-    p{margin:10px 0}
+    .sidebar{display:grid;gap:16px;position:sticky;top:92px;}
+    .side-card{padding:16px;border-radius:18px;background:var(--panel);border:1px solid var(--panel-border);box-shadow:var(--shadow);}
+    .side-card h4{margin:0 0 10px;font-size:1rem;line-height:1.2}
+    .side-card p{margin:0 0 10px;color:var(--muted);font-size:.94rem}
+    .toc{display:grid;gap:8px}
+    .toc a{color:#dce8ff;font-size:.92rem;padding:8px 10px;border-radius:10px;border:1px solid transparent;background:rgba(255,255,255,.02);opacity:.95;}
+    .toc a:hover{border-color:rgba(255,255,255,.1);background:rgba(255,255,255,.04);opacity:1;}
+    .contact-box{
+      background: radial-gradient(220px 140px at 15% 10%, rgba(59,130,246,.22), transparent 70%),
+                  radial-gradient(220px 140px at 100% 100%, rgba(139,92,246,.2), transparent 70%),
+                  rgba(255,255,255,.04);
+    }
+    .small-muted{color:var(--muted2);font-size:.88rem}
 
-    .callout{margin-top:14px;border:1px solid var(--border);background:var(--bg2);border-radius:14px;padding:14px}
-    pre{margin:12px 0;padding:12px;border-radius:14px;border:1px solid var(--border);background:#0b1220;color:#eaf1ff;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.9rem}
+    .refs{margin-top:22px;padding-top:14px;border-top:1px solid rgba(255,255,255,.10);}
+    .refs h3{margin:0 0 10px}
+    .refs a{color:#dbeafe;text-decoration:underline}
 
-    .divider{height:1px;background:var(--border);margin:18px 0}
-    .refs{margin-top:18px;border-top:1px solid var(--border);padding-top:14px;color:var(--muted);font-size:.95rem}
-    .refs a{font-weight:800}
+    .footer{border-top:1px solid rgba(255,255,255,.08);padding:20px 0 36px;color:var(--muted);}
+    .footer-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;font-size:.92rem;}
 
-    .footer{border-top:1px solid var(--border);padding:22px 0 18px;color:var(--muted);font-size:.9rem;background:#fff}
-    @media (max-width:560px){.btn{width:100%}.cover{aspect-ratio:16/9}}
+    @media (max-width: 980px){
+      .hero-grid{grid-template-columns:1fr}
+      .content-grid{grid-template-columns:1fr}
+      .sidebar{position:static}
+    }
+    @media (max-width: 780px){
+      .nav{align-items:flex-start;flex-direction:column;padding:12px 0;}
+      .nav-top{width:100%}
+      .mobile-nav-toggle{display:inline-flex}
+      .nav-links{width:100%;display:none;flex-direction:column;align-items:flex-start;gap:12px;padding:6px 0 6px;}
+      .nav-links.show{display:flex}
+      .nav-links .btn{width:100%;justify-content:center}
+      .hero-card{padding:18px}
+      .article-panel{padding:18px}
+    }
   </style>
 </head>
 
 <body>
-  <header class="header">
-    <div class="container">
-      <nav class="nav">
-        <a class="brand" href="/index.html">
-          <div class="brand-badge" aria-hidden="true"></div>
+  <header class="site-header">
+    <div class="container nav">
+      <div class="nav-top">
+        <a href="../index.html" class="brand" aria-label="Sentinel Identity home">
+          <div class="brand-badge"></div>
           <div class="brand-text">
-            <strong>Sentinel Identity</strong>
-            <span>Entra ID & Microsoft 365 consulting</span>
+            <div class="brand-title">Sentinel Identity</div>
+            <div class="brand-sub">Entra Identity & Access Management consulting</div>
           </div>
         </a>
-        <a class="btn btn-primary" href="/index.html#contact">Request an Assessment</a>
+        <button class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Toggle menu">Menu</button>
+      </div>
+
+      <nav class="nav-links" id="navLinks" aria-label="Primary navigation">
+        <a href="../index.html#who-we-help">Who we help</a>
+        <a href="../index.html#services">Services</a>
+        <a href="../blog.html">Blog</a>
+        <a href="../index.html#contact">Contact</a>
+        <a class="btn btn-primary" href="../index.html#contact">Request an Assessment</a>
       </nav>
     </div>
   </header>
 
   <section class="hero">
-    <div class="container hero-inner">
-      <div class="kicker"><span class="dot"></span> Microsoft Defender for Office 365</div>
-      <h1>How to recall a message using Microsoft Defender</h1>
-      <p class="subtitle">
-        Outlook recall is not a control plane. Defender remediation is. The goal is to locate the message, scope blast radius, execute a removal action with auditability, and verify outcomes. This is incident response hygiene, not “try again and hope.”
-      </p>
-      <div class="meta">
-        <span>2026-03-03</span><span>9 min read</span><span>Remediation</span><span>AIR</span>
+    <div class="container">
+      <div class="hero-card">
+        <div class="hero-grid">
+          <div>
+            <div class="eyebrow">
+              <span class="eyebrow-dot"></span>
+              <span>MICROSOFT DEFENDER FOR OFFICE 365</span>
+            </div>
+
+            <h1>Remove an email across mailboxes using Microsoft Defender</h1>
+
+            <p class="subtitle">
+              Use Explorer and remediation actions in Microsoft Defender for Office 365 to remove a delivered message. This is the practical alternative to “Outlook recall.”
+            </p>
+
+            <div class="meta-row">
+              <span class="meta-pill">2026-03-07</span>
+              <span class="meta-pill">9 min read</span>
+              <span class="meta-pill">Defender</span>
+              <span class="meta-pill">Email remediation</span>
+            </div>
+
+            <a class="btn btn-outline" href="../blog.html">← Back to Blog</a>
+          </div>
+
+          <div class="hero-image" aria-label="Topic banner">
+            <img
+              src="data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%271200%27%20height%3D%27675%27%20viewBox%3D%270%200%201200%20675%27%3E%3Cdefs%3E%3ClinearGradient%20id%3D%27g%27%20x1%3D%270%27%20x2%3D%271%27%3E%3Cstop%20offset%3D%270%27%20stop-color%3D%27%232563eb%27/%3E%3Cstop%20offset%3D%270.55%27%20stop-color%3D%27%237c3aed%27/%3E%3Cstop%20offset%3D%271%27%20stop-color%3D%27%2306b6d4%27/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%271200%27%20height%3D%27675%27%20fill%3D%27%230b1220%27/%3E%3Ccircle%20cx%3D%27260%27%20cy%3D%27520%27%20r%3D%27300%27%20fill%3D%27url(%2523g)%27%20opacity%3D%270.22%27/%3E%3Ccircle%20cx%3D%27980%27%20cy%3D%27160%27%20r%3D%27260%27%20fill%3D%27url(%2523g)%27%20opacity%3D%270.16%27/%3E%3Crect%20x%3D%27180%27%20y%3D%27210%27%20width%3D%27660%27%20height%3D%27340%27%20rx%3D%2724%27%20fill%3D%27%230f1a2f%27%20stroke%3D%27rgba(255%2C255%2C255%2C0.18)%27/%3E%3Cpath%20d%3D%27M220%20270h580v220H220z%27%20fill%3D%27rgba(255%2C255%2C255%2C0.06)%27/%3E%3Cpath%20d%3D%27M220%20270l290%20170L800%20270%27%20fill%3D%27none%27%20stroke%3D%27rgba(255%2C255%2C255%2C0.25)%27%20stroke-width%3D%2710%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27/%3E%3Cpath%20d%3D%27M880%20240c-86%200-156%2070-156%20156%200%20104%2088%20192%20156%20216%2068-24%20156-112%20156-216%200-86-70-156-156-156z%27%20fill%3D%27rgba(255%2C255%2C255%2C0.08)%27%20stroke%3D%27rgba(255%2C255%2C255%2C0.18)%27/%3E%3Cpath%20d%3D%27M880%20305l70%2030v58c0%2052-38%20102-70%20116-32-14-70-64-70-116v-58l70-30z%27%20fill%3D%27url(%2523g)%27%20opacity%3D%270.9%27/%3E%3Ctext%20x%3D%27180%27%20y%3D%27140%27%20fill%3D%27rgba(255%2C255%2C255%2C0.85)%27%20font-family%3D%27Segoe%20UI%2C%20Arial%27%20font-size%3D%2734%27%20font-weight%3D%27700%27%3EDefender%20%E2%80%A2%20Email%20Remediation%3C/text%3E%3C/svg%3E"
+              alt="Defender email remediation banner"
+            />
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
-  <main>
+  <main class="main-wrap">
     <div class="container">
-      <article class="article">
-        <div class="cover">
-          <img alt="" src="data:image/svg+xml;charset=UTF-8,<?xml version='1.0'?><svg xmlns='http://www.w3.org/2000/svg' width='1200' height='675' viewBox='0 0 1200 675'><defs><linearGradient id='g' x1='0' x2='1'><stop offset='0' stop-color='%232563eb'/><stop offset='0.55' stop-color='%237c3aed'/><stop offset='1' stop-color='%2306b6d4'/></linearGradient></defs><rect width='1200' height='675' fill='%230b1220'/><circle cx='260' cy='520' r='300' fill='url(%23g)' opacity='0.22'/><circle cx='980' cy='160' r='260' fill='url(%23g)' opacity='0.16'/><rect x='180' y='210' width='660' height='340' rx='24' fill='%230f1a2f' stroke='rgba(255,255,255,0.18)'/><path d='M220 270h580v220H220z' fill='rgba(255,255,255,0.06)'/><path d='M220 270l290 170L800 270' fill='none' stroke='rgba(255,255,255,0.25)' stroke-width='10' stroke-linecap='round' stroke-linejoin='round'/><path d='M880 240c-86 0-156 70-156 156 0 104 88 192 156 216 68-24 156-112 156-216 0-86-70-156-156-156z' fill='rgba(255,255,255,0.08)' stroke='rgba(255,255,255,0.18)'/><path d='M880 305l70 30v58c0 52-38 102-70 116-32-14-70-64-70-116v-58l70-30z' fill='url(%23g)' opacity='0.9'/><text x='180' y='140' fill='rgba(255,255,255,0.85)' font-family='Segoe UI, Arial' font-size='34' font-weight='700'>Defender %E2%80%A2 Email Remediation</text></svg>">
-        </div>
+      <div class="content-grid">
 
-        <div class="body">
-          <div class="callout">
-            The remediation mindset: you are controlling the delivered artifact across mailboxes. Don’t start by deleting “a copy” in one inbox. Start by proving scope and then applying a controlled action across the tenant.
-          </div>
-
-          <h2>Architecture: where “recall” actually lives</h2>
+        <article class="panel article-panel" id="article">
           <p>
-            Outlook recall is a client-side best-effort feature and fails in common realities: users on mobile, external recipients, different mail clients, message already read, message moved by rules, or protections changing the flow. Defender for Office 365 gives you a control plane: you query the message at rest and in transit, then remediate it using actions that the platform can apply across mailboxes.
+            If a message was delivered and you need it removed across mailboxes, use Microsoft Defender for Office 365 remediation.
+            Outlook message recall is not reliable across clients, devices, and external recipients.
           </p>
-
-          <h2>Step 1: investigation and scoping in Explorer</h2>
-          <p>
-            Start in the Microsoft Defender portal and use Explorer (Threat Explorer) to locate the message. Your goal is not “find the subject line.” Your goal is to produce a defensible scope: which recipients received it, whether it was delivered, whether it was moved to junk/quarantine, whether there were clicks, and whether the payload is still present.
-          </p>
-          <p>
-            Use the strongest identifiers available. Message ID is the best. Subject + sender + time window is workable but less precise. Once you have the message record, confirm you’re working on the exact artifact by checking headers and delivery details.
-          </p>
-
-          <h2>Step 2: decide the remediation action based on risk</h2>
-          <p>
-            Defender actions are not equal. Choose the minimum action that achieves the safety objective. If the message is suspicious but you’re still validating, moving to Junk can be appropriate. If confirmed malicious, remove it. If you have downstream compromise indicators, remediation is just one part of the incident and should be paired with account/session actions.
-          </p>
-          <p>
-            When you execute a remediation action, record the reason, scope, and expected outcome. This is what you need later when someone asks why mail disappeared and whether it was handled consistently.
-          </p>
-
-          <h2>Step 3: AIR approvals and operational control</h2>
-          <p>
-            In tenants using Automated Investigation and Response (AIR), some actions may require approval. This can be intentional governance: avoid automatic hard deletes without human review. The engineering requirement is the same: the action must either execute or be approved and then execute. Don’t assume the click you made was the change. Verify the action status.
-          </p>
-
-          <h2>Step 4: verification (prove removal, not “looks ok”)</h2>
-          <p>
-            Verification means checking the action status in Defender, confirming the message no longer appears as delivered in Explorer, and spot-checking mailbox state for a subset of recipients. If the incident includes link clicks or credential entry, remediation must extend to identity: revoke sessions, reset credentials, and look for suspicious sign-ins.
-          </p>
-
-          <h2>Hardening: stop repeats with alert policies</h2>
-          <p>
-            Once you remediate, you should improve detection. Alert policies can give you early warning signals for patterns you care about. The operational goal is not to generate noise. It is to generate actionable alerts that correlate with your incident response playbook.
-          </p>
-
-          <div class="divider"></div>
-
-          <div class="refs">
-            <strong>Microsoft references</strong>
-            <ul>
-              <li><a href="https://learn.microsoft.com/en-us/defender-office-365/remediate-malicious-email-delivered-office-365" target="_blank" rel="noopener">Remediate malicious email that was delivered</a></li>
-              <li><a href="https://learn.microsoft.com/en-us/defender-office-365/air-review-approve-pending-completed-actions" target="_blank" rel="noopener">Review and approve pending/completed actions (AIR)</a></li>
-              <li><a href="https://learn.microsoft.com/en-us/defender-office-365/alert-policies-defender-portal" target="_blank" rel="noopener">Alert policies in the Microsoft Defender portal</a></li>
-              <li><a href="https://learn.microsoft.com/en-us/defender-office-365/threat-explorer" target="_blank" rel="noopener">Threat Explorer (Explorer) overview</a></li>
-            </ul>
-          </div>
 
           <div class="callout">
-            If you want a repeatable “investigate → remediate → verify” runbook that your team can follow during an incident without improvising, use the assessment form.
+            <strong>Applies to</strong>
+            Microsoft Defender for Office 365 (Plan 1/2 features vary), Microsoft Defender portal, and Exchange Online.
           </div>
-        </div>
-      </article>
+
+          <h2 id="before-you-start">Before you start</h2>
+          <p>
+            Collect at least one stable identifier for the message. Message ID is best. If you don’t have it, use sender + recipient + subject + a narrow time range.
+            This reduces false positives when multiple similar messages exist.
+          </p>
+
+          <h2 id="scope">Step 1: Find and scope the message in Explorer</h2>
+          <p>
+            In the Microsoft Defender portal, use Explorer (Threat Explorer) to locate the message and confirm delivery details.
+            Focus on scope: who received it, where it landed (Inbox, Junk, Quarantine), and whether there were interactions such as URL clicks.
+          </p>
+
+          <div class="note-card">
+            <strong>Tip</strong>
+            Treat scope as part of the fix. If you can’t clearly identify the message and recipients, you can’t reliably remediate it.
+          </div>
+
+          <h2 id="remediate">Step 2: Run a remediation action</h2>
+          <p>
+            Once the correct message is identified, choose an action appropriate for the risk. For confirmed malicious content, remove it.
+            If you are still validating, you can move to Junk or take a less destructive action while investigation continues.
+          </p>
+
+          <h2 id="air-approval">Step 3: Review and approve actions (AIR)</h2>
+          <p>
+            If your tenant uses Automated Investigation and Response (AIR), some actions can be pending approval.
+            In that case, remediation is not complete until the action is approved and the status indicates it finished successfully.
+          </p>
+
+          <h2 id="verify">Verify the result</h2>
+          <p>
+            Verify in two places:
+            1) Defender action status (completed/failed), and
+            2) Explorer results for the message over the same time window.
+            If the message is still present, do not retry randomly. Confirm you targeted the correct artifact and that the action applied to the intended recipients.
+          </p>
+
+          <h2 id="if-still-there">If the message is still present</h2>
+          <p>
+            Check whether you’re blocked by permissions, licensing, or scope. Also verify the message wasn’t delivered as multiple variants (for example, modified subjects or different attachments).
+            If you suspect multiple variants, use tighter identifiers such as Internet Message ID or attachment hash where available.
+          </p>
+
+          <section class="refs">
+            <h3>References</h3>
+            <p>
+              <a href="https://learn.microsoft.com/en-us/defender-office-365/remediate-malicious-email-delivered-office-365" target="_blank" rel="noopener">
+                Remediate malicious email that was delivered
+              </a>
+            </p>
+            <p>
+              <a href="https://learn.microsoft.com/en-us/defender-office-365/air-review-approve-pending-completed-actions" target="_blank" rel="noopener">
+                Review and approve pending/completed actions (AIR)
+              </a>
+            </p>
+            <p>
+              <a href="https://learn.microsoft.com/en-us/defender-office-365/alert-policies-defender-portal" target="_blank" rel="noopener">
+                Alert policies in the Microsoft Defender portal
+              </a>
+            </p>
+          </section>
+
+          <div class="article-footer">
+            <div class="tags">
+              <span class="tag">Microsoft Defender</span>
+              <span class="tag">Email</span>
+              <span class="tag">Remediation</span>
+            </div>
+            <a class="btn btn-primary" href="../index.html#contact">Request an Assessment</a>
+          </div>
+        </article>
+
+        <aside class="sidebar">
+          <div class="side-card">
+            <h4>In this article</h4>
+            <div class="toc">
+              <a href="#before-you-start">Before you start</a>
+              <a href="#scope">Find and scope</a>
+              <a href="#remediate">Run remediation</a>
+              <a href="#air-approval">AIR approvals</a>
+              <a href="#verify">Verify</a>
+              <a href="#if-still-there">If still present</a>
+            </div>
+          </div>
+
+          <div class="side-card">
+            <h4>Audience</h4>
+            <p><strong>Primary:</strong> M365 security admins and messaging admins</p>
+            <p class="small-muted">You need access to the Microsoft Defender portal and relevant permissions.</p>
+          </div>
+
+          <div class="side-card contact-box">
+            <h4>Need help?</h4>
+            <p>If you can share sender, subject, time window, and what you already tried, you can get to a clean remediation faster.</p>
+            <a class="btn btn-primary" href="../index.html#contact" style="width:100%;">Request an Assessment</a>
+            <p class="small-muted" style="margin-top:10px;">Email: info@sentinelidentity.ca</p>
+          </div>
+        </aside>
+
+      </div>
     </div>
   </main>
 
   <footer class="footer">
-    <div class="container">© 2026 Sentinel Identity · <a href="/blog.html">Blog</a></div>
+    <div class="container footer-row">
+      <div>© <span id="year"></span> Sentinel Identity</div>
+      <div>Entra IAM consulting · Worldwide remote</div>
+    </div>
   </footer>
+
+  <script>
+    const mobileNavToggle = document.getElementById('mobileNavToggle');
+    const navLinks = document.getElementById('navLinks');
+    if (mobileNavToggle && navLinks) mobileNavToggle.addEventListener('click', () => navLinks.classList.toggle('show'));
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>
