@@ -3,24 +3,27 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AADSTS76026: The request has expired | Sentinel Identity</title>
-  <meta name="description" content="Fix AADSTS76026 (RequestIssueTimeExpired) for SAML SSO in Microsoft Entra ID. Set the Sign-on URL so My Apps launches generate a fresh SAML request, then verify in sign-in logs." />
+  <title>Sentinel Identity | Entra Identity & Access Management Consulting</title>
+  <meta name="description" content="Premium Entra Identity & Access Management consulting. Conditional Access baseline, MFA hardening, admin role design, and SSO governance." />
   <meta name="theme-color" content="#071126" />
 
   <style>
     :root{
       --bg:#071126;
       --bg2:#0c1834;
-      --panel:rgba(255,255,255,0.06);
-      --panel-border:rgba(255,255,255,0.12);
+      --panel:rgba(255,255,255,.06);
+      --panel2:rgba(255,255,255,.04);
+      --border:rgba(255,255,255,.12);
       --text:#e8efff;
       --muted:#b8c5ea;
       --muted2:#93a6d6;
+
       --blue:#3b82f6;
       --cyan:#22d3ee;
       --violet:#8b5cf6;
-      --shadow:0 20px 60px rgba(0,0,0,.35);
-      --radius:20px;
+
+      --shadow:0 22px 70px rgba(0,0,0,.38);
+      --radius:22px;
       --max:1180px;
     }
 
@@ -30,636 +33,509 @@
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       color:var(--text);
       background:
-        radial-gradient(900px 500px at 8% -10%, rgba(59,130,246,.35), transparent 60%),
-        radial-gradient(700px 400px at 95% 10%, rgba(139,92,246,.28), transparent 60%),
-        radial-gradient(500px 300px at 80% 70%, rgba(34,211,238,.15), transparent 60%),
+        radial-gradient(900px 520px at 8% -10%, rgba(59,130,246,.35), transparent 60%),
+        radial-gradient(780px 440px at 95% 8%, rgba(139,92,246,.26), transparent 60%),
+        radial-gradient(520px 320px at 80% 70%, rgba(34,211,238,.14), transparent 60%),
         linear-gradient(180deg, var(--bg), var(--bg2));
-      line-height:1.7;
+      line-height:1.6;
     }
 
     a{color:inherit;text-decoration:none}
     a:hover{opacity:1}
     img{max-width:100%;display:block}
 
-    .container{
-      width:min(var(--max), calc(100% - 32px));
-      margin:0 auto;
-    }
+    .container{width:min(var(--max), calc(100% - 32px)); margin:0 auto;}
 
     /* Header */
-    .site-header{
-      position:sticky;
-      top:0;
-      z-index:50;
-      backdrop-filter: blur(10px);
-      background:rgba(7,17,38,.75);
-      border-bottom:1px solid rgba(255,255,255,.08);
+    .header{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter: blur(12px);
+      background: rgba(7,17,38,.78);
+      border-bottom: 1px solid rgba(255,255,255,.08);
     }
-
     .nav{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:16px;
       min-height:78px;
+      display:flex; align-items:center; justify-content:space-between; gap:14px;
     }
-
-    .nav-top{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      width:auto;
-    }
-
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      min-width:0;
-    }
-
-    .brand-badge{
-      width:36px;
-      height:36px;
-      border-radius:12px;
-      background:
-        radial-gradient(circle at 30% 30%, #7dd3fc, #3b82f6 45%, #1d4ed8 70%, #1e1b4b);
-      box-shadow: 0 8px 24px rgba(59,130,246,.45);
+    .brand{display:flex;align-items:center;gap:12px;min-width:0}
+    .badge{
+      width:38px;height:38px;border-radius:12px;flex:0 0 auto;
+      background: radial-gradient(circle at 30% 30%, #7dd3fc, #3b82f6 45%, #1d4ed8 70%, #1e1b4b);
+      box-shadow:0 10px 28px rgba(59,130,246,.45);
       border:1px solid rgba(255,255,255,.22);
-      flex:0 0 auto;
     }
-
     .brand-text{display:flex;flex-direction:column;min-width:0}
-    .brand-title{
-      font-weight:800;
-      letter-spacing:.01em;
-      font-size:1.05rem;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-    .brand-sub{
-      color:var(--muted);
-      font-size:.82rem;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      max-width: 520px;
-    }
+    .brand-text strong{font-weight:900;letter-spacing:.01em;font-size:1.06rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .brand-text span{color:var(--muted);font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px}
 
-    .nav-links{
-      display:flex;
-      align-items:center;
-      gap:20px;
-      flex-wrap:wrap;
-      justify-content:flex-end;
+    .links{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:flex-end}
+    .links a{
+      color:#d9e5ff; font-weight:800; opacity:.92;
+      padding:10px 10px; border-radius:12px;
     }
-
-    .nav-links a{
-      color:#d9e5ff;
-      font-weight:700;
-      opacity:.9;
-    }
-    .nav-links a:hover{opacity:1}
+    .links a:hover{background:rgba(255,255,255,.05); opacity:1}
 
     .btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      border:none;
-      cursor:pointer;
-      border-radius:14px;
-      padding:12px 18px;
-      font-weight:800;
-      transition:.2s ease;
-      text-decoration:none;
-      white-space:nowrap;
+      display:inline-flex; align-items:center; justify-content:center; gap:10px;
+      border:none; cursor:pointer; border-radius:14px;
+      padding:12px 18px; font-weight:900; white-space:nowrap;
+      transition:transform .15s ease, box-shadow .15s ease;
     }
-
+    .btn:hover{transform:translateY(-1px)}
     .btn-primary{
-      color:white;
+      color:#fff;
       background:linear-gradient(90deg, var(--violet), var(--blue), var(--cyan));
-      box-shadow: 0 10px 30px rgba(59,130,246,.35);
+      box-shadow: 0 12px 34px rgba(59,130,246,.35);
     }
-    .btn-primary:hover{transform:translateY(-1px)}
-
-    .btn-outline{
+    .btn-ghost{
       color:#dfe9ff;
-      background:rgba(255,255,255,.03);
+      background:rgba(255,255,255,.04);
       border:1px solid rgba(255,255,255,.14);
     }
 
-    /* Mobile */
-    .mobile-nav-toggle{
+    .mobile-btn{
       display:none;
       background:rgba(255,255,255,.05);
       border:1px solid rgba(255,255,255,.12);
       color:#ecf4ff;
       border-radius:12px;
       padding:10px 12px;
-      font-weight:800;
+      font-weight:900;
       cursor:pointer;
     }
+    .mobile-panel{
+      display:none;
+      padding:10px 0 14px;
+      border-top:1px solid rgba(255,255,255,.08);
+    }
+    .mobile-panel a{display:block;padding:12px 10px;border-radius:12px;font-weight:800;color:#dce8ff}
+    .mobile-panel a:hover{background:rgba(255,255,255,.05)}
+    .mobile-panel .btn{width:100%;margin-top:10px}
 
     /* Hero */
-    .hero{padding:34px 0 18px}
-
+    .hero{padding:34px 0 20px}
     .hero-card{
-      position:relative;
-      overflow:hidden;
-      border-radius:26px;
+      border-radius:28px;
       border:1px solid rgba(255,255,255,.12);
       background:
-        linear-gradient(135deg, rgba(17,24,39,.85), rgba(9,14,29,.9)),
-        radial-gradient(circle at 15% 20%, rgba(59,130,246,.22), transparent 60%);
-      box-shadow:var(--shadow);
-      padding:26px;
+        linear-gradient(135deg, rgba(17,24,39,.82), rgba(9,14,29,.92)),
+        radial-gradient(circle at 18% 18%, rgba(59,130,246,.20), transparent 55%);
+      box-shadow: var(--shadow);
+      overflow:hidden;
     }
-
-    .hero-grid{
+    .hero-inner{
+      padding:26px;
       display:grid;
-      grid-template-columns: 1.25fr .9fr;
-      gap:22px;
+      grid-template-columns: 1.2fr .8fr;
+      gap:18px;
       align-items:stretch;
     }
-
     .eyebrow{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
+      display:inline-flex; align-items:center; gap:8px;
       color:#dbeafe;
       background:rgba(59,130,246,.12);
       border:1px solid rgba(59,130,246,.26);
       padding:8px 12px;
       border-radius:999px;
       font-size:.85rem;
-      font-weight:800;
+      font-weight:900;
       margin-bottom:14px;
       letter-spacing:.02em;
+      width:fit-content;
     }
-    .eyebrow-dot{
-      width:8px;height:8px;border-radius:999px;background:#60a5fa;
-      box-shadow:0 0 16px rgba(96,165,250,.8);
-    }
-
+    .dot{width:8px;height:8px;border-radius:999px;background:#60a5fa;box-shadow:0 0 16px rgba(96,165,250,.8)}
     h1{
       margin:0 0 12px;
-      font-size:clamp(2rem, 3vw, 3rem);
+      font-size:clamp(2.05rem, 3.2vw, 3.05rem);
+      letter-spacing:-.03em;
       line-height:1.08;
-      letter-spacing:-.02em;
     }
-
-    .subtitle{
+    .sub{
       margin:0 0 18px;
       color:var(--muted);
-      font-size:1.03rem;
-      max-width:72ch;
+      max-width:74ch;
+      font-size:1.04rem;
     }
+    .hero-actions{display:flex;gap:10px;flex-wrap:wrap}
+    .hero-actions .btn{padding:12px 16px}
 
-    .meta-row{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      margin-bottom:18px;
+    .hero-side{
+      border-left:1px solid rgba(255,255,255,.10);
+      padding-left:18px;
+      display:grid;
+      align-content:start;
+      gap:12px;
     }
-
-    .meta-pill{
+    .kpi{
       background:rgba(255,255,255,.04);
-      border:1px solid rgba(255,255,255,.10);
-      border-radius:999px;
-      padding:8px 12px;
-      color:#d9e6ff;
-      font-size:.86rem;
-      font-weight:700;
-    }
-
-    /* Banner */
-    .hero-image{
-      position:relative;
-      border-radius:18px;
-      min-height:260px;
       border:1px solid rgba(255,255,255,.12);
-      overflow:hidden;
+      border-radius:18px;
+      padding:12px;
+    }
+    .kpi strong{display:block;font-size:.95rem}
+    .kpi span{display:block;color:var(--muted);font-size:.9rem;margin-top:4px}
+
+    .banner{
+      margin-top:14px;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.12);
       background:#0b1328;
+      overflow:hidden;
+      min-height: 210px;
+      position:relative;
     }
-    .hero-image img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      opacity:.95;
-    }
-    .hero-image::after{
+    .banner img{width:100%;height:100%;object-fit:cover;opacity:.95}
+    .banner::after{
       content:"";
       position:absolute; inset:0;
       background:
         linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
-      background-size: 24px 24px;
-      opacity:.20;
+      background-size: 26px 26px;
+      opacity:.18;
       pointer-events:none;
     }
 
-    /* Layout */
-    .main-wrap{padding: 10px 0 70px}
-
-    .content-grid{
-      display:grid;
-      grid-template-columns: minmax(0, 1fr) 320px;
-      gap:22px;
-      align-items:start;
-    }
-
-    .panel{
-      background:var(--panel);
-      border:1px solid var(--panel-border);
-      border-radius:20px;
-      box-shadow:var(--shadow);
-    }
-
-    .article-panel{padding:24px}
-
-    .article-panel h2{
-      font-size:1.45rem;
-      margin:28px 0 10px;
-      line-height:1.2;
-      letter-spacing:-.01em;
-    }
-
-    .article-panel h3{
-      font-size:1.1rem;
-      margin:22px 0 8px;
-      line-height:1.25;
-      color:#edf3ff;
-    }
-
-    .article-panel p{
-      margin:0 0 14px;
-      color:#dde7ff;
-    }
-
-    .callout{
-      margin:18px 0;
-      padding:14px;
-      border-radius:14px;
-      border:1px solid rgba(34,211,238,.22);
-      background:rgba(34,211,238,.07);
-    }
-    .callout strong{display:block;margin-bottom:6px}
-
-    .note-card{
-      margin:18px 0;
-      padding:16px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.1);
-      background:rgba(255,255,255,.03);
-      color:#dde7ff;
-    }
-
-    pre{
-      margin:14px 0;
-      padding:14px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(0,0,0,.35);
-      overflow:auto;
-      color:#eaf1ff;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size:.92rem;
-      line-height:1.55;
-    }
-
-    .article-footer{
-      margin-top:26px;
-      padding-top:18px;
-      border-top:1px solid rgba(255,255,255,.1);
+    /* Sections */
+    section{padding:22px 0}
+    .section-head{
       display:flex;
-      flex-wrap:wrap;
-      align-items:center;
+      align-items:flex-end;
       justify-content:space-between;
       gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:12px;
     }
-
-    .tags{display:flex;flex-wrap:wrap;gap:8px}
-    .tag{
-      padding:7px 10px;
-      border-radius:999px;
-      background:rgba(255,255,255,.04);
-      border:1px solid rgba(255,255,255,.1);
-      color:#dbe8ff;
-      font-size:.82rem;
-      font-weight:700;
+    .section-head h2{
+      margin:0;
+      font-size:1.55rem;
+      letter-spacing:-.02em;
+      line-height:1.15;
     }
+    .section-head p{margin:0;color:var(--muted);max-width:78ch}
 
-    /* Sidebar */
-    .sidebar{
+    .grid{
       display:grid;
-      gap:16px;
-      position:sticky;
-      top:92px;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap:14px;
     }
-
-    .side-card{
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.04));
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:22px;
+      box-shadow: var(--shadow);
       padding:16px;
-      border-radius:18px;
-      background:var(--panel);
-      border:1px solid var(--panel-border);
-      box-shadow:var(--shadow);
+    }
+    .card h3{margin:0 0 8px;font-size:1.05rem;letter-spacing:-.01em}
+    .card p{margin:0;color:var(--muted);font-size:.95rem;line-height:1.5}
+
+    .two-col{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:14px;
     }
 
-    .side-card h4{margin:0 0 10px;font-size:1rem;line-height:1.2}
-    .side-card p{margin:0 0 10px;color:var(--muted);font-size:.94rem}
-
-    .toc{display:grid;gap:8px}
-    .toc a{
-      color:#dce8ff;
-      font-size:.92rem;
-      padding:8px 10px;
-      border-radius:10px;
-      border:1px solid transparent;
-      background:rgba(255,255,255,.02);
-      opacity:.95;
+    /* Contact form */
+    .form-wrap{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:14px;
+      align-items:start;
     }
-    .toc a:hover{
-      border-color:rgba(255,255,255,.1);
+    form{display:grid;gap:10px}
+    label{font-weight:900;color:#dbe8ff;font-size:.9rem}
+    input, textarea, select{
+      width:100%;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.14);
       background:rgba(255,255,255,.04);
-      opacity:1;
+      color:var(--text);
+      outline:none;
+      font-size:.95rem;
     }
-
-    .contact-box{
-      background:
-        radial-gradient(220px 140px at 15% 10%, rgba(59,130,246,.22), transparent 70%),
-        radial-gradient(220px 140px at 100% 100%, rgba(139,92,246,.2), transparent 70%),
-        rgba(255,255,255,.04);
+    textarea{min-height:130px;resize:vertical}
+    input::placeholder, textarea::placeholder{color:rgba(184,197,234,.9)}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .status{
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.04);
+      padding:12px;
+      color:var(--muted);
+      font-size:.93rem;
+      display:none;
     }
-
-    .small-muted{color:var(--muted2);font-size:.88rem}
-
-    /* References */
-    .refs{
-      margin-top: 22px;
-      padding-top: 14px;
-      border-top: 1px solid rgba(255,255,255,.10);
-    }
-    .refs h3{margin:0 0 10px}
-    .refs a{color:#dbeafe;text-decoration:underline}
-    .refs a:hover{opacity:.95}
+    .status.ok{border-color:rgba(34,211,238,.25); background:rgba(34,211,238,.08); color:#dffbff;}
+    .status.err{border-color:rgba(239,68,68,.25); background:rgba(239,68,68,.08); color:#ffe4e4;}
+    .muted{color:var(--muted);font-size:.92rem}
 
     /* Footer */
     .footer{
       border-top:1px solid rgba(255,255,255,.08);
-      padding:20px 0 36px;
+      padding:20px 0 34px;
       color:var(--muted);
+      margin-top:10px;
     }
     .footer-row{
-      display:flex;
-      flex-wrap:wrap;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
+      display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;
       font-size:.92rem;
     }
 
     @media (max-width: 980px){
-      .hero-grid{grid-template-columns:1fr}
-      .content-grid{grid-template-columns:1fr}
-      .sidebar{position:static}
+      .hero-inner{grid-template-columns:1fr}
+      .hero-side{border-left:none;padding-left:0;border-top:1px solid rgba(255,255,255,.10);padding-top:14px}
+      .grid{grid-template-columns:1fr}
+      .two-col{grid-template-columns:1fr}
+      .form-wrap{grid-template-columns:1fr}
     }
-
     @media (max-width: 780px){
-      .nav{
-        align-items:flex-start;
-        flex-direction:column;
-        padding:12px 0;
-      }
-      .nav-top{width:100%}
-      .mobile-nav-toggle{display:inline-flex}
-      .nav-links{
-        width:100%;
-        display:none;
-        flex-direction:column;
-        align-items:flex-start;
-        gap:12px;
-        padding:6px 0 6px;
-      }
-      .nav-links.show{display:flex}
-      .nav-links .btn{width:100%;justify-content:center}
-      .hero-card{padding:18px}
-      .article-panel{padding:18px}
-    }
-
-    @media (max-width: 520px){
-      .container{width:min(var(--max), calc(100% - 20px))}
-      h1{font-size:1.75rem}
-      .subtitle{font-size:.96rem}
-      .hero-image{min-height:220px}
+      .links{display:none}
+      .mobile-btn{display:inline-flex}
+      .hero-inner{padding:18px}
+      .form-row{grid-template-columns:1fr}
     }
   </style>
 </head>
 
 <body>
-  <header class="site-header">
-    <div class="container nav">
-      <div class="nav-top">
-        <a href="../index.html" class="brand" aria-label="Sentinel Identity home">
-          <div class="brand-badge"></div>
+  <header class="header">
+    <div class="container">
+      <div class="nav">
+        <a class="brand" href="#top" aria-label="Sentinel Identity home">
+          <div class="badge" aria-hidden="true"></div>
           <div class="brand-text">
-            <div class="brand-title">Sentinel Identity</div>
-            <div class="brand-sub">Entra Identity & Access Management consulting</div>
+            <strong>Sentinel Identity</strong>
+            <span>Entra Identity & Access Management consulting</span>
           </div>
         </a>
-        <button class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Toggle menu">Menu</button>
+
+        <nav class="links" aria-label="Primary navigation">
+          <a href="#services">Services</a>
+          <a href="#approach">Approach</a>
+          <a href="#coverage">Coverage</a>
+          <a href="blog.html">Blog</a>
+          <a href="#contact">Assessment</a>
+        </nav>
+
+        <a class="btn btn-primary" href="#contact">Request an Assessment</a>
+        <button class="mobile-btn" id="mobileBtn" aria-label="Open menu" aria-expanded="false">Menu</button>
       </div>
 
-      <nav class="nav-links" id="navLinks" aria-label="Primary navigation">
-        <a href="../index.html#who-we-help">Who we help</a>
-        <a href="../index.html#services">Services</a>
-        <a href="../blog.html">Blog</a>
-        <a href="../index.html#contact">Contact</a>
-        <a class="btn btn-primary" href="../index.html#contact">Request an Assessment</a>
-      </nav>
+      <div class="mobile-panel" id="mobilePanel" aria-label="Mobile menu">
+        <a href="#services">Services</a>
+        <a href="#approach">Approach</a>
+        <a href="#coverage">Coverage</a>
+        <a href="blog.html">Blog</a>
+        <a href="#contact">Assessment</a>
+        <a class="btn btn-primary" href="#contact">Request an Assessment</a>
+      </div>
     </div>
   </header>
 
-  <section class="hero" aria-label="Post hero">
-    <div class="container">
-      <div class="hero-card">
-        <div class="hero-grid">
-          <div>
-            <div class="eyebrow">
-              <span class="eyebrow-dot"></span>
-              <span>ENTRA ID · SAML SINGLE SIGN-ON</span>
+  <main id="top">
+    <section class="hero">
+      <div class="container">
+        <div class="hero-card">
+          <div class="hero-inner">
+            <div>
+              <div class="eyebrow"><span class="dot"></span><span>ENTRA IAM · CONDITIONAL ACCESS · SSO</span></div>
+              <h1>Entra Identity & Access Management for teams that run production</h1>
+              <p class="sub">
+                Baselines and operating models for Conditional Access, MFA methods, admin roles, and enterprise apps.
+                Clear scope. Controlled rollout. Verifiable outcomes.
+              </p>
+
+              <div class="hero-actions">
+                <a class="btn btn-primary" href="#contact">Request an Assessment</a>
+                <a class="btn btn-ghost" href="blog.html">Read the blog</a>
+              </div>
+
+              <div class="banner" aria-label="Hero banner">
+                <img alt="" src="data:image/svg+xml;charset=UTF-8,<?xml version='1.0'?><svg xmlns='http://www.w3.org/2000/svg' width='1200' height='600' viewBox='0 0 1200 600'><defs><linearGradient id='g' x1='0' x2='1'><stop offset='0' stop-color='%232563eb'/><stop offset='0.55' stop-color='%237c3aed'/><stop offset='1' stop-color='%2306b6d4'/></linearGradient></defs><rect width='1200' height='600' fill='%230b1220'/><circle cx='260' cy='140' r='260' fill='url(%23g)' opacity='0.22'/><circle cx='1040' cy='520' r='320' fill='url(%23g)' opacity='0.16'/><path d='M820 150c-122 0-220 98-220 220 0 148 118 270 220 300 102-30 220-152 220-300 0-122-98-220-220-220z' fill='rgba(255,255,255,0.08)' stroke='rgba(255,255,255,0.18)'/><path d='M820 245l98 42v82c0 74-52 146-98 166-46-20-98-92-98-166v-82l98-42z' fill='url(%23g)' opacity='0.92'/><rect x='120' y='250' width='420' height='220' rx='22' fill='rgba(255,255,255,0.06)' stroke='rgba(255,255,255,0.16)'/><path d='M150 300h360M150 338h300M150 376h320M150 414h260' stroke='rgba(255,255,255,0.22)' stroke-width='10' stroke-linecap='round'/><text x='120' y='170' fill='rgba(255,255,255,0.85)' font-family='Segoe UI, Arial' font-size='34' font-weight='700'>Entra IAM • Baseline Controls</text></svg>">
+              </div>
             </div>
 
-            <h1>AADSTS76026: The request has expired</h1>
-
-            <p class="subtitle">
-              Fix AADSTS76026 for SAML apps that fail when launched from My Apps. Set the Sign-on URL so Entra starts a fresh request, then verify in sign-in logs.
-            </p>
-
-            <div class="meta-row" aria-label="Post metadata">
-              <span class="meta-pill">2026-03-07</span>
-              <span class="meta-pill">8 min read</span>
-              <span class="meta-pill">Entra ID</span>
-              <span class="meta-pill">SAML</span>
-            </div>
-
-            <a class="btn btn-outline" href="../blog.html">← Back to Blog</a>
-          </div>
-
-          <div class="hero-image" aria-label="Topic banner">
-            <img
-              src="data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%271200%27%20height%3D%27675%27%20viewBox%3D%270%200%201200%20675%27%3E%3Cdefs%3E%3ClinearGradient%20id%3D%27g%27%20x1%3D%270%27%20x2%3D%271%27%3E%3Cstop%20offset%3D%270%27%20stop-color%3D%27%232563eb%27/%3E%3Cstop%20offset%3D%270.55%27%20stop-color%3D%27%237c3aed%27/%3E%3Cstop%20offset%3D%271%27%20stop-color%3D%27%2306b6d4%27/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%271200%27%20height%3D%27675%27%20fill%3D%27%230b1220%27/%3E%3Ccircle%20cx%3D%27230%27%20cy%3D%27150%27%20r%3D%27260%27%20fill%3D%27url(%2523g)%27%20opacity%3D%270.25%27/%3E%3Ccircle%20cx%3D%271080%27%20cy%3D%27560%27%20r%3D%27320%27%20fill%3D%27url(%2523g)%27%20opacity%3D%270.18%27/%3E%3Crect%20x%3D%27120%27%20y%3D%27170%27%20width%3D%27520%27%20height%3D%27340%27%20rx%3D%2724%27%20fill%3D%27%230f1a2f%27%20stroke%3D%27rgba(255%2C255%2C255%2C0.18)%27/%3E%3Ccircle%20cx%3D%27165%27%20cy%3D%27200%27%20r%3D%278%27%20fill%3D%27%23ff5f57%27/%3E%3Ccircle%20cx%3D%27195%27%20cy%3D%27200%27%20r%3D%278%27%20fill%3D%27%23febc2e%27/%3E%3Ccircle%20cx%3D%27225%27%20cy%3D%27200%27%20r%3D%278%27%20fill%3D%27%2328c840%27/%3E%3Cpath%20d%3D%27M860%20210c-96%200-174%2078-174%20174%200%20116%2098%20214%20174%20240%2076-26%20174-124%20174-240%200-96-78-174-174-174z%27%20fill%3D%27rgba(255%2C255%2C255%2C0.08)%27%20stroke%3D%27rgba(255%2C255%2C255%2C0.18)%27/%3E%3Cpath%20d%3D%27M860%20285l78%2034v64c0%2058-42%20114-78%20130-36-16-78-72-78-130v-64l78-34z%27%20fill%3D%27url(%2523g)%27%20opacity%3D%270.9%27/%3E%3Ctext%20x%3D%27120%27%20y%3D%27120%27%20fill%3D%27rgba(255%2C255%2C255%2C0.85)%27%20font-family%3D%27Segoe%20UI%2C%20Arial%27%20font-size%3D%2734%27%20font-weight%3D%27700%27%3ESAML%20SSO%20%E2%80%A2%20Request%20Expired%3C/text%3E%3C/svg%3E"
-              alt="SAML SSO request expired banner"
-            />
+            <aside class="hero-side">
+              <div class="kpi">
+                <strong>Conditional Access baseline</strong>
+                <span>Staged rollout, exclusions with owners, rollback notes.</span>
+              </div>
+              <div class="kpi">
+                <strong>MFA methods hardening</strong>
+                <span>Reduce weak pathways and method drift.</span>
+              </div>
+              <div class="kpi">
+                <strong>Admin roles and privilege</strong>
+                <span>Role clarity, least privilege, access reviews.</span>
+              </div>
+              <div class="kpi">
+                <strong>Enterprise app governance</strong>
+                <span>SSO consistency, safe defaults, ownership.</span>
+              </div>
+            </aside>
           </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <main class="main-wrap">
-    <div class="container">
-      <div class="content-grid">
-
-        <article class="panel article-panel" id="article">
-          <p>
-            You might see <strong>AADSTS76026: The request has expired. Try to submit new request.</strong> when users launch a SAML app from
-            <strong>My Apps</strong>, but the same app works when users start from the application’s own sign-in page.
-          </p>
-
-          <div class="callout">
-            <strong>Applies to</strong>
-            Microsoft Entra ID (Enterprise applications) using SAML single sign-on.
+    <section id="services">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>Services</h2>
+            <p>Focused IAM workstreams. No clutter, no “transformation” buzzwords.</p>
           </div>
+        </div>
 
-          <h2 id="cause">Why this error happens</h2>
-          <p>
-            In a SAML flow, the application (service provider) generates a sign-in request that includes a timestamp.
-            Entra ID validates that timestamp to help prevent replay. If Entra receives an older request, it rejects it as expired.
-          </p>
-          <p>
-            This commonly happens when users start the sign-in from <strong>My Apps</strong> and the enterprise app doesn’t have a valid entry point.
-            Without the correct entry point, the app can reuse a stale request or fail to generate a new request at the right time.
-          </p>
-
-          <h2 id="fix">Fix: Set the Sign-on URL in the SAML configuration</h2>
-          <p>
-            Set the <strong>Sign-on URL</strong> so My Apps launches redirect users to the application’s SAML entry page (SP-initiated URL).
-            This helps the application generate a fresh SAML request.
-          </p>
-
-          <h3 id="steps">Steps</h3>
-          <p>In the Entra admin center:</p>
-          <p>
-            1. Go to <strong>Identity</strong> &gt; <strong>Applications</strong> &gt; <strong>Enterprise applications</strong>.<br/>
-            2. Select the application.<br/>
-            3. Select <strong>Single sign-on</strong> &gt; <strong>SAML</strong>.<br/>
-            4. Under <strong>Basic SAML Configuration</strong>, select <strong>Edit</strong>.<br/>
-            5. In <strong>Sign-on URL</strong>, enter the application’s SP-initiated sign-in URL (the URL users normally use to start SSO from the app).<br/>
-            6. Select <strong>Save</strong>.
-          </p>
-
-          <div class="note-card">
-            <strong>Tip</strong>
-            If you are not sure what URL to use, start with the application’s standard sign-in page that triggers SSO. Many vendors document this as the “SP-initiated SSO URL” or “SSO start URL.”
+        <div class="grid">
+          <div class="card">
+            <h3>Conditional Access baseline</h3>
+            <p>Minimum effective policy set, pilot, expand, and support-ready documentation.</p>
           </div>
-
-          <h2 id="verify">Verify the fix</h2>
-          <p>
-            Use a clean browser session so you don’t validate against cached redirects.
-          </p>
-          <p>
-            1. Open an InPrivate/Incognito window.<br/>
-            2. Go to <strong>myapps.microsoft.com</strong>.<br/>
-            3. Select the application tile.<br/>
-            4. Confirm the sign-in completes without AADSTS76026.
-          </p>
-
-          <h2 id="still-fails">If the issue continues</h2>
-          <p>
-            If the Sign-on URL is correct and the error continues, focus on time consistency and request replay.
-          </p>
-
-          <h3 id="clock-skew">Check for clock skew</h3>
-          <p>
-            If the application server (or an upstream component) has incorrect time, Entra can treat the request as expired.
-            Ensure app servers and any federation/proxy components use a reliable NTP source.
-          </p>
-
-          <h3 id="proxy-caching">Check for proxy or gateway replay</h3>
-          <p>
-            If a reverse proxy, WAF, or gateway caches authentication pages or redirects, it can cause reuse of an old request.
-            Review caching rules and disable caching for sign-in endpoints.
-          </p>
-
-          <h3 id="logs">Confirm the pattern in sign-in logs</h3>
-          <p>
-            In Entra admin center, use <strong>Sign-in logs</strong> to compare:
-            a failed My Apps launch versus a successful app-initiated launch. This helps confirm the issue is launch-path specific.
-          </p>
-
-          <section class="refs" aria-label="References">
-            <h3>References</h3>
-            <p>
-              <a href="https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/configure-saml-single-sign-on" target="_blank" rel="noopener">
-                Configure SAML-based single sign-on
-              </a>
-            </p>
-            <p>
-              <a href="https://learn.microsoft.com/en-us/entra/identity-platform/reference-error-codes" target="_blank" rel="noopener">
-                Microsoft Entra ID error codes (includes AADSTS errors)
-              </a>
-            </p>
-            <p>
-              <a href="https://learn.microsoft.com/en-us/entra/identity/monitoring-health/concept-sign-ins" target="_blank" rel="noopener">
-                Sign-in logs in Microsoft Entra ID
-              </a>
-            </p>
-          </section>
-
-          <div class="article-footer">
-            <div class="tags">
-              <span class="tag">Entra ID</span>
-              <span class="tag">SAML</span>
-              <span class="tag">SSO</span>
-              <span class="tag">Troubleshooting</span>
-            </div>
-
-            <a class="btn btn-primary" href="../index.html#contact">Request an Assessment</a>
+          <div class="card">
+            <h3>MFA and authentication methods</h3>
+            <p>Method standardization, cleanup, and reduction of unusable legacy registrations.</p>
           </div>
-        </article>
-
-        <aside class="sidebar">
-          <div class="side-card">
-            <h4>In this article</h4>
-            <div class="toc" id="toc">
-              <a href="#cause">Why this error happens</a>
-              <a href="#fix">Fix</a>
-              <a href="#verify">Verify</a>
-              <a href="#still-fails">If the issue continues</a>
-              <a href="#logs">Sign-in logs</a>
-            </div>
-            <p class="small-muted" style="margin-top:10px;">Use these sections when writing future posts.</p>
+          <div class="card">
+            <h3>Admin roles and privileged access</h3>
+            <p>Role design, least privilege, standing access reduction, and review cadence.</p>
           </div>
-
-          <div class="side-card">
-            <h4>Audience</h4>
-            <p><strong>Primary:</strong> Entra / M365 admins and small IT teams</p>
-            <p><strong>Assumption:</strong> You can update enterprise app SSO configuration and review sign-in logs.</p>
+          <div class="card">
+            <h3>SSO and enterprise apps</h3>
+            <p>Consistent SAML/OIDC configuration, ownership, and safe defaults.</p>
           </div>
-
-          <div class="side-card contact-box">
-            <h4>Need help with Entra IAM?</h4>
-            <p>Use the assessment form and include the app name, launch method (My Apps vs app URL), and the time of a failed sign-in.</p>
-            <a class="btn btn-primary" href="../index.html#contact" style="width:100%;">Request an Assessment</a>
-            <p class="small-muted" style="margin-top:10px;">Email: info@sentinelidentity.ca</p>
+          <div class="card">
+            <h3>Identity monitoring</h3>
+            <p>Operational signals from sign-in logs. Triage patterns and response steps.</p>
           </div>
-        </aside>
-
+          <div class="card">
+            <h3>Messaging and Defender workflows</h3>
+            <p>Shared mailbox standards, send permissions, remediation patterns that scale.</p>
+          </div>
+        </div>
       </div>
-    </div>
+    </section>
+
+    <section id="approach">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>Approach</h2>
+            <p>Prove the current state, implement safely, verify with evidence.</p>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="card">
+            <h3>Assessment</h3>
+            <p>Define scope, risks, and the smallest change that improves security without breaking operations.</p>
+          </div>
+          <div class="card">
+            <h3>Implementation</h3>
+            <p>Controlled rollout with pilot groups, monitoring, and rollback notes.</p>
+          </div>
+          <div class="card">
+            <h3>Verification</h3>
+            <p>Confirm outcomes in logs and behavior. If it cannot be verified, it is not complete.</p>
+          </div>
+          <div class="card">
+            <h3>Handover</h3>
+            <p>Runbooks and ownership so issues do not repeat as “tribal knowledge.”</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="coverage">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>Coverage</h2>
+            <p>Remote consulting, worldwide. Designed for lean IT teams.</p>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="card">
+            <h3>Where this works well</h3>
+            <p>Small and mid-sized orgs with Microsoft 365, hybrid identity, or a growing enterprise app footprint.</p>
+          </div>
+          <div class="card">
+            <h3>What to include in a request</h3>
+            <p>Symptom, impact, affected users/apps, and timestamps for failures. That is enough to start.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>Request an assessment</h2>
+            <p>This form should email you. If it says “failed to send,” the backend endpoint is missing or misconfigured.</p>
+          </div>
+        </div>
+
+        <div class="form-wrap">
+          <div class="card">
+            <div id="formStatus" class="status" role="status" aria-live="polite"></div>
+
+            <form id="assessmentForm" autocomplete="on">
+              <input type="text" name="company_site" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;top:-9999px" aria-hidden="true" />
+
+              <div class="form-row">
+                <div>
+                  <label for="name">Name</label>
+                  <input id="name" name="name" type="text" placeholder="Your name" required />
+                </div>
+                <div>
+                  <label for="email">Email</label>
+                  <input id="email" name="email" type="email" placeholder="you@company.com" required />
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div>
+                  <label for="org">Organization</label>
+                  <input id="org" name="org" type="text" placeholder="Company or team name" />
+                </div>
+                <div>
+                  <label for="topic">Primary area</label>
+                  <select id="topic" name="topic" required>
+                    <option value="Entra IAM">Entra IAM</option>
+                    <option value="Conditional Access">Conditional Access</option>
+                    <option value="MFA / Auth Methods">MFA / Auth Methods</option>
+                    <option value="Admin Roles / Privileged Access">Admin roles / Privileged access</option>
+                    <option value="SSO / Enterprise Apps">SSO / Enterprise apps</option>
+                    <option value="Exchange / Messaging">Exchange / Messaging</option>
+                    <option value="Defender for Office 365">Defender for Office 365</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label for="message">Describe the issue</label>
+                <textarea id="message" name="message" placeholder="Symptom, impact, and timestamps. Include any error code." required></textarea>
+                <div class="muted" style="margin-top:6px;">
+                  Include: impacted users/apps, when it started, and what you already tried.
+                </div>
+              </div>
+
+              <button class="btn btn-primary" type="submit" id="submitBtn">Send</button>
+              <div class="muted">Email: info@sentinelidentity.ca</div>
+            </form>
+          </div>
+
+          <div class="card">
+            <h3>What happens next</h3>
+            <p class="muted">You get a confirmation email. Then you get a response with next steps and what to check first.</p>
+            <p class="muted">Prefer reading first? <a href="blog.html" style="text-decoration:underline;color:#dbeafe;">Go to the blog</a></p>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 
   <footer class="footer">
@@ -670,14 +546,65 @@
   </footer>
 
   <script>
-    const mobileNavToggle = document.getElementById('mobileNavToggle');
-    const navLinks = document.getElementById('navLinks');
-    if (mobileNavToggle && navLinks) {
-      mobileNavToggle.addEventListener('click', () => {
-        navLinks.classList.toggle('show');
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    const mobileBtn = document.getElementById('mobileBtn');
+    const mobilePanel = document.getElementById('mobilePanel');
+    if (mobileBtn && mobilePanel) {
+      mobileBtn.addEventListener('click', () => {
+        const open = mobilePanel.style.display === 'block';
+        mobilePanel.style.display = open ? 'none' : 'block';
+        mobileBtn.setAttribute('aria-expanded', String(!open));
+      });
+      mobilePanel.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+        mobilePanel.style.display = 'none';
+        mobileBtn.setAttribute('aria-expanded', 'false');
+      }));
+    }
+
+    const form = document.getElementById('assessmentForm');
+    const statusEl = document.getElementById('formStatus');
+    const submitBtn = document.getElementById('submitBtn');
+
+    function showStatus(type, msg){
+      statusEl.className = 'status ' + (type || '');
+      statusEl.textContent = msg;
+      statusEl.style.display = 'block';
+    }
+
+    if (form) {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        showStatus('', 'Sending…');
+        submitBtn.disabled = true;
+
+        const fd = new FormData(form);
+        const payload = Object.fromEntries(fd.entries());
+
+        try {
+          const res = await fetch('/api/assessment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) {
+            showStatus('err', (data && data.error) ? data.error : 'Failed to send.');
+            submitBtn.disabled = false;
+            return;
+          }
+
+          showStatus('ok', 'Sent. Check your inbox.');
+          form.reset();
+          submitBtn.disabled = false;
+
+        } catch (err) {
+          showStatus('err', 'Failed to send. Missing /api/assessment or network error.');
+          submitBtn.disabled = false;
+        }
       });
     }
-    document.getElementById('year').textContent = new Date().getFullYear();
   </script>
 </body>
 </html>
