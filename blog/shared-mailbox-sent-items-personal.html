@@ -3,105 +3,202 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Shared mailbox sent mail in personal Sent Items | Sentinel Identity</title>
-  <meta name="description" content="Enable MessageCopyForSentAsEnabled and MessageCopyForSendOnBehalfEnabled so a shared mailbox keeps sent copies in its Sent Items folder." />
-  <meta name="theme-color" content="#f6f8fb" />
+  <title>Sent mail from a shared mailbox appears in personal Sent Items | Sentinel Identity</title>
+  <meta name="description" content="Engineer-level explanation and fix: why delegated sends from a shared mailbox land in the sender’s Sent Items and how to enable shared mailbox sent copy settings deterministically." />
+  <meta name="theme-color" content="#ffffff" />
+
   <style>
-    :root{--bg:#f6f8fb;--bg2:#ffffff;--panel:#ffffff;--panel-border:rgba(15,23,42,.10);--text:#0f172a;--muted:#475569;--muted2:#64748b;--blue:#2563eb;--cyan:#0891b2;--violet:#7c3aed;--shadow:0 12px 30px rgba(15,23,42,.08);--max:1180px}
-    *{box-sizing:border-box} html,body{margin:0;padding:0}
-    body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--text);
-      background:radial-gradient(900px 520px at 8% -10%, rgba(37,99,235,.10), transparent 60%),radial-gradient(780px 440px at 95% 8%, rgba(124,58,237,.08), transparent 60%),radial-gradient(520px 320px at 80% 70%, rgba(8,145,178,.06), transparent 60%),linear-gradient(180deg, var(--bg), var(--bg2));line-height:1.7}
-    a{color:inherit;text-decoration:none} img{max-width:100%;display:block}
+    :root{
+      --bg:#ffffff;
+      --bg2:#f6f8fb;
+      --text:#0f172a;
+      --muted:#475569;
+      --muted2:#64748b;
+      --border:rgba(15,23,42,.10);
+      --panel:#ffffff;
+      --shadow:0 10px 26px rgba(15,23,42,.08);
+      --blue:#2563eb;
+      --cyan:#0891b2;
+      --violet:#7c3aed;
+      --max:1180px;
+      --radius:16px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{
+      font-family:"Segoe UI", Inter, system-ui, -apple-system, Roboto, Arial, sans-serif;
+      color:var(--text);
+      background: linear-gradient(180deg, var(--bg), var(--bg2));
+      line-height:1.7;
+    }
+    a{color:var(--blue);text-decoration:none}
+    a:hover{text-decoration:underline}
     .container{width:min(var(--max), calc(100% - 32px)); margin:0 auto;}
-    .site-header{position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);background:rgba(255,255,255,.85);border-bottom:1px solid rgba(15,23,42,.10)}
-    .nav{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:72px}
-    .brand{display:flex;align-items:center;gap:12px;min-width:0}
-    .brand-badge{width:36px;height:36px;border-radius:12px;flex:0 0 auto;background:radial-gradient(circle at 30% 30%, #93c5fd, #2563eb 55%, #1d4ed8 85%);box-shadow:0 10px 28px rgba(37,99,235,.25);border:1px solid rgba(15,23,42,.10)}
-    .brand-title{font-weight:900;font-size:1.02rem} .brand-sub{color:var(--muted2);font-size:.82rem;max-width:520px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .nav-links{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:flex-end}
-    .nav-links a{color:#0f172a;font-weight:800;padding:10px 10px;border-radius:12px}
-    .nav-links a:hover{background:rgba(15,23,42,.04)}
-    .btn{display:inline-flex;align-items:center;justify-content:center;border:none;cursor:pointer;border-radius:14px;padding:12px 16px;font-weight:900;transition:transform .15s ease;white-space:nowrap}
-    .btn:hover{transform:translateY(-1px)}
-    .btn-primary{color:#fff;background:linear-gradient(90deg, var(--violet), var(--blue), var(--cyan));}
-    .btn-outline{color:#0f172a;background:#fff;border:1px solid rgba(15,23,42,.12)}
-    .hero{padding:26px 0 10px}
-    .hero-card{background:#fff;border:1px solid rgba(15,23,42,.10);border-radius:22px;box-shadow:var(--shadow);overflow:hidden}
-    .hero-inner{padding:18px;display:grid;grid-template-columns:1.2fr .8fr;gap:14px;align-items:stretch}
-    .eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(37,99,235,.08);border:1px solid rgba(37,99,235,.18);color:#0f172a;padding:8px 12px;border-radius:999px;font-size:.85rem;font-weight:900;width:fit-content;margin-bottom:12px}
-    .dot{width:8px;height:8px;border-radius:999px;background:#2563eb}
-    h1{margin:0 0 10px;font-size:clamp(1.9rem, 3vw, 2.5rem);line-height:1.1;letter-spacing:-.02em}
-    .subtitle{margin:0 0 14px;color:var(--muted);max-width:78ch}
-    .meta{display:flex;flex-wrap:wrap;gap:8px}
-    .pill{border:1px solid rgba(15,23,42,.10);background:rgba(15,23,42,.03);border-radius:999px;padding:6px 10px;font-weight:800;font-size:.82rem;color:#0f172a}
-    .banner{border:1px solid rgba(15,23,42,.10);border-radius:18px;overflow:hidden;background:#0b1220;min-height:180px}
-    main{padding:10px 0 60px}
+
+    header{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter: blur(8px);
+      background: rgba(255,255,255,.86);
+      border-bottom:1px solid var(--border);
+    }
+    .nav{min-height:64px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .brand{display:flex;align-items:center;gap:10px;min-width:0}
+    .logo{
+      width:34px;height:34px;border-radius:10px;
+      background: radial-gradient(circle at 30% 30%, #93c5fd, #2563eb 60%, #1d4ed8 90%);
+      border:1px solid var(--border);
+      box-shadow: 0 10px 20px rgba(37,99,235,.18);
+      flex:0 0 auto;
+    }
+    .brand strong{font-weight:800;white-space:nowrap}
+    .brand span{color:var(--muted2);font-size:.86rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px}
+    .navlinks{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+    .navlinks a{color:var(--text);font-weight:700;padding:8px 10px;border-radius:10px}
+    .navlinks a:hover{background:rgba(15,23,42,.04);text-decoration:none}
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;
+      padding:10px 14px;border-radius:12px;font-weight:800;
+      border:1px solid var(--border); background:#fff; color:var(--text);
+    }
+    .btn.primary{
+      border:none;color:#fff;
+      background: linear-gradient(90deg, var(--violet), var(--blue), var(--cyan));
+    }
+
+    .titlebar{padding:22px 0 10px}
+    .kicker{
+      display:inline-flex;align-items:center;gap:8px;
+      font-weight:800;font-size:.85rem;color:var(--muted);
+      padding:6px 10px;border-radius:999px;
+      border:1px solid rgba(37,99,235,.18);
+      background: rgba(37,99,235,.06);
+    }
+    .dot{width:8px;height:8px;border-radius:999px;background:var(--blue)}
+    h1{margin:12px 0 8px;font-size:clamp(1.9rem, 2.9vw, 2.6rem);line-height:1.15;letter-spacing:-.02em}
+    .subtitle{margin:0;color:var(--muted);max-width:92ch}
+    .meta{margin-top:10px;display:flex;flex-wrap:wrap;gap:8px}
+    .pill{
+      font-size:.84rem;font-weight:700;color:var(--muted);
+      border:1px solid var(--border); background:rgba(15,23,42,.03);
+      padding:6px 10px;border-radius:999px;
+    }
+
+    main{padding:14px 0 56px}
     .layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start}
-    .panel{background:#fff;border:1px solid rgba(15,23,42,.10);border-radius:18px;box-shadow:var(--shadow)}
-    .article{padding:18px}
-    .article h2{margin:22px 0 8px;font-size:1.35rem}
-    .article p{margin:0 0 12px;color:var(--muted)}
-    pre{margin:12px 0;padding:12px;border-radius:14px;border:1px solid rgba(15,23,42,.12);background:#0b1220;color:#e8efff;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.92rem;line-height:1.55}
-    .refs{margin-top:16px;padding-top:12px;border-top:1px solid rgba(15,23,42,.10)}
-    .refs a{color:#2563eb;text-decoration:underline}
-    .sidebar{display:grid;gap:12px;position:sticky;top:88px}
-    .side-card{padding:14px}
+    .panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+    article{padding:18px 18px 6px}
+    article h2{margin:22px 0 8px;font-size:1.35rem;letter-spacing:-.01em}
+    article h3{margin:16px 0 6px;font-size:1.05rem}
+    article p{margin:0 0 12px;color:var(--muted)}
+    article ul{margin:0 0 12px 18px;color:var(--muted)}
+    article li{margin:6px 0}
+
+    .callout{
+      margin:14px 0;padding:12px;border-radius:14px;
+      border:1px solid rgba(8,145,178,.20);
+      background: rgba(8,145,178,.06);
+      color:var(--text);
+    }
+    .callout strong{display:block;margin-bottom:6px}
+
+    pre{
+      margin:12px 0;padding:12px;border-radius:14px;border:1px solid rgba(15,23,42,.12);
+      background:#0b1220;color:#e8efff;overflow:auto;font-family:var(--mono);font-size:.92rem;line-height:1.55;
+    }
+    .inline{
+      font-family:var(--mono);
+      background:rgba(15,23,42,.06);
+      border:1px solid rgba(15,23,42,.10);
+      padding:2px 6px;border-radius:8px;
+      color:#0f172a;
+      font-size:.92rem;
+    }
+
+    aside{position:sticky;top:86px;display:grid;gap:12px}
+    .side{padding:14px}
+    .side h4{margin:0 0 10px;font-size:1rem}
     .toc{display:grid;gap:8px}
-    .toc a{padding:10px 10px;border-radius:12px;border:1px solid rgba(15,23,42,.08);background:rgba(15,23,42,.03);color:#0f172a;font-weight:800;font-size:.92rem}
-    .cta-btn{width:100%;text-align:center}
-    .footer{border-top:1px solid rgba(15,23,42,.10);padding:18px 0 30px;color:var(--muted2)}
-    .footer-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;font-size:.92rem}
-    @media (max-width: 980px){.hero-inner{grid-template-columns:1fr}.layout{grid-template-columns:1fr}.sidebar{position:static}}
+    .toc a{
+      display:block;padding:10px 10px;border-radius:12px;
+      border:1px solid rgba(15,23,42,.08);
+      background: rgba(15,23,42,.03);
+      color:var(--text);font-weight:700;font-size:.92rem;text-decoration:none;
+    }
+    .toc a:hover{background:rgba(37,99,235,.06);border-color:rgba(37,99,235,.18)}
+    .cta{width:100%;text-align:center}
+
+    footer{border-top:1px solid var(--border);padding:18px 0 30px;color:var(--muted2);background:#fff}
+    .foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;font-size:.92rem}
+
+    @media (max-width: 980px){
+      .layout{grid-template-columns:1fr}
+      aside{position:static}
+    }
   </style>
 </head>
+
 <body>
-  <header class="site-header">
+  <header>
     <div class="container nav">
-      <a href="../index.html" class="brand">
-        <div class="brand-badge"></div>
-        <div>
-          <div class="brand-title">Sentinel Identity</div>
-          <div class="brand-sub">Entra Identity & Access Management consulting</div>
+      <a class="brand" href="../index.html">
+        <div class="logo" aria-hidden="true"></div>
+        <div style="min-width:0">
+          <strong>Sentinel Identity</strong><br />
+          <span>Entra Identity & Access Management consulting</span>
         </div>
       </a>
-      <nav class="nav-links">
+      <nav class="navlinks">
         <a href="../index.html#services">Services</a>
-        <a href="../index.html#contact">Assessment</a>
         <a href="../blog.html">Blog</a>
-        <a class="btn btn-primary" href="../index.html#contact">Request an Assessment</a>
+        <a class="btn primary" href="../index.html#contact">Request an Assessment</a>
       </nav>
     </div>
   </header>
 
-  <section class="hero">
-    <div class="container">
-      <div class="hero-card">
-        <div class="hero-inner">
-          <div>
-            <div class="eyebrow"><span class="dot"></span><span>EXCHANGE ONLINE · SENT ITEMS</span></div>
-            <h1>Sent mail from a shared mailbox shows in personal Sent Items</h1>
-            <p class="subtitle">Enable mailbox copy settings so a shared mailbox keeps sent copies in its Sent Items folder.</p>
-            <div class="meta">
-              <span class="pill">2026-03-07</span><span class="pill">8 min</span><span class="pill">Exchange Online</span>
-            </div>
-            <div style="margin-top:12px"><a class="btn btn-outline" href="../blog.html">Back to Blog</a></div>
-          </div>
-          <div class="banner">
-            <img alt="" src="data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%271200%27%20height%3D%27675%27%20viewBox%3D%270%200%201200%20675%27%3E%3Crect%20width%3D%271200%27%20height%3D%27675%27%20fill%3D%27%230b1220%27/%3E%3Ctext%20x%3D%27160%27%20y%3D%27140%27%20fill%3D%27rgba(255%2C255%2C255%2C0.85)%27%20font-family%3D%27Segoe%20UI%2C%20Arial%27%20font-size%3D%2734%27%20font-weight%3D%27700%27%3EShared%20Mailbox%20%E2%80%A2%20Sent%20Items%3C/text%3E%3C/svg%3E" />
-          </div>
-        </div>
-      </div>
+  <div class="container titlebar">
+    <div class="kicker"><span class="dot"></span>Exchange Online · Shared mailbox operations</div>
+    <h1>Sent mail from a shared mailbox appears in personal Sent Items</h1>
+    <p class="subtitle">
+      Delegated sends often store the sent copy in the sender’s mailbox by default. If you need continuity and shared visibility,
+      enable the shared mailbox sent copy settings deterministically and verify behavior per send model.
+    </p>
+    <div class="meta">
+      <span class="pill">Updated: 2026-03-07</span>
+      <span class="pill">Applies to: Shared mailbox delegated send</span>
+      <span class="pill">Scope: Exchange Online</span>
     </div>
-  </section>
+  </div>
 
   <main>
-    <div class="container">
-      <div class="layout">
-        <article class="panel article">
-          <p>This behavior is common with delegated sends. If you need a sent copy in the shared mailbox for continuity and audit, enable mailbox copy settings.</p>
+    <div class="container layout">
+      <article class="panel">
+        <div class="callout">
+          <strong>Operational impact</strong>
+          If sent items are stored only in personal mailboxes, shared mailbox continuity breaks: the team cannot see what was sent, when, or by whom,
+          and troubleshooting becomes guesswork.
+        </div>
 
-          <h2 id="fix">Fix</h2>
-          <pre># Connect-ExchangeOnline
+        <h2 id="why">Why this happens</h2>
+        <p>
+          When a user sends as/on behalf of a shared mailbox, the message originates from a delegated context. Depending on the client and the permission model,
+          Exchange Online can store the sent copy in the sender’s mailbox by default. This is not a bug; it is default behavior unless configured otherwise.
+        </p>
+
+        <h2 id="models">Understand the send model</h2>
+        <ul>
+          <li><strong>Send As</strong>: message appears from the shared mailbox identity.</li>
+          <li><strong>Send on Behalf</strong>: message appears as “User on behalf of Mailbox”.</li>
+        </ul>
+        <p>
+          You should enable sent item copy settings for both models if your operations require shared visibility.
+        </p>
+
+        <h2 id="fix">Deterministic fix</h2>
+        <p>
+          Enable these mailbox properties on the shared mailbox:
+        </p>
+        <pre># Connect-ExchangeOnline
 
 $SharedMailbox = "shared@domain.com"
 
@@ -109,35 +206,56 @@ Set-Mailbox -Identity $SharedMailbox `
   -MessageCopyForSentAsEnabled $true `
   -MessageCopyForSendOnBehalfEnabled $true</pre>
 
-          <h2 id="verify">Verify</h2>
-          <p>Send a test message from the shared mailbox and confirm the message appears in the shared mailbox Sent Items folder.</p>
+        <h2 id="verify">Verification</h2>
+        <ol>
+          <li>Send a test message using <strong>Send As</strong> from the shared mailbox.</li>
+          <li>Send a test message using <strong>Send on Behalf</strong> (if used in your org).</li>
+          <li>Confirm a copy appears in the <strong>shared mailbox Sent Items</strong> folder.</li>
+        </ol>
 
-          <div class="refs">
-            <h3>References</h3>
-            <p><a href="https://learn.microsoft.com/en-us/exchange/collaboration-exo/shared-mailboxes" target="_blank" rel="noopener">Shared mailboxes</a></p>
-          </div>
-        </article>
+        <h2 id="still">If it still does not behave as expected</h2>
+        <ul>
+          <li>Confirm the send model used matches the setting you enabled (Send As vs Send on Behalf).</li>
+          <li>Test in Outlook on the web to reduce client-side variability.</li>
+          <li>Confirm the user is actually sending with the shared mailbox identity, not their own address.</li>
+          <li>Check whether additional mailbox-level policies or add-ins are altering send behavior.</li>
+        </ul>
 
-        <aside class="sidebar">
-          <div class="panel side-card">
-            <h4>In this article</h4>
-            <div class="toc">
-              <a href="#fix">Fix</a>
-              <a href="#verify">Verify</a>
-            </div>
+        <h2 id="references">References</h2>
+        <ul>
+          <li><a href="https://learn.microsoft.com/en-us/exchange/collaboration-exo/shared-mailboxes" target="_blank" rel="noopener">Shared mailboxes in Exchange Online</a></li>
+        </ul>
+
+        <div style="padding:12px 18px 18px; border-top:1px solid var(--border); margin-top:10px;">
+          <a class="btn" href="../blog.html">Back to Blog</a>
+        </div>
+      </article>
+
+      <aside>
+        <div class="panel side">
+          <h4>In this article</h4>
+          <div class="toc">
+            <a href="#why">Why this happens</a>
+            <a href="#models">Send model</a>
+            <a href="#fix">Fix</a>
+            <a href="#verify">Verify</a>
+            <a href="#still">If it still does not work</a>
+            <a href="#references">References</a>
           </div>
-          <a class="btn btn-primary cta-btn" href="../index.html#contact">Request an Assessment</a>
-        </aside>
-      </div>
+        </div>
+
+        <a class="btn primary cta" href="../index.html#contact">Request an Assessment</a>
+      </aside>
     </div>
   </main>
 
-  <footer class="footer">
-    <div class="container footer-row">
+  <footer>
+    <div class="container foot">
       <div>© <span id="year"></span> Sentinel Identity</div>
       <div>Entra IAM consulting · Worldwide remote</div>
     </div>
   </footer>
-  <script>document.getElementById('year').textContent=new Date().getFullYear();</script>
+
+  <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
 </body>
 </html>
