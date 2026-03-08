@@ -1,696 +1,413 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9915553948229076"
-     crossorigin="anonymous"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#ffffff" />
 
-  <!-- =========================
-  FIELDS TO EDIT FOR EACH POST
-  =========================
-  1) <title> ... </title>
-  2) meta description
-  3) Post eyebrow label (in hero)
-  4) H1 title
-  5) subtitle (2 lines max)
-  6) meta pills (date, read time, tags)
-  7) banner image (optional): replace the <img src="..."> in .hero-image
-  8) Article content: write in sections using <h2> (TOC auto-build uses h2)
-  9) Microsoft references list
-  ========================= -->
+  <!-- AdSense (blog only; ok to keep here) -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9915553948229076"
+    crossorigin="anonymous"></script>
 
-  <title>Sentinel Identity | Blog Post</title>
-  <meta name="description" content="Sentinel Identity blog post on Microsoft Entra Identity & Access Management." />
-  <meta name="theme-color" content="#071126" />
+  <!-- ===== EDIT THESE PER POST ===== -->
+  <title>POST_TITLE | Sentinel Identity</title>
+  <meta name="description" content="POST_DESCRIPTION" />
+  <!-- =============================== -->
 
   <style>
     :root{
-      --bg:#071126;
-      --bg2:#0c1834;
-      --panel:rgba(255,255,255,0.06);
-      --panel-border:rgba(255,255,255,0.12);
-      --text:#e8efff;
-      --muted:#b8c5ea;
-      --muted2:#93a6d6;
-
-      --blue:#3b82f6;
-      --cyan:#22d3ee;
-      --violet:#8b5cf6;
-      --shadow:0 20px 60px rgba(0,0,0,.35);
-      --radius:20px;
-      --max:1180px;
+      --bg:#ffffff;
+      --text:#0f172a;
+      --muted:#475569;
+      --muted2:#64748b;
+      --border: rgba(15, 23, 42, .10);
+      --surface:#ffffff;
+      --surface2:#f8fafc;
+      --blue:#2563eb;
+      --blue2:#1d4ed8;
+      --codebg:#0b1220;
+      --codefg:#e5e7eb;
+      --max: 760px;
+      --radius: 14px;
+      --shadow: 0 18px 45px rgba(2,6,23,.08);
     }
 
     *{box-sizing:border-box}
     html,body{margin:0;padding:0}
+    html{scroll-behavior:smooth}
     body{
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      color:var(--text);
-      background:
-        radial-gradient(900px 500px at 8% -10%, rgba(59,130,246,.35), transparent 60%),
-        radial-gradient(700px 400px at 95% 10%, rgba(139,92,246,.28), transparent 60%),
-        radial-gradient(500px 300px at 80% 70%, rgba(34,211,238,.15), transparent 60%),
-        linear-gradient(180deg, var(--bg), var(--bg2));
-      line-height:1.7;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.75;
     }
 
-    a{color:inherit;text-decoration:none}
-    a:hover{opacity:1}
-    img{max-width:100%;display:block}
+    a{color:var(--blue); text-decoration:none}
+    a:hover{text-decoration:underline}
 
-    .container{
-      width:min(var(--max), calc(100% - 32px));
-      margin:0 auto;
-    }
-
-    /* Header */
-    .site-header{
-      position:sticky;
+    .topbar{
+      position: sticky;
       top:0;
-      z-index:50;
+      z-index:30;
+      background: rgba(255,255,255,.86);
       backdrop-filter: blur(10px);
-      background:rgba(7,17,38,.75);
-      border-bottom:1px solid rgba(255,255,255,.08);
+      border-bottom: 1px solid var(--border);
     }
 
-    .nav{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:16px;
-      min-height:78px;
-    }
-
-    .nav-top{
+    .topbar-inner{
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 14px 18px;
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:12px;
-      width:auto;
     }
 
     .brand{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      min-width:0;
-    }
-
-    .brand-badge{
-      width:36px;
-      height:36px;
-      border-radius:12px;
-      background:
-        radial-gradient(circle at 30% 30%, #7dd3fc, #3b82f6 45%, #1d4ed8 70%, #1e1b4b);
-      box-shadow: 0 8px 24px rgba(59,130,246,.45);
-      border:1px solid rgba(255,255,255,.22);
-      flex:0 0 auto;
-    }
-
-    .brand-text{display:flex;flex-direction:column;min-width:0}
-    .brand-title{
+      display:flex; align-items:center; gap:10px;
       font-weight:800;
-      letter-spacing:.01em;
-      font-size:1.05rem;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
+      color: var(--text);
     }
-    .brand-sub{
-      color:var(--muted);
-      font-size:.82rem;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      max-width: 520px;
+    .mark{
+      width:30px; height:30px; border-radius:10px;
+      background: linear-gradient(135deg, #2563eb, #60a5fa);
     }
-
-    .nav-links{
-      display:flex;
-      align-items:center;
-      gap:20px;
-      flex-wrap:wrap;
-      justify-content:flex-end;
+    .navlinks{
+      display:flex; gap:12px; flex-wrap:wrap;
+      color: var(--muted);
+      font-weight:650;
+      font-size:.96rem;
     }
-
-    .nav-links a{
-      color:#d9e5ff;
-      font-weight:700;
-      opacity:.9;
-    }
-    .nav-links a:hover{opacity:1}
+    .navlinks a{color:var(--muted); padding:6px 8px; border-radius:10px}
+    .navlinks a:hover{background: rgba(37,99,235,.06); text-decoration:none; color: var(--text)}
 
     .btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      border:none;
+      display:inline-flex; align-items:center; justify-content:center;
+      border-radius:999px;
+      padding:10px 14px;
+      border:1px solid var(--border);
+      background: var(--surface);
+      font-weight:750;
+      color: var(--text);
       cursor:pointer;
-      border-radius:14px;
-      padding:12px 18px;
-      font-weight:800;
-      transition:.2s ease;
-      text-decoration:none;
-      white-space:nowrap;
     }
-
     .btn-primary{
-      color:white;
-      background:linear-gradient(90deg, var(--violet), var(--blue), var(--cyan));
-      box-shadow: 0 10px 30px rgba(59,130,246,.35);
+      border: 1px solid rgba(37,99,235,.20);
+      background: rgba(37,99,235,.10);
     }
-    .btn-primary:hover{transform:translateY(-1px)}
+    .btn-primary:hover{background: rgba(37,99,235,.14); text-decoration:none}
 
-    .btn-outline{
-      color:#dfe9ff;
-      background:rgba(255,255,255,.03);
-      border:1px solid rgba(255,255,255,.14);
-    }
-
-    /* Mobile */
-    .mobile-nav-toggle{
-      display:none;
-      background:rgba(255,255,255,.05);
-      border:1px solid rgba(255,255,255,.12);
-      color:#ecf4ff;
-      border-radius:12px;
-      padding:10px 12px;
-      font-weight:800;
-      cursor:pointer;
-    }
-
-    /* Hero */
-    .hero{padding:34px 0 18px}
-
-    .hero-card{
-      position:relative;
-      overflow:hidden;
-      border-radius:26px;
-      border:1px solid rgba(255,255,255,.12);
-      background:
-        linear-gradient(135deg, rgba(17,24,39,.85), rgba(9,14,29,.9)),
-        radial-gradient(circle at 15% 20%, rgba(59,130,246,.22), transparent 60%);
-      box-shadow:var(--shadow);
-      padding:26px;
-    }
-
-    .hero-grid{
+    .wrap{
+      max-width: 1080px;
+      margin:0 auto;
+      padding: 0 18px 60px;
       display:grid;
-      grid-template-columns: 1.25fr .9fr;
-      gap:22px;
-      align-items:stretch;
-    }
-
-    .eyebrow{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      color:#dbeafe;
-      background:rgba(59,130,246,.12);
-      border:1px solid rgba(59,130,246,.26);
-      padding:8px 12px;
-      border-radius:999px;
-      font-size:.85rem;
-      font-weight:800;
-      margin-bottom:14px;
-      letter-spacing:.02em;
-    }
-    .eyebrow-dot{
-      width:8px;height:8px;border-radius:999px;background:#60a5fa;
-      box-shadow:0 0 16px rgba(96,165,250,.8);
-    }
-
-    h1{
-      margin:0 0 12px;
-      font-size:clamp(2rem, 3vw, 3rem);
-      line-height:1.08;
-      letter-spacing:-.02em;
-    }
-
-    .subtitle{
-      margin:0 0 18px;
-      color:var(--muted);
-      font-size:1.03rem;
-      max-width:70ch;
-    }
-
-    .meta-row{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      margin-bottom:18px;
-    }
-
-    .meta-pill{
-      background:rgba(255,255,255,.04);
-      border:1px solid rgba(255,255,255,.10);
-      border-radius:999px;
-      padding:8px 12px;
-      color:#d9e6ff;
-      font-size:.86rem;
-      font-weight:700;
-    }
-
-    /* Banner */
-    .hero-image{
-      position:relative;
-      border-radius:18px;
-      min-height:260px;
-      border:1px solid rgba(255,255,255,.12);
-      overflow:hidden;
-      background:
-        radial-gradient(circle at 20% 25%, rgba(34,211,238,.25), transparent 45%),
-        radial-gradient(circle at 80% 20%, rgba(139,92,246,.24), transparent 45%),
-        linear-gradient(135deg, #0b1328, #111b3b 45%, #0a1022);
-    }
-    .hero-image img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      opacity:.95;
-    }
-    .hero-image::after{
-      content:"";
-      position:absolute; inset:0;
-      background:
-        linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
-      background-size: 24px 24px;
-      opacity:.22;
-      pointer-events:none;
-    }
-
-    /* Layout */
-    .main-wrap{padding: 10px 0 70px}
-
-    .content-grid{
-      display:grid;
-      grid-template-columns: minmax(0, 1fr) 320px;
-      gap:22px;
+      grid-template-columns: 1fr 280px;
+      gap: 26px;
       align-items:start;
     }
 
-    .panel{
-      background:var(--panel);
-      border:1px solid var(--panel-border);
-      border-radius:20px;
-      box-shadow:var(--shadow);
+    main{
+      max-width: var(--max);
+      padding-top: 34px;
     }
 
-    .article-panel{padding:24px}
-
-    .article-panel h2{
-      font-size:1.45rem;
-      margin:28px 0 10px;
-      line-height:1.2;
-      letter-spacing:-.01em;
+    .kicker{
+      color: var(--muted2);
+      font-weight:700;
+      letter-spacing:.02em;
+      font-size:.92rem;
+      text-transform: uppercase;
     }
 
-    .article-panel h3{
-      font-size:1.1rem;
-      margin:22px 0 8px;
-      line-height:1.25;
-      color:#edf3ff;
+    h1{
+      margin: 8px 0 10px;
+      font-size: clamp(2.0rem, 3.5vw, 2.7rem);
+      line-height: 1.12;
+      letter-spacing: -0.03em;
     }
 
-    .article-panel p{
-      margin:0 0 14px;
-      color:#dde7ff;
+    .subtitle{
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 1.08rem;
+      max-width: 68ch;
+    }
+
+    .meta{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      color: var(--muted2);
+      font-size: .95rem;
+      margin: 0 0 22px;
+    }
+    .meta span{display:inline-flex; gap:6px; align-items:center}
+    .dot{width:4px;height:4px;border-radius:99px;background:rgba(71,85,105,.7)}
+
+    .hero-image{
+      width:100%;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      overflow:hidden;
+      box-shadow: var(--shadow);
+      margin: 14px 0 26px;
+    }
+    .hero-image img{width:100%;display:block}
+
+    article p{margin: 0 0 14px}
+    article h2{
+      margin: 26px 0 10px;
+      font-size: 1.35rem;
+      letter-spacing: -0.01em;
+    }
+    article h3{
+      margin: 18px 0 8px;
+      font-size: 1.10rem;
     }
 
     .callout{
-      margin:18px 0;
-      padding:14px;
-      border-radius:14px;
-      border:1px solid rgba(34,211,238,.22);
-      background:rgba(34,211,238,.07);
+      border:1px solid var(--border);
+      background: var(--surface2);
+      border-radius: var(--radius);
+      padding: 14px 14px;
+      margin: 16px 0;
     }
-    .callout strong{display:block;margin-bottom:6px}
-
-    .note-card{
-      margin:18px 0;
-      padding:16px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.1);
-      background:rgba(255,255,255,.03);
-    }
+    .callout strong{display:block; margin-bottom:6px}
+    .callout.warn{border-color: rgba(185,28,28,.25); background: rgba(185,28,28,.05)}
+    .callout.info{border-color: rgba(37,99,235,.22); background: rgba(37,99,235,.05)}
 
     pre{
-      margin:14px 0;
-      padding:14px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(0,0,0,.35);
+      margin: 14px 0 18px;
+      padding: 14px;
+      border-radius: var(--radius);
+      background: var(--codebg);
+      color: var(--codefg);
       overflow:auto;
-      color:#eaf1ff;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size:.92rem;
-      line-height:1.55;
+      border: 1px solid rgba(255,255,255,.08);
+      font-size: .92rem;
+      line-height: 1.6;
     }
+    code{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace}
 
-    .article-footer{
-      margin-top:26px;
-      padding-top:18px;
-      border-top:1px solid rgba(255,255,255,.1);
-      display:flex;
-      flex-wrap:wrap;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
+    .tocbox{
+      position: sticky;
+      top: 86px;
+      border:1px solid var(--border);
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 14px;
+      box-shadow: var(--shadow);
     }
-
-    .tags{display:flex;flex-wrap:wrap;gap:8px}
-    .tag{
-      padding:7px 10px;
-      border-radius:999px;
-      background:rgba(255,255,255,.04);
-      border:1px solid rgba(255,255,255,.1);
-      color:#dbe8ff;
-      font-size:.82rem;
-      font-weight:700;
-    }
-
-    /* Sidebar */
-    .sidebar{
-      display:grid;
-      gap:16px;
-      position:sticky;
-      top:92px;
-    }
-
-    .side-card{
-      padding:16px;
-      border-radius:18px;
-      background:var(--panel);
-      border:1px solid var(--panel-border);
-      box-shadow:var(--shadow);
-    }
-
-    .side-card h4{margin:0 0 10px;font-size:1rem;line-height:1.2}
-    .side-card p{margin:0 0 10px;color:var(--muted);font-size:.94rem}
-
-    .toc{
-      display:grid;
-      gap:8px;
-    }
+    .tocbox h4{margin:0 0 10px; font-size:1rem}
+    .toc{display:grid; gap:8px}
     .toc a{
-      color:#dce8ff;
-      font-size:.92rem;
-      padding:8px 10px;
-      border-radius:10px;
-      border:1px solid transparent;
-      background:rgba(255,255,255,.02);
-      opacity:.95;
+      color: var(--muted);
+      font-weight:650;
+      font-size:.95rem;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: rgba(15,23,42,.02);
+      border: 1px solid transparent;
     }
-    .toc a:hover{
-      border-color:rgba(255,255,255,.1);
-      background:rgba(255,255,255,.04);
-      opacity:1;
-    }
+    .toc a:hover{background: rgba(37,99,235,.06); border-color: rgba(37,99,235,.10); text-decoration:none; color: var(--text)}
 
-    .contact-box{
-      background:
-        radial-gradient(220px 140px at 15% 10%, rgba(59,130,246,.22), transparent 70%),
-        radial-gradient(220px 140px at 100% 100%, rgba(139,92,246,.2), transparent 70%),
-        rgba(255,255,255,.04);
+    .sidecard{
+      margin-top: 12px;
+      border:1px solid var(--border);
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 14px;
+      box-shadow: var(--shadow);
     }
+    .sidecard h4{margin:0 0 8px; font-size:1rem}
+    .sidecard p{margin:0; color: var(--muted); font-size:.95rem}
 
-    .small-muted{color:var(--muted2);font-size:.88rem}
-
-    /* References */
-    .refs{
-      margin-top: 22px;
-      padding-top: 14px;
-      border-top: 1px solid rgba(255,255,255,.10);
+    .subscribe{
+      display:flex; gap:10px; flex-wrap:wrap;
+      margin-top: 10px;
     }
-    .refs h3{margin:0 0 10px}
-    .refs a{color:#dbeafe;text-decoration:underline}
-    .refs a:hover{opacity:.95}
-
-    /* Footer */
-    .footer{
-      border-top:1px solid rgba(255,255,255,.08);
-      padding:20px 0 36px;
-      color:var(--muted);
+    .input{
+      flex:1 1 160px;
+      padding:10px 12px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background: var(--surface2);
+      outline:none;
+      font-size:.98rem;
     }
-    .footer-row{
+    .solid{
+      border:none;
+      background: var(--blue);
+      color:white;
+      font-weight:800;
+      padding:10px 14px;
+      border-radius:999px;
+      cursor:pointer;
+    }
+    .solid:hover{background: var(--blue2)}
+    .status{margin-top:10px; display:none; font-size:.92rem; color: var(--muted)}
+    .status.ok{color:#0f766e}
+    .status.err{color:#b91c1c}
+
+    footer{
+      max-width: 1080px;
+      margin: 40px auto 0;
+      padding: 18px 18px 26px;
+      border-top: 1px solid var(--border);
+      color: var(--muted2);
       display:flex;
-      flex-wrap:wrap;
-      align-items:center;
       justify-content:space-between;
       gap:10px;
-      font-size:.92rem;
+      flex-wrap:wrap;
+      font-size:.95rem;
     }
 
     @media (max-width: 980px){
-      .hero-grid{grid-template-columns:1fr}
-      .content-grid{grid-template-columns:1fr}
-      .sidebar{position:static}
-    }
-
-    @media (max-width: 780px){
-      .nav{
-        align-items:flex-start;
-        flex-direction:column;
-        padding:12px 0;
-      }
-      .nav-top{width:100%}
-      .mobile-nav-toggle{display:inline-flex}
-      .nav-links{
-        width:100%;
-        display:none;
-        flex-direction:column;
-        align-items:flex-start;
-        gap:12px;
-        padding:6px 0 6px;
-      }
-      .nav-links.show{display:flex}
-      .nav-links .btn{width:100%;justify-content:center}
-      .hero-card{padding:18px}
-      .article-panel{padding:18px}
-    }
-
-    @media (max-width: 520px){
-      .container{width:min(var(--max), calc(100% - 20px))}
-      h1{font-size:1.75rem}
-      .subtitle{font-size:.96rem}
-      .hero-image{min-height:220px}
+      .wrap{grid-template-columns: 1fr}
+      .tocbox{position: static}
     }
   </style>
 </head>
 
 <body>
-  <header class="site-header">
-    <div class="container nav">
-      <div class="nav-top">
-        <a href="../index.html" class="brand" aria-label="Sentinel Identity home">
-          <div class="brand-badge"></div>
-          <div class="brand-text">
-            <div class="brand-title">Sentinel Identity</div>
-            <div class="brand-sub">Entra Identity & Access Management consulting</div>
-          </div>
-        </a>
-        <button class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Toggle menu">Menu</button>
-      </div>
+  <div class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="../index.html" aria-label="Sentinel Identity home">
+        <span class="mark" aria-hidden="true"></span>
+        <span>Sentinel Identity</span>
+      </a>
 
-      <nav class="nav-links" id="navLinks" aria-label="Primary navigation">
-        <a href="../index.html#who-we-help">Who we help</a>
+      <nav class="navlinks" aria-label="Site navigation">
         <a href="../index.html#services">Services</a>
         <a href="../blog.html">Blog</a>
-        <a href="../index.html#contact">Contact</a>
-        <a class="btn btn-primary" href="../index.html#contact">Request an Assessment</a>
+        <a href="../index.html#assessment">Assessment</a>
       </nav>
+
+      <a class="btn btn-primary" href="../index.html#assessment">Request assessment</a>
     </div>
-  </header>
+  </div>
 
-  <section class="hero" aria-label="Post hero">
-    <div class="container">
-      <div class="hero-card">
-        <div class="hero-grid">
-          <div>
-            <!-- EDIT: eyebrow label -->
-            <div class="eyebrow">
-              <span class="eyebrow-dot"></span>
-              <span>ENTRA ID · IDENTITY ARCHITECTURE</span>
-            </div>
+  <div class="wrap">
+    <main>
+      <!-- ===== EDIT THESE PER POST ===== -->
+      <div class="kicker">CATEGORY</div>
+      <h1 id="top">POST_TITLE</h1>
+      <p class="subtitle">POST_SUBTITLE</p>
 
-            <!-- EDIT: Title + subtitle -->
-            <h1>Your blog post title goes here</h1>
-            <p class="subtitle">
-              One to two lines. Define the failure mode, the scope, and what this article will prove and fix.
-            </p>
-
-            <!-- EDIT: Meta pills -->
-            <div class="meta-row" aria-label="Post metadata">
-              <span class="meta-pill">2026-03-07</span>
-              <span class="meta-pill">10 min read</span>
-              <span class="meta-pill">Entra ID</span>
-              <span class="meta-pill">IAM</span>
-            </div>
-
-            <a class="btn btn-outline" href="../blog.html">← Back to Blog</a>
-          </div>
-
-          <!-- EDIT: Banner image (recommended: use the SVG banners we made)
-               Replace src with your data:image/svg+xml... string OR a local image path
-          -->
-          <div class="hero-image" aria-label="Topic banner">
-            <img
-              src="data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%271200%27%20height%3D%27675%27%20viewBox%3D%270%200%201200%20675%27%3E%3Cdefs%3E%3ClinearGradient%20id%3D%27g%27%20x1%3D%270%27%20x2%3D%271%27%3E%3Cstop%20offset%3D%270%27%20stop-color%3D%27%232563eb%27/%3E%3Cstop%20offset%3D%270.55%27%20stop-color%3D%27%237c3aed%27/%3E%3Cstop%20offset%3D%271%27%20stop-color%3D%27%2306b6d4%27/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%271200%27%20height%3D%27675%27%20fill%3D%27%230b1220%27/%3E%3Ccircle%20cx%3D%27240%27%20cy%3D%27150%27%20r%3D%27260%27%20fill%3D%27url(%2523g)%27%20opacity%3D%270.22%27/%3E%3Ccircle%20cx%3D%271070%27%20cy%3D%27560%27%20r%3D%27310%27%20fill%3D%27url(%2523g)%27%20opacity%3D%270.16%27/%3E%3Cpath%20d%3D%27M840%20210c-96%200-174%2078-174%20174%200%20116%2098%20214%20174%20240%2076-26%20174-124%20174-240%200-96-78-174-174-174z%27%20fill%3D%27rgba(255%2C255%2C255%2C0.08)%27%20stroke%3D%27rgba(255%2C255%2C255%2C0.18)%27/%3E%3Cpath%20d%3D%27M840%20285l78%2034v64c0%2058-42%20114-78%20130-36-16-78-72-78-130v-64l78-34z%27%20fill%3D%27url(%2523g)%27%20opacity%3D%270.9%27/%3E%3Ctext%20x%3D%27120%27%20y%3D%27120%27%20fill%3D%27rgba(255%2C255%2C255%2C0.85)%27%20font-family%3D%27Segoe%20UI%2C%20Arial%27%20font-size%3D%2734%27%20font-weight%3D%27700%27%3EEntra%20IAM%20%E2%80%A2%20Architecture%3C/text%3E%3C/svg%3E"
-              alt="Topic banner"
-            />
-          </div>
-        </div>
+      <div class="meta">
+        <span>DATE</span><span class="dot"></span>
+        <span>READ_TIME</span><span class="dot"></span>
+        <span>Sentinel Identity</span>
       </div>
-    </div>
-  </section>
 
-  <main class="main-wrap">
-    <div class="container">
-      <div class="content-grid">
-
-        <!-- MAIN ARTICLE -->
-        <article class="panel article-panel" id="article">
-          <p>
-            Write like you’re documenting an incident review or a design decision. Start with the observable symptom, then describe the architecture, then prove the cause, then apply remediation that you can validate.
-          </p>
-
-          <div class="callout">
-            <strong>Executive summary</strong>
-            One paragraph that answers: what broke, why it broke, what you changed, and how you verified it.
-          </div>
-
-          <h2 id="context">Context and architecture</h2>
-          <p>
-            Describe the components involved. Example: Entra ID, Conditional Access, authentication methods policy, device compliance, legacy protocols, token lifetime, sign-in logs, and any upstream system (ADFS, Entra Connect, reverse proxy).
-          </p>
-
-          <h2 id="failure-mode">Failure mode and impact</h2>
-          <p>
-            Explain the failure mode in operational terms. What was the user experience? What was the blast radius? Which workflows were affected? What was the security risk if left unresolved?
-          </p>
-
-          <h2 id="validation">Validation and evidence</h2>
-          <p>
-            Show how you prove the cause. Reference sign-in logs, audit logs, message trace, Defender Explorer, or Exchange permission state. If you can’t prove it, call that out and explain what evidence would confirm it.
-          </p>
-
-          <h2 id="remediation">Remediation and implementation</h2>
-          <p>
-            Explain the remediation choice and why it is safe. Mention rollback strategy. Keep it specific. If there’s PowerShell, include only what’s necessary and explain what it changes.
-          </p>
-
-          <pre># Example placeholder
-# Explain what this changes and why it’s safe</pre>
-
-          <h2 id="verification">Verification and monitoring</h2>
-          <p>
-            Describe how you verify the fix (tests, logs, expected signals) and how you ensure it doesn’t regress (alerts, documentation, ownership).
-          </p>
-
-          <div class="note-card">
-            <strong>Operational note</strong>
-            Write down the “supported way” to do the thing. Most repeat incidents happen because people keep using the old path.
-          </div>
-
-          <section class="refs" aria-label="References">
-            <h3>Microsoft references</h3>
-            <p class="small-muted">Link the exact Microsoft Learn pages you relied on. No random blogs unless you clearly label them as opinion.</p>
-            <p>
-              <a href="https://learn.microsoft.com/" target="_blank" rel="noopener">Microsoft Learn</a>
-            </p>
-          </section>
-
-          <div class="article-footer">
-            <div class="tags">
-              <span class="tag">Entra ID</span>
-              <span class="tag">IAM</span>
-              <span class="tag">Security</span>
-            </div>
-
-            <a class="btn btn-primary" href="../index.html#contact">Request an Assessment</a>
-          </div>
-        </article>
-
-        <!-- SIDEBAR -->
-        <aside class="sidebar">
-          <div class="side-card">
-            <h4>In this article</h4>
-            <div class="toc" id="toc">
-              <!-- Auto-generated from h2 headings -->
-            </div>
-            <p class="small-muted" style="margin-top:10px;">TOC is built from your H2 headings.</p>
-          </div>
-
-          <div class="side-card">
-            <h4>Audience</h4>
-            <p><strong>Primary:</strong> Entra / M365 admins and small security teams.</p>
-            <p><strong>Assumption:</strong> you can read logs and make controlled changes.</p>
-          </div>
-
-          <div class="side-card contact-box">
-            <h4>Need help with Entra IAM?</h4>
-            <p>Use the assessment form and describe the symptom and impact. You’ll get next steps you can actually execute.</p>
-            <a class="btn btn-primary" href="../index.html#contact" style="width:100%;">Request an Assessment</a>
-            <p class="small-muted" style="margin-top:10px;">Email: info@sentinelidentity.ca</p>
-          </div>
-        </aside>
-
+      <div class="hero-image">
+        <!-- Replace with a topic-relevant image URL you own/host (or remove entire hero-image div) -->
+        <img src="HERO_IMAGE_URL" alt="HERO_IMAGE_ALT" />
       </div>
-    </div>
-  </main>
+      <!-- =============================== -->
 
-  <footer class="footer">
-    <div class="container footer-row">
-      <div>© <span id="year"></span> Sentinel Identity</div>
-      <div>Entra IAM consulting · Worldwide remote</div>
+      <article id="article">
+        <!-- ===== PASTE ARTICLE CONTENT HERE ===== -->
+
+        <p>Replace this content.</p>
+
+        <!-- ===================================== -->
+      </article>
+    </main>
+
+    <aside>
+      <div class="tocbox">
+        <h4>In this article</h4>
+        <div class="toc" id="toc"></div>
+      </div>
+
+      <div class="sidecard">
+        <h4>Subscribe</h4>
+        <p>One email when a new post is published.</p>
+
+        <form class="subscribe" id="subscribeForm">
+          <input class="input" type="email" id="subEmail" placeholder="you@company.com" required />
+          <button class="solid" type="submit" id="subBtn">Subscribe</button>
+        </form>
+        <div class="status" id="subStatus" aria-live="polite"></div>
+      </div>
+
+      <div class="sidecard">
+        <h4>Need help?</h4>
+        <p><a class="btn" style="margin-top:10px; display:inline-flex;" href="../index.html#assessment">Request assessment</a></p>
+      </div>
+    </aside>
+  </div>
+
+  <footer>
+    <div>© <span id="year"></span> Sentinel Identity</div>
+    <div>
+      <a href="../privacy.html">Privacy</a> ·
+      <a href="../terms.html">Terms</a> ·
+      <a href="../cookies.html">Cookies</a> ·
+      <a href="mailto:info@sentinelidentity.ca">Email</a>
     </div>
   </footer>
 
   <script>
-    // Mobile nav toggle
-    const mobileNavToggle = document.getElementById('mobileNavToggle');
-    const navLinks = document.getElementById('navLinks');
-    if (mobileNavToggle && navLinks) {
-      mobileNavToggle.addEventListener('click', () => {
-        navLinks.classList.toggle('show');
-      });
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    // Build TOC from h2/h3 in the article
+    const toc = document.getElementById("toc");
+    const headers = document.querySelectorAll("#article h2, #article h3");
+    headers.forEach(h => {
+      if (!h.id) h.id = h.textContent.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+      const a = document.createElement("a");
+      a.href = "#" + h.id;
+      a.textContent = h.textContent;
+      toc.appendChild(a);
+    });
+
+    // Subscribe -> /api/subscribe
+    const subForm = document.getElementById("subscribeForm");
+    const subStatus = document.getElementById("subStatus");
+    const subBtn = document.getElementById("subBtn");
+
+    function showSub(type, msg){
+      subStatus.className = "status " + (type || "");
+      subStatus.textContent = msg;
+      subStatus.style.display = "block";
     }
 
-    // Footer year
-    document.getElementById('year').textContent = new Date().getFullYear();
+    if (subForm) {
+      subForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        showSub("", "Subscribing…");
+        subBtn.disabled = true;
 
-    // Auto-generate TOC from H2 headings inside article
-    (function buildTOC(){
-      const article = document.getElementById('article');
-      const toc = document.getElementById('toc');
-      if (!article || !toc) return;
+        try {
+          const email = document.getElementById("subEmail").value.trim();
+          const res = await fetch("/api/subscribe", {
+            method: "POST",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify({ email, sourcePage: window.location.href })
+          });
 
-      const headings = Array.from(article.querySelectorAll('h2[id]'));
-      if (!headings.length) {
-        toc.innerHTML = "<div class='small-muted'>No sections yet.</div>";
-        return;
-      }
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) {
+            showSub("err", data.error || data.details || "Subscription failed.");
+            subBtn.disabled = false;
+            return;
+          }
 
-      toc.innerHTML = headings.map(h => {
-        const text = h.textContent.trim();
-        const id = h.getAttribute('id');
-        return `<a href="#${id}">${text}</a>`;
-      }).join("");
+          showSub("ok", "Subscribed. Check your inbox.");
+          subForm.reset();
+          subBtn.disabled = false;
 
-      // Smooth scroll
-      toc.querySelectorAll('a[href^="#"]').forEach(link => {
-        link.addEventListener("click", (e) => {
-          const id = link.getAttribute("href");
-          const el = document.querySelector(id);
-          if (!el) return;
-          e.preventDefault();
-          el.scrollIntoView({ behavior: "smooth", block: "start" });
-        });
+        } catch (err) {
+          showSub("err", "Subscription failed. Network or /api/subscribe missing.");
+          subBtn.disabled = false;
+        }
       });
-    })();
+    }
   </script>
 </body>
 </html>
