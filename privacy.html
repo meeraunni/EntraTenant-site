@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy | Sentinel Identity</title>
+  <meta name="description" content="Privacy Policy for Sentinel Identity." />
+  <meta name="theme-color" content="#071126" />
+  <style>
+    :root{
+      --bg:#070b16; --bg2:#0b1227;
+      --text:#eef3ff; --muted:#b9c6e4;
+      --border:rgba(255,255,255,.12);
+      --panel:rgba(255,255,255,.06);
+      --max:980px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      color:var(--text);
+      background: linear-gradient(180deg,var(--bg),var(--bg2));
+      line-height:1.7;
+    }
+    a{color:#7dd3fc;text-decoration:none}
+    a:hover{text-decoration:underline}
+    .container{width:min(var(--max), calc(100% - 32px)); margin:0 auto; padding:28px 0 50px}
+    header{
+      padding:18px 0;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      background:rgba(7,11,22,.6);
+      position:sticky; top:0; backdrop-filter: blur(10px);
+    }
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .brand{font-weight:900;letter-spacing:.01em}
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;
+      padding:10px 14px;border-radius:12px;
+      border:1px solid var(--border); background:var(--panel);
+      color:var(--text); font-weight:800;
+    }
+    h1{margin:20px 0 8px; font-size:2rem; letter-spacing:-.02em}
+    p{margin:0 0 12px; color:var(--muted)}
+    h2{margin:22px 0 8px; font-size:1.2rem}
+    ul{margin:0 0 12px 18px; color:var(--muted)}
+    .box{
+      border:1px solid var(--border);
+      background:var(--panel);
+      border-radius:16px;
+      padding:14px;
+      margin:16px 0;
+    }
+    footer{
+      margin-top:26px;
+      padding-top:16px;
+      border-top:1px solid rgba(255,255,255,.08);
+      color:var(--muted);
+      font-size:.92rem;
+    }
+    .small{font-size:.92rem;color:var(--muted)}
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="container" style="padding:0; width:min(980px, calc(100% - 32px));">
+    <div class="topbar">
+      <div class="brand">Sentinel Identity</div>
+      <a class="btn" href="index.html">Home</a>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  <h1>Privacy Policy</h1>
+  <p class="small"><strong>Last updated:</strong> <span id="updated"></span></p>
+
+  <div class="box">
+    <p>
+      Sentinel Identity (“we”, “us”) operates the website <strong>sentinelidentity.ca</strong>.
+      This policy explains what we collect, why we collect it, and your choices.
+    </p>
+  </div>
+
+  <h2>Information we collect</h2>
+  <ul>
+    <li><strong>Contact/assessment form:</strong> name, email, organization (optional), selected topic (optional), and the issue summary you submit.</li>
+    <li><strong>Basic site analytics (if enabled):</strong> aggregated usage data such as page views and device/browser type.</li>
+    <li><strong>Cookies:</strong> used for site functionality and, if ads are enabled later, advertising/measurement cookies.</li>
+  </ul>
+
+  <h2>How we use information</h2>
+  <ul>
+    <li>To respond to your assessment request and communicate about your inquiry.</li>
+    <li>To improve site content and user experience.</li>
+    <li>To comply with legal obligations and prevent abuse/spam.</li>
+  </ul>
+
+  <h2>Sharing</h2>
+  <p>
+    We do not sell your personal information. We may share data with service providers used to operate the site
+    (for example: hosting, email delivery, analytics, and later ad networks if you enable ads).
+  </p>
+
+  <h2>Advertising (future)</h2>
+  <p>
+    If we enable ads, third-party vendors may use cookies or device identifiers to serve ads and measure performance.
+    You can control cookies in your browser settings.
+  </p>
+
+  <h2>Data retention</h2>
+  <p>
+    We retain form submissions for as long as needed to respond and maintain reasonable business records, unless a longer
+    retention period is required by law.
+  </p>
+
+  <h2>Your choices</h2>
+  <ul>
+    <li>You can request access, correction, or deletion of your submitted information.</li>
+    <li>You can disable cookies in your browser (some site functions may be affected).</li>
+  </ul>
+
+  <h2>Contact</h2>
+  <p>
+    Email: <a href="mailto:info@sentinelidentity.ca">info@sentinelidentity.ca</a>
+  </p>
+
+  <footer>
+    <div>© <span id="year"></span> Sentinel Identity</div>
+  </footer>
+</main>
+
+<script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+  document.getElementById("updated").textContent = new Date().toISOString().slice(0,10);
+</script>
+
+</body>
+</html>
