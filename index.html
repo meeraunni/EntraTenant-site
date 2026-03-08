@@ -3,25 +3,27 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Blog | Sentinel Identity</title>
-  <meta name="description" content="Sentinel Identity blog: Entra ID and Microsoft 365 admin fixes, written for real-world environments." />
+  <title>Sentinel Identity | Entra Identity & Access Management Consulting</title>
+  <meta name="description" content="Premium Entra Identity & Access Management consulting. Conditional Access baseline, MFA hardening, admin role design, and SSO governance." />
   <meta name="theme-color" content="#071126" />
 
   <style>
     :root{
       --bg:#071126;
       --bg2:#0c1834;
-      --panel:rgba(255,255,255,0.06);
-      --panel2:rgba(255,255,255,0.04);
-      --panel-border:rgba(255,255,255,0.12);
+      --panel:rgba(255,255,255,.06);
+      --panel2:rgba(255,255,255,.04);
+      --border:rgba(255,255,255,.12);
       --text:#e8efff;
       --muted:#b8c5ea;
       --muted2:#93a6d6;
+
       --blue:#3b82f6;
       --cyan:#22d3ee;
       --violet:#8b5cf6;
-      --shadow:0 20px 60px rgba(0,0,0,.35);
-      --radius:20px;
+
+      --shadow:0 22px 70px rgba(0,0,0,.38);
+      --radius:22px;
       --max:1180px;
     }
 
@@ -31,506 +33,509 @@
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       color:var(--text);
       background:
-        radial-gradient(900px 500px at 8% -10%, rgba(59,130,246,.35), transparent 60%),
-        radial-gradient(700px 400px at 95% 10%, rgba(139,92,246,.28), transparent 60%),
-        radial-gradient(500px 300px at 80% 70%, rgba(34,211,238,.15), transparent 60%),
+        radial-gradient(900px 520px at 8% -10%, rgba(59,130,246,.35), transparent 60%),
+        radial-gradient(780px 440px at 95% 8%, rgba(139,92,246,.26), transparent 60%),
+        radial-gradient(520px 320px at 80% 70%, rgba(34,211,238,.14), transparent 60%),
         linear-gradient(180deg, var(--bg), var(--bg2));
       line-height:1.6;
     }
 
     a{color:inherit;text-decoration:none}
+    a:hover{opacity:1}
     img{max-width:100%;display:block}
 
-    .container{
-      width:min(var(--max), calc(100% - 32px));
-      margin:0 auto;
-    }
+    .container{width:min(var(--max), calc(100% - 32px)); margin:0 auto;}
 
     /* Header */
-    .site-header{
-      position:sticky;
-      top:0;
-      z-index:50;
-      backdrop-filter: blur(10px);
-      background:rgba(7,17,38,.75);
-      border-bottom:1px solid rgba(255,255,255,.08);
+    .header{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter: blur(12px);
+      background: rgba(7,17,38,.78);
+      border-bottom: 1px solid rgba(255,255,255,.08);
     }
-
     .nav{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:16px;
       min-height:78px;
+      display:flex; align-items:center; justify-content:space-between; gap:14px;
     }
-
-    .nav-top{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      width:auto;
-    }
-
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      min-width:0;
-    }
-
-    .brand-badge{
-      width:36px;
-      height:36px;
-      border-radius:12px;
-      background:
-        radial-gradient(circle at 30% 30%, #7dd3fc, #3b82f6 45%, #1d4ed8 70%, #1e1b4b);
-      box-shadow: 0 8px 24px rgba(59,130,246,.45);
+    .brand{display:flex;align-items:center;gap:12px;min-width:0}
+    .badge{
+      width:38px;height:38px;border-radius:12px;flex:0 0 auto;
+      background: radial-gradient(circle at 30% 30%, #7dd3fc, #3b82f6 45%, #1d4ed8 70%, #1e1b4b);
+      box-shadow:0 10px 28px rgba(59,130,246,.45);
       border:1px solid rgba(255,255,255,.22);
-      flex:0 0 auto;
     }
+    .brand-text{display:flex;flex-direction:column;min-width:0}
+    .brand-text strong{font-weight:900;letter-spacing:.01em;font-size:1.06rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .brand-text span{color:var(--muted);font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px}
 
-    .brand-text{
-      display:flex;
-      flex-direction:column;
-      min-width:0;
+    .links{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:flex-end}
+    .links a{
+      color:#d9e5ff; font-weight:800; opacity:.92;
+      padding:10px 10px; border-radius:12px;
     }
-
-    .brand-title{
-      font-weight:800;
-      letter-spacing:.01em;
-      font-size:1.05rem;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-
-    .brand-sub{
-      color:var(--muted);
-      font-size:.82rem;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      max-width:520px;
-    }
-
-    .nav-links{
-      display:flex;
-      align-items:center;
-      gap:18px;
-      flex-wrap:wrap;
-      justify-content:flex-end;
-    }
-
-    .nav-links a{
-      color:#d9e5ff;
-      font-weight:700;
-      opacity:.9;
-    }
-    .nav-links a:hover{opacity:1}
+    .links a:hover{background:rgba(255,255,255,.05); opacity:1}
 
     .btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      border:none;
-      cursor:pointer;
-      border-radius:14px;
-      padding:12px 18px;
-      font-weight:800;
-      transition:.2s ease;
-      text-decoration:none;
-      white-space:nowrap;
+      display:inline-flex; align-items:center; justify-content:center; gap:10px;
+      border:none; cursor:pointer; border-radius:14px;
+      padding:12px 18px; font-weight:900; white-space:nowrap;
+      transition:transform .15s ease, box-shadow .15s ease;
     }
-
+    .btn:hover{transform:translateY(-1px)}
     .btn-primary{
-      color:white;
+      color:#fff;
       background:linear-gradient(90deg, var(--violet), var(--blue), var(--cyan));
-      box-shadow: 0 10px 30px rgba(59,130,246,.35);
+      box-shadow: 0 12px 34px rgba(59,130,246,.35);
     }
-    .btn-primary:hover{transform:translateY(-1px)}
-
-    .btn-outline{
+    .btn-ghost{
       color:#dfe9ff;
-      background:rgba(255,255,255,.03);
+      background:rgba(255,255,255,.04);
       border:1px solid rgba(255,255,255,.14);
     }
 
-    .mobile-nav-toggle{
+    .mobile-btn{
       display:none;
       background:rgba(255,255,255,.05);
       border:1px solid rgba(255,255,255,.12);
       color:#ecf4ff;
       border-radius:12px;
       padding:10px 12px;
-      font-weight:800;
+      font-weight:900;
       cursor:pointer;
     }
+    .mobile-panel{
+      display:none;
+      padding:10px 0 14px;
+      border-top:1px solid rgba(255,255,255,.08);
+    }
+    .mobile-panel a{display:block;padding:12px 10px;border-radius:12px;font-weight:800;color:#dce8ff}
+    .mobile-panel a:hover{background:rgba(255,255,255,.05)}
+    .mobile-panel .btn{width:100%;margin-top:10px}
 
     /* Hero */
-    .hero{
-      padding:34px 0 14px;
-    }
-
+    .hero{padding:34px 0 20px}
     .hero-card{
-      border-radius:26px;
+      border-radius:28px;
       border:1px solid rgba(255,255,255,.12);
       background:
-        linear-gradient(135deg, rgba(17,24,39,.85), rgba(9,14,29,.9)),
-        radial-gradient(circle at 15% 20%, rgba(59,130,246,.22), transparent 60%);
-      box-shadow:var(--shadow);
-      padding:24px;
+        linear-gradient(135deg, rgba(17,24,39,.82), rgba(9,14,29,.92)),
+        radial-gradient(circle at 18% 18%, rgba(59,130,246,.20), transparent 55%);
+      box-shadow: var(--shadow);
+      overflow:hidden;
     }
-
-    .hero-top{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:14px;
-      flex-wrap:wrap;
+    .hero-inner{
+      padding:26px;
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:18px;
+      align-items:stretch;
     }
-
     .eyebrow{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
+      display:inline-flex; align-items:center; gap:8px;
       color:#dbeafe;
       background:rgba(59,130,246,.12);
       border:1px solid rgba(59,130,246,.26);
       padding:8px 12px;
       border-radius:999px;
       font-size:.85rem;
-      font-weight:800;
-      margin-bottom:12px;
+      font-weight:900;
+      margin-bottom:14px;
+      letter-spacing:.02em;
+      width:fit-content;
     }
-    .eyebrow-dot{width:8px;height:8px;border-radius:999px;background:#60a5fa;box-shadow:0 0 16px rgba(96,165,250,.8);}
-
-    .hero h1{
-      margin:0 0 10px;
-      font-size:clamp(2rem, 3vw, 2.7rem);
+    .dot{width:8px;height:8px;border-radius:999px;background:#60a5fa;box-shadow:0 0 16px rgba(96,165,250,.8)}
+    h1{
+      margin:0 0 12px;
+      font-size:clamp(2.05rem, 3.2vw, 3.05rem);
+      letter-spacing:-.03em;
       line-height:1.08;
-      letter-spacing:-.02em;
     }
-
-    .hero p{
-      margin:0;
+    .sub{
+      margin:0 0 18px;
       color:var(--muted);
-      max-width:78ch;
-      font-size:1.02rem;
+      max-width:74ch;
+      font-size:1.04rem;
+    }
+    .hero-actions{display:flex;gap:10px;flex-wrap:wrap}
+    .hero-actions .btn{padding:12px 16px}
+
+    .hero-side{
+      border-left:1px solid rgba(255,255,255,.10);
+      padding-left:18px;
+      display:grid;
+      align-content:start;
+      gap:12px;
+    }
+    .kpi{
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:18px;
+      padding:12px;
+    }
+    .kpi strong{display:block;font-size:.95rem}
+    .kpi span{display:block;color:var(--muted);font-size:.9rem;margin-top:4px}
+
+    .banner{
+      margin-top:14px;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.12);
+      background:#0b1328;
+      overflow:hidden;
+      min-height: 210px;
+      position:relative;
+    }
+    .banner img{width:100%;height:100%;object-fit:cover;opacity:.95}
+    .banner::after{
+      content:"";
+      position:absolute; inset:0;
+      background:
+        linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+      background-size: 26px 26px;
+      opacity:.18;
+      pointer-events:none;
     }
 
-    /* Controls */
-    .controls{
-      margin-top:14px;
+    /* Sections */
+    section{padding:22px 0}
+    .section-head{
       display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
       gap:12px;
       flex-wrap:wrap;
-      align-items:center;
+      margin-bottom:12px;
+    }
+    .section-head h2{
+      margin:0;
+      font-size:1.55rem;
+      letter-spacing:-.02em;
+      line-height:1.15;
+    }
+    .section-head p{margin:0;color:var(--muted);max-width:78ch}
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap:14px;
+    }
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.04));
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:22px;
+      box-shadow: var(--shadow);
+      padding:16px;
+    }
+    .card h3{margin:0 0 8px;font-size:1.05rem;letter-spacing:-.01em}
+    .card p{margin:0;color:var(--muted);font-size:.95rem;line-height:1.5}
+
+    .two-col{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:14px;
     }
 
-    .search{
-      flex: 1 1 280px;
-      min-width: 220px;
+    /* Contact form */
+    .form-wrap{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:14px;
+      align-items:start;
     }
-    .search input{
+    form{display:grid;gap:10px}
+    label{font-weight:900;color:#dbe8ff;font-size:.9rem}
+    input, textarea, select{
       width:100%;
       padding:12px 12px;
       border-radius:14px;
-      border:1px solid rgba(255,255,255,.12);
+      border:1px solid rgba(255,255,255,.14);
       background:rgba(255,255,255,.04);
       color:var(--text);
       outline:none;
       font-size:.95rem;
     }
-    .search input::placeholder{color:rgba(184,197,234,.9)}
-
-    .chips{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-    }
-
-    .chip{
+    textarea{min-height:130px;resize:vertical}
+    input::placeholder, textarea::placeholder{color:rgba(184,197,234,.9)}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .status{
+      border-radius:14px;
       border:1px solid rgba(255,255,255,.12);
       background:rgba(255,255,255,.04);
-      color:#dbe8ff;
-      border-radius:999px;
-      padding:8px 10px;
-      font-weight:800;
-      font-size:.82rem;
-      cursor:pointer;
-      transition:.15s ease;
-    }
-    .chip:hover{background:rgba(255,255,255,.06)}
-    .chip.active{
-      background:rgba(59,130,246,.18);
-      border-color:rgba(59,130,246,.35);
-      color:#eaf2ff;
-    }
-
-    /* Layout */
-    main{padding: 14px 0 70px;}
-
-    .layout{
-      display:grid;
-      grid-template-columns: minmax(0,1fr) 320px;
-      gap: 20px;
-      align-items:start;
-    }
-
-    .panel{
-      background:var(--panel);
-      border:1px solid var(--panel-border);
-      border-radius:20px;
-      box-shadow:var(--shadow);
-    }
-
-    /* Feed */
-    .feed{
-      display:grid;
-      gap: 14px;
-    }
-
-    .post{
-      display:grid;
-      grid-template-columns: 260px 1fr;
-      gap: 0;
-      overflow:hidden;
-      border-radius:20px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(255,255,255,.04);
-      transition:.18s ease;
-    }
-
-    .post:hover{
-      transform: translateY(-2px);
-      border-color: rgba(59,130,246,.35);
-      background: rgba(255,255,255,.055);
-    }
-
-    .post-img{
-      background:#0b1328;
-      position:relative;
-      min-height: 170px;
-    }
-    .post-img img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      opacity:.96;
-    }
-
-    .post-body{
-      padding: 14px 16px 16px;
-    }
-
-    .post-meta{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-      margin-bottom: 8px;
-    }
-
-    .pill{
-      background:rgba(255,255,255,.04);
-      border:1px solid rgba(255,255,255,.10);
-      border-radius:999px;
-      padding:6px 10px;
-      color:#d9e6ff;
-      font-size:.82rem;
-      font-weight:700;
-    }
-
-    .post-title{
-      margin:0;
-      font-size:1.08rem;
-      line-height:1.25;
-      letter-spacing:-.01em;
-      color:#f1f6ff;
-    }
-
-    .post-excerpt{
-      margin:8px 0 0;
+      padding:12px;
       color:var(--muted);
-      font-size:.95rem;
-      line-height:1.5;
-      max-width: 95ch;
+      font-size:.93rem;
+      display:none;
     }
-
-    .read{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      margin-top: 10px;
-      color:#cfe3ff;
-      font-weight:900;
-      font-size:.92rem;
-    }
-    .read span{opacity:.9}
-    .post:hover .read span{opacity:1}
-
-    .empty{
-      padding:16px;
-      color:var(--muted);
-      border-radius:20px;
-      border:1px dashed rgba(255,255,255,.16);
-      background:rgba(255,255,255,.03);
-    }
-
-    /* Sidebar */
-    .sidebar{
-      display:grid;
-      gap:16px;
-      position:sticky;
-      top:92px;
-    }
-
-    .side-card{
-      padding:16px;
-      border-radius:18px;
-      background:rgba(255,255,255,.04);
-      border:1px solid rgba(255,255,255,.12);
-      box-shadow:var(--shadow);
-    }
-
-    .side-card h3{
-      margin:0 0 10px;
-      font-size:1.02rem;
-    }
-
-    .side-card p{
-      margin:0 0 10px;
-      color:var(--muted);
-      font-size:.94rem;
-    }
-
-    .contact-box{
-      background:
-        radial-gradient(220px 140px at 15% 10%, rgba(59,130,246,.22), transparent 70%),
-        radial-gradient(220px 140px at 100% 100%, rgba(139,92,246,.2), transparent 70%),
-        rgba(255,255,255,.04);
-    }
+    .status.ok{border-color:rgba(34,211,238,.25); background:rgba(34,211,238,.08); color:#dffbff;}
+    .status.err{border-color:rgba(239,68,68,.25); background:rgba(239,68,68,.08); color:#ffe4e4;}
+    .muted{color:var(--muted);font-size:.92rem}
 
     /* Footer */
     .footer{
       border-top:1px solid rgba(255,255,255,.08);
-      padding:20px 0 36px;
+      padding:20px 0 34px;
       color:var(--muted);
+      margin-top:10px;
     }
     .footer-row{
-      display:flex;
-      flex-wrap:wrap;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
+      display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;
       font-size:.92rem;
     }
 
     @media (max-width: 980px){
-      .layout{grid-template-columns:1fr;}
-      .sidebar{position:static}
-      .post{grid-template-columns:1fr;}
-      .post-img{min-height:200px}
+      .hero-inner{grid-template-columns:1fr}
+      .hero-side{border-left:none;padding-left:0;border-top:1px solid rgba(255,255,255,.10);padding-top:14px}
+      .grid{grid-template-columns:1fr}
+      .two-col{grid-template-columns:1fr}
+      .form-wrap{grid-template-columns:1fr}
     }
-
     @media (max-width: 780px){
-      .nav{align-items:flex-start;flex-direction:column;padding:12px 0;}
-      .nav-top{width:100%}
-      .mobile-nav-toggle{display:inline-flex}
-      .nav-links{
-        width:100%;
-        display:none;
-        flex-direction:column;
-        align-items:flex-start;
-        gap:12px;
-        padding:6px 0 6px;
-      }
-      .nav-links.show{display:flex}
-      .nav-links .btn{width:100%;justify-content:center}
-      .hero-card{padding:18px}
+      .links{display:none}
+      .mobile-btn{display:inline-flex}
+      .hero-inner{padding:18px}
+      .form-row{grid-template-columns:1fr}
     }
   </style>
 </head>
 
 <body>
-  <header class="site-header">
-    <div class="container nav">
-      <div class="nav-top">
-        <a href="index.html" class="brand" aria-label="Sentinel Identity home">
-          <div class="brand-badge"></div>
+  <header class="header">
+    <div class="container">
+      <div class="nav">
+        <a class="brand" href="#top" aria-label="Sentinel Identity home">
+          <div class="badge" aria-hidden="true"></div>
           <div class="brand-text">
-            <div class="brand-title">Sentinel Identity</div>
-            <div class="brand-sub">Entra Identity & Access Management consulting</div>
+            <strong>Sentinel Identity</strong>
+            <span>Entra Identity & Access Management consulting</span>
           </div>
         </a>
-        <button class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Toggle menu">Menu</button>
+
+        <nav class="links" aria-label="Primary navigation">
+          <a href="#services">Services</a>
+          <a href="#approach">Approach</a>
+          <a href="#coverage">Coverage</a>
+          <a href="blog.html">Blog</a>
+          <a href="#contact">Assessment</a>
+        </nav>
+
+        <a class="btn btn-primary" href="#contact">Request an Assessment</a>
+        <button class="mobile-btn" id="mobileBtn" aria-label="Open menu" aria-expanded="false">Menu</button>
       </div>
 
-      <nav class="nav-links" id="navLinks" aria-label="Primary navigation">
-        <a href="index.html#who-we-help">Who we help</a>
-        <a href="index.html#services">Services</a>
+      <div class="mobile-panel" id="mobilePanel" aria-label="Mobile menu">
+        <a href="#services">Services</a>
+        <a href="#approach">Approach</a>
+        <a href="#coverage">Coverage</a>
         <a href="blog.html">Blog</a>
-        <a href="index.html#contact">Contact</a>
-        <a class="btn btn-primary" href="index.html#contact">Request an Assessment</a>
-      </nav>
+        <a href="#contact">Assessment</a>
+        <a class="btn btn-primary" href="#contact">Request an Assessment</a>
+      </div>
     </div>
   </header>
 
-  <section class="hero">
-    <div class="container">
-      <div class="hero-card">
-        <div class="eyebrow"><span class="eyebrow-dot"></span><span>ARTICLES · SENTINEL IDENTITY</span></div>
-        <div class="hero-top">
+  <main id="top">
+    <section class="hero">
+      <div class="container">
+        <div class="hero-card">
+          <div class="hero-inner">
+            <div>
+              <div class="eyebrow"><span class="dot"></span><span>ENTRA IAM · CONDITIONAL ACCESS · SSO</span></div>
+              <h1>Entra Identity & Access Management for teams that run production</h1>
+              <p class="sub">
+                Baselines and operating models for Conditional Access, MFA methods, admin roles, and enterprise apps.
+                Clear scope. Controlled rollout. Verifiable outcomes.
+              </p>
+
+              <div class="hero-actions">
+                <a class="btn btn-primary" href="#contact">Request an Assessment</a>
+                <a class="btn btn-ghost" href="blog.html">Read the blog</a>
+              </div>
+
+              <div class="banner" aria-label="Hero banner">
+                <img alt="" src="data:image/svg+xml;charset=UTF-8,<?xml version='1.0'?><svg xmlns='http://www.w3.org/2000/svg' width='1200' height='600' viewBox='0 0 1200 600'><defs><linearGradient id='g' x1='0' x2='1'><stop offset='0' stop-color='%232563eb'/><stop offset='0.55' stop-color='%237c3aed'/><stop offset='1' stop-color='%2306b6d4'/></linearGradient></defs><rect width='1200' height='600' fill='%230b1220'/><circle cx='260' cy='140' r='260' fill='url(%23g)' opacity='0.22'/><circle cx='1040' cy='520' r='320' fill='url(%23g)' opacity='0.16'/><path d='M820 150c-122 0-220 98-220 220 0 148 118 270 220 300 102-30 220-152 220-300 0-122-98-220-220-220z' fill='rgba(255,255,255,0.08)' stroke='rgba(255,255,255,0.18)'/><path d='M820 245l98 42v82c0 74-52 146-98 166-46-20-98-92-98-166v-82l98-42z' fill='url(%23g)' opacity='0.92'/><rect x='120' y='250' width='420' height='220' rx='22' fill='rgba(255,255,255,0.06)' stroke='rgba(255,255,255,0.16)'/><path d='M150 300h360M150 338h300M150 376h320M150 414h260' stroke='rgba(255,255,255,0.22)' stroke-width='10' stroke-linecap='round'/><text x='120' y='170' fill='rgba(255,255,255,0.85)' font-family='Segoe UI, Arial' font-size='34' font-weight='700'>Entra IAM • Baseline Controls</text></svg>">
+              </div>
+            </div>
+
+            <aside class="hero-side">
+              <div class="kpi">
+                <strong>Conditional Access baseline</strong>
+                <span>Staged rollout, exclusions with owners, rollback notes.</span>
+              </div>
+              <div class="kpi">
+                <strong>MFA methods hardening</strong>
+                <span>Reduce weak pathways and method drift.</span>
+              </div>
+              <div class="kpi">
+                <strong>Admin roles and privilege</strong>
+                <span>Role clarity, least privilege, access reviews.</span>
+              </div>
+              <div class="kpi">
+                <strong>Enterprise app governance</strong>
+                <span>SSO consistency, safe defaults, ownership.</span>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="services">
+      <div class="container">
+        <div class="section-head">
           <div>
-            <h1>Blog</h1>
-            <p>Entra ID and Microsoft 365 admin fixes. Short, specific, and written for production environments.</p>
+            <h2>Services</h2>
+            <p>Focused IAM workstreams. No clutter, no “transformation” buzzwords.</p>
           </div>
-          <a class="btn btn-primary" href="index.html#contact">Request an Assessment</a>
         </div>
 
-        <div class="controls">
-          <div class="search">
-            <input id="searchInput" type="text" placeholder="Search (AADSTS, shared mailbox, Defender, Send As)" />
+        <div class="grid">
+          <div class="card">
+            <h3>Conditional Access baseline</h3>
+            <p>Minimum effective policy set, pilot, expand, and support-ready documentation.</p>
           </div>
-
-          <div class="chips" aria-label="Topic filters">
-            <button class="chip active" type="button" data-filter-tag="All">All</button>
-            <button class="chip" type="button" data-filter-tag="Entra ID">Entra ID</button>
-            <button class="chip" type="button" data-filter-tag="Exchange Online">Exchange Online</button>
-            <button class="chip" type="button" data-filter-tag="Microsoft Defender">Microsoft Defender</button>
-            <button class="chip" type="button" data-filter-tag="Outlook">Outlook</button>
+          <div class="card">
+            <h3>MFA and authentication methods</h3>
+            <p>Method standardization, cleanup, and reduction of unusable legacy registrations.</p>
+          </div>
+          <div class="card">
+            <h3>Admin roles and privileged access</h3>
+            <p>Role design, least privilege, standing access reduction, and review cadence.</p>
+          </div>
+          <div class="card">
+            <h3>SSO and enterprise apps</h3>
+            <p>Consistent SAML/OIDC configuration, ownership, and safe defaults.</p>
+          </div>
+          <div class="card">
+            <h3>Identity monitoring</h3>
+            <p>Operational signals from sign-in logs. Triage patterns and response steps.</p>
+          </div>
+          <div class="card">
+            <h3>Messaging and Defender workflows</h3>
+            <p>Shared mailbox standards, send permissions, remediation patterns that scale.</p>
           </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <main>
-    <div class="container">
-      <div class="layout">
-
-        <div>
-          <div id="feed" class="feed" aria-label="Blog feed"></div>
+    <section id="approach">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>Approach</h2>
+            <p>Prove the current state, implement safely, verify with evidence.</p>
+          </div>
         </div>
 
-        <aside class="sidebar">
-          <div class="side-card">
-            <h3>What you’ll find here</h3>
-            <p>Identity (Entra), messaging (Exchange/Outlook), and security operations (Defender). Fixes you can validate.</p>
-            <p class="small-muted">New posts are added as standalone HTML files under /blog/.</p>
+        <div class="two-col">
+          <div class="card">
+            <h3>Assessment</h3>
+            <p>Define scope, risks, and the smallest change that improves security without breaking operations.</p>
           </div>
-
-          <div class="side-card contact-box">
-            <h3>Need help with Entra IAM?</h3>
-            <p>Use the assessment form and include the symptom, user impact, and the time of the failure.</p>
-            <a class="btn btn-primary" href="index.html#contact" style="width:100%;">Request an Assessment</a>
-            <p class="small-muted" style="margin-top:10px;">Email: info@sentinelidentity.ca</p>
+          <div class="card">
+            <h3>Implementation</h3>
+            <p>Controlled rollout with pilot groups, monitoring, and rollback notes.</p>
           </div>
-        </aside>
-
+          <div class="card">
+            <h3>Verification</h3>
+            <p>Confirm outcomes in logs and behavior. If it cannot be verified, it is not complete.</p>
+          </div>
+          <div class="card">
+            <h3>Handover</h3>
+            <p>Runbooks and ownership so issues do not repeat as “tribal knowledge.”</p>
+          </div>
+        </div>
       </div>
-    </div>
+    </section>
+
+    <section id="coverage">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>Coverage</h2>
+            <p>Remote consulting, worldwide. Designed for lean IT teams.</p>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="card">
+            <h3>Where this works well</h3>
+            <p>Small and mid-sized orgs with Microsoft 365, hybrid identity, or a growing enterprise app footprint.</p>
+          </div>
+          <div class="card">
+            <h3>What to include in a request</h3>
+            <p>Symptom, impact, affected users/apps, and timestamps for failures. That is enough to start.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>Request an assessment</h2>
+            <p>This form should email you. If it says “failed to send,” the backend endpoint is missing or misconfigured.</p>
+          </div>
+        </div>
+
+        <div class="form-wrap">
+          <div class="card">
+            <div id="formStatus" class="status" role="status" aria-live="polite"></div>
+
+            <form id="assessmentForm" autocomplete="on">
+              <input type="text" name="company_site" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;top:-9999px" aria-hidden="true" />
+
+              <div class="form-row">
+                <div>
+                  <label for="name">Name</label>
+                  <input id="name" name="name" type="text" placeholder="Your name" required />
+                </div>
+                <div>
+                  <label for="email">Email</label>
+                  <input id="email" name="email" type="email" placeholder="you@company.com" required />
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div>
+                  <label for="org">Organization</label>
+                  <input id="org" name="org" type="text" placeholder="Company or team name" />
+                </div>
+                <div>
+                  <label for="topic">Primary area</label>
+                  <select id="topic" name="topic" required>
+                    <option value="Entra IAM">Entra IAM</option>
+                    <option value="Conditional Access">Conditional Access</option>
+                    <option value="MFA / Auth Methods">MFA / Auth Methods</option>
+                    <option value="Admin Roles / Privileged Access">Admin roles / Privileged access</option>
+                    <option value="SSO / Enterprise Apps">SSO / Enterprise apps</option>
+                    <option value="Exchange / Messaging">Exchange / Messaging</option>
+                    <option value="Defender for Office 365">Defender for Office 365</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label for="message">Describe the issue</label>
+                <textarea id="message" name="message" placeholder="Symptom, impact, and timestamps. Include any error code." required></textarea>
+                <div class="muted" style="margin-top:6px;">
+                  Include: impacted users/apps, when it started, and what you already tried.
+                </div>
+              </div>
+
+              <button class="btn btn-primary" type="submit" id="submitBtn">Send</button>
+              <div class="muted">Email: info@sentinelidentity.ca</div>
+            </form>
+          </div>
+
+          <div class="card">
+            <h3>What happens next</h3>
+            <p class="muted">You get a confirmation email. Then you get a response with next steps and what to check first.</p>
+            <p class="muted">Prefer reading first? <a href="blog.html" style="text-decoration:underline;color:#dbeafe;">Go to the blog</a></p>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 
   <footer class="footer">
@@ -541,209 +546,65 @@
   </footer>
 
   <script>
-    // Mobile nav
-    const mobileNavToggle = document.getElementById('mobileNavToggle');
-    const navLinks = document.getElementById('navLinks');
-    if (mobileNavToggle && navLinks) {
-      mobileNavToggle.addEventListener('click', () => navLinks.classList.toggle('show'));
-    }
-
     document.getElementById('year').textContent = new Date().getFullYear();
 
-    // Topic-matched SVG banners (self-contained)
-    const svgAADSTS = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
-      <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
-        <defs><linearGradient id="g" x1="0" x2="1">
-          <stop offset="0" stop-color="#2563eb"/><stop offset="0.55" stop-color="#7c3aed"/><stop offset="1" stop-color="#06b6d4"/>
-        </linearGradient></defs>
-        <rect width="1200" height="675" fill="#0b1220"/>
-        <circle cx="230" cy="150" r="260" fill="url(#g)" opacity="0.25"/>
-        <circle cx="1080" cy="560" r="320" fill="url(#g)" opacity="0.18"/>
-        <rect x="120" y="170" width="520" height="340" rx="24" fill="#0f1a2f" stroke="rgba(255,255,255,0.18)"/>
-        <circle cx="165" cy="200" r="8" fill="#ff5f57"/><circle cx="195" cy="200" r="8" fill="#febc2e"/><circle cx="225" cy="200" r="8" fill="#28c840"/>
-        <path d="M860 210c-96 0-174 78-174 174 0 116 98 214 174 240 76-26 174-124 174-240 0-96-78-174-174-174z" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.18)"/>
-        <path d="M860 285l78 34v64c0 58-42 114-78 130-36-16-78-72-78-130v-64l78-34z" fill="url(#g)" opacity="0.9"/>
-        <text x="120" y="120" fill="rgba(255,255,255,0.85)" font-family="Segoe UI, Arial" font-size="34" font-weight="700">SAML SSO · Request Expired</text>
-      </svg>
-    `);
-
-    const svgDefender = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
-      <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
-        <defs><linearGradient id="g" x1="0" x2="1">
-          <stop offset="0" stop-color="#2563eb"/><stop offset="0.55" stop-color="#7c3aed"/><stop offset="1" stop-color="#06b6d4"/>
-        </linearGradient></defs>
-        <rect width="1200" height="675" fill="#0b1220"/>
-        <circle cx="260" cy="520" r="300" fill="url(#g)" opacity="0.22"/>
-        <circle cx="980" cy="160" r="260" fill="url(#g)" opacity="0.16"/>
-        <rect x="180" y="210" width="660" height="340" rx="24" fill="#0f1a2f" stroke="rgba(255,255,255,0.18)"/>
-        <path d="M220 270h580v220H220z" fill="rgba(255,255,255,0.06)"/>
-        <path d="M220 270l290 170L800 270" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M880 240c-86 0-156 70-156 156 0 104 88 192 156 216 68-24 156-112 156-216 0-86-70-156-156-156z" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.18)"/>
-        <path d="M880 305l70 30v58c0 52-38 102-70 116-32-14-70-64-70-116v-58l70-30z" fill="url(#g)" opacity="0.9"/>
-        <text x="180" y="140" fill="rgba(255,255,255,0.85)" font-family="Segoe UI, Arial" font-size="34" font-weight="700">Defender · Email Remediation</text>
-      </svg>
-    `);
-
-    const svgSendPerm = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
-      <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
-        <defs><linearGradient id="g" x1="0" x2="1">
-          <stop offset="0" stop-color="#2563eb"/><stop offset="0.55" stop-color="#7c3aed"/><stop offset="1" stop-color="#06b6d4"/>
-        </linearGradient></defs>
-        <rect width="1200" height="675" fill="#0b1220"/>
-        <circle cx="230" cy="160" r="260" fill="url(#g)" opacity="0.2"/>
-        <rect x="160" y="220" width="740" height="300" rx="24" fill="#0f1a2f" stroke="rgba(255,255,255,0.18)"/>
-        <path d="M200 280h660v180H200z" fill="rgba(255,255,255,0.06)"/>
-        <path d="M200 280l330 160 330-160" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
-        <rect x="920" y="280" width="180" height="220" rx="22" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.18)"/>
-        <rect x="965" y="400" width="90" height="70" rx="14" fill="url(#g)"/>
-        <text x="160" y="140" fill="rgba(255,255,255,0.85)" font-family="Segoe UI, Arial" font-size="34" font-weight="700">Outlook · Send Permission</text>
-      </svg>
-    `);
-
-    const svgDLvsShared = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
-      <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
-        <defs><linearGradient id="g" x1="0" x2="1">
-          <stop offset="0" stop-color="#2563eb"/><stop offset="0.55" stop-color="#7c3aed"/><stop offset="1" stop-color="#06b6d4"/>
-        </linearGradient></defs>
-        <rect width="1200" height="675" fill="#0b1220"/>
-        <circle cx="1040" cy="520" r="320" fill="url(#g)" opacity="0.2"/>
-        <rect x="140" y="210" width="520" height="320" rx="24" fill="#0f1a2f" stroke="rgba(255,255,255,0.18)"/>
-        <rect x="720" y="210" width="340" height="320" rx="24" fill="#0f1a2f" stroke="rgba(255,255,255,0.18)"/>
-        <text x="170" y="260" fill="rgba(255,255,255,0.8)" font-family="Segoe UI, Arial" font-size="20" font-weight="700">Distribution list</text>
-        <text x="750" y="260" fill="rgba(255,255,255,0.8)" font-family="Segoe UI, Arial" font-size="20" font-weight="700">Shared mailbox</text>
-        <text x="140" y="140" fill="rgba(255,255,255,0.85)" font-family="Segoe UI, Arial" font-size="34" font-weight="700">DL vs Shared Mailbox</text>
-      </svg>
-    `);
-
-    const svgSentItems = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
-      <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
-        <defs><linearGradient id="g" x1="0" x2="1">
-          <stop offset="0" stop-color="#2563eb"/><stop offset="0.55" stop-color="#7c3aed"/><stop offset="1" stop-color="#06b6d4"/>
-        </linearGradient></defs>
-        <rect width="1200" height="675" fill="#0b1220"/>
-        <circle cx="240" cy="520" r="300" fill="url(#g)" opacity="0.18"/>
-        <rect x="160" y="220" width="720" height="300" rx="24" fill="#0f1a2f" stroke="rgba(255,255,255,0.18)"/>
-        <rect x="920" y="240" width="220" height="260" rx="22" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.18)"/>
-        <text x="950" y="290" fill="rgba(255,255,255,0.75)" font-family="Segoe UI, Arial" font-size="18" font-weight="700">Sent Items</text>
-        <text x="160" y="140" fill="rgba(255,255,255,0.85)" font-family="Segoe UI, Arial" font-size="34" font-weight="700">Shared Mailbox · Sent Items</text>
-      </svg>
-    `);
-
-    const posts = [
-      {
-        title: "AADSTS76026: The request has expired",
-        slug: "aadsts76026-request-expired.html",
-        date: "2026-03-07",
-        minutes: 8,
-        tags: ["Entra ID", "SAML"],
-        excerpt: "Fix for SAML apps that fail from My Apps. Set the Sign-on URL so the app generates a fresh request, then verify in sign-in logs.",
-        image: svgAADSTS
-      },
-      {
-        title: "Remove an email using Microsoft Defender",
-        slug: "recall-message-microsoft-defender.html",
-        date: "2026-03-07",
-        minutes: 9,
-        tags: ["Microsoft Defender", "Email"],
-        excerpt: "Use Explorer to scope the message, run a remediation action, review AIR approvals, and confirm the message is removed.",
-        image: svgDefender
-      },
-      {
-        title: "No permission to send from this mailbox (Outlook)",
-        slug: "no-permission-send-from-mailbox-outlook.html",
-        date: "2026-03-07",
-        minutes: 10,
-        tags: ["Exchange Online", "Outlook"],
-        excerpt: "Most cases are missing Send As/Send on Behalf, or Outlook using cached permission state. Validate in PowerShell and test in OWA first.",
-        image: svgSendPerm
-      },
-      {
-        title: "Distribution list vs shared mailbox",
-        slug: "distribution-list-vs-shared-mailbox.html",
-        date: "2026-03-07",
-        minutes: 10,
-        tags: ["Exchange Online", "Mail objects"],
-        excerpt: "Choose based on workflow. DL delivers copies to people. Shared mailbox creates a shared queue with shared history and delegation.",
-        image: svgDLvsShared
-      },
-      {
-        title: "Shared mailbox sent mail in personal Sent Items",
-        slug: "shared-mailbox-sent-items-personal.html",
-        date: "2026-03-07",
-        minutes: 8,
-        tags: ["Exchange Online", "Shared mailbox"],
-        excerpt: "Enable mailbox copy settings so a sent copy is saved in the shared mailbox Sent Items folder for delegated sends.",
-        image: svgSentItems
-      }
-    ];
-
-    posts.sort((a,b) => (b.date || "").localeCompare(a.date || ""));
-
-    const feed = document.getElementById("feed");
-    const searchInput = document.getElementById("searchInput");
-    const chips = Array.from(document.querySelectorAll(".chip"));
-    let activeTag = "All";
-
-    function escapeHtml(str) {
-      return String(str || "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+    const mobileBtn = document.getElementById('mobileBtn');
+    const mobilePanel = document.getElementById('mobilePanel');
+    if (mobileBtn && mobilePanel) {
+      mobileBtn.addEventListener('click', () => {
+        const open = mobilePanel.style.display === 'block';
+        mobilePanel.style.display = open ? 'none' : 'block';
+        mobileBtn.setAttribute('aria-expanded', String(!open));
+      });
+      mobilePanel.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+        mobilePanel.style.display = 'none';
+        mobileBtn.setAttribute('aria-expanded', 'false');
+      }));
     }
 
-    function setActiveChip(tag) {
-      activeTag = tag;
-      chips.forEach(c => c.classList.toggle("active", c.dataset.filterTag === tag));
-      render();
+    const form = document.getElementById('assessmentForm');
+    const statusEl = document.getElementById('formStatus');
+    const submitBtn = document.getElementById('submitBtn');
+
+    function showStatus(type, msg){
+      statusEl.className = 'status ' + (type || '');
+      statusEl.textContent = msg;
+      statusEl.style.display = 'block';
     }
 
-    chips.forEach(chip => chip.addEventListener("click", () => setActiveChip(chip.dataset.filterTag)));
-    if (searchInput) searchInput.addEventListener("input", () => render());
+    if (form) {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        showStatus('', 'Sending…');
+        submitBtn.disabled = true;
 
-    function matches(post, q) {
-      const query = (q || "").trim().toLowerCase();
-      const hay = `${post.title} ${post.excerpt} ${(post.tags || []).join(" ")}`.toLowerCase();
+        const fd = new FormData(form);
+        const payload = Object.fromEntries(fd.entries());
 
-      const tagOk = activeTag === "All" || (post.tags || []).some(t => t.toLowerCase() === activeTag.toLowerCase());
-      const searchOk = !query || hay.includes(query);
+        try {
+          const res = await fetch('/api/assessment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
 
-      return tagOk && searchOk;
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) {
+            showStatus('err', (data && data.error) ? data.error : 'Failed to send.');
+            submitBtn.disabled = false;
+            return;
+          }
+
+          showStatus('ok', 'Sent. Check your inbox.');
+          form.reset();
+          submitBtn.disabled = false;
+
+        } catch (err) {
+          showStatus('err', 'Failed to send. Missing /api/assessment or network error.');
+          submitBtn.disabled = false;
+        }
+      });
     }
-
-    function postCard(p) {
-      const tags = (p.tags || []).slice(0, 2).map(t => `<span class="pill">${escapeHtml(t)}</span>`).join("");
-      return `
-        <a class="post" href="blog/${escapeHtml(p.slug)}" aria-label="Read post: ${escapeHtml(p.title)}">
-          <div class="post-img">
-            <img src="${p.image}" alt="" />
-          </div>
-          <div class="post-body">
-            <div class="post-meta">
-              <span class="pill">${escapeHtml(p.date)}</span>
-              <span class="pill">${escapeHtml(p.minutes)} min</span>
-              ${tags}
-            </div>
-            <h3 class="post-title">${escapeHtml(p.title)}</h3>
-            <p class="post-excerpt">${escapeHtml(p.excerpt)}</p>
-            <div class="read"><span>Read</span> →</div>
-          </div>
-        </a>
-      `;
-    }
-
-    function render() {
-      const q = searchInput ? searchInput.value : "";
-      const filtered = posts.filter(p => matches(p, q));
-      if (!filtered.length) {
-        feed.innerHTML = `<div class="empty">No posts found. Try a different keyword or click “All”.</div>`;
-        return;
-      }
-      feed.innerHTML = filtered.map(postCard).join("");
-    }
-
-    render();
   </script>
 </body>
 </html>
