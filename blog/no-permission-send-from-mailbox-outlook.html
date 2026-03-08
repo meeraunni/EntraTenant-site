@@ -4,173 +4,275 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>You don’t have permission to send from this mailbox (Outlook) | Sentinel Identity</title>
-  <meta name="description" content="Engineer-level breakdown of Outlook send permission failures: how Exchange evaluates Send As vs Send on Behalf, why Full Access is not enough, and how Outlook caching creates false negatives." />
-  <meta name="theme-color" content="#ffffff" />
+  <meta name="description" content="Fix the Outlook error 'You don’t have permission to send messages from this mailbox'. Learn how Exchange evaluates Send As vs Send on Behalf, how to validate permissions, and how to verify in OWA and Outlook." />
+  <meta name="theme-color" content="#071126" />
 
   <style>
-    :root{
-      --bg:#ffffff; --bg2:#f6f7fb; --card:#ffffff; --border:#e6e8ef;
-      --text:#111827; --muted:#6b7280; --link:#2563eb; --chip:#f3f4f6;
-      --shadow: 0 10px 25px rgba(17,24,39,.06); --radius:16px; --max:980px;
-    }
+    /* Same stylesheet as other posts (kept inline for portability) */
+    :root{--bg:#071126;--bg2:#0c1834;--panel:rgba(255,255,255,0.06);--panel-border:rgba(255,255,255,0.12);--text:#e8efff;--muted:#b8c5ea;--muted2:#93a6d6;--blue:#3b82f6;--cyan:#22d3ee;--violet:#8b5cf6;--shadow:0 20px 60px rgba(0,0,0,.35);--max:1180px}
     *{box-sizing:border-box} html,body{margin:0;padding:0}
-    body{font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:var(--text);background:var(--bg);line-height:1.65}
-    a{color:var(--link);text-decoration:none} a:hover{text-decoration:underline}
-    .container{width:min(var(--max), calc(100% - 32px));margin:0 auto}
-    .header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
-    .nav{min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:16px}
-    .brand{display:flex;align-items:center;gap:12px;min-width:0;color:inherit}
-    .brand-badge{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#2563eb 0%,#7c3aed 60%,#06b6d4 100%);box-shadow:0 0 0 1px rgba(0,0,0,.06) inset}
-    .brand-text strong{display:block;font-size:.98rem;letter-spacing:.01em;color:#111827}
-    .brand-text span{display:block;font-size:.82rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:420px}
-    .btn{display:inline-flex;align-items:center;justify-content:center;padding:11px 14px;border-radius:12px;border:1px solid var(--border);background:#fff;font-weight:900;font-size:.92rem;color:#111827;cursor:pointer;transition:transform .15s ease, box-shadow .15s ease}
-    .btn:hover{transform:translateY(-1px);box-shadow:var(--shadow);text-decoration:none}
-    .btn-primary{border:0;color:#fff;background:linear-gradient(90deg,#2563eb 0%,#7c3aed 60%,#06b6d4 100%)}
-
-    .hero{background:linear-gradient(180deg,#ffffff 0%,#f7f8fc 100%);border-bottom:1px solid var(--border)}
-    .hero-inner{padding:28px 0 18px}
-    .kicker{display:flex;gap:10px;align-items:center;color:var(--muted);font-weight:900;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase}
-    .dot{width:8px;height:8px;border-radius:999px;background:#2563eb}
-    h1{margin:10px 0 0;font-size:clamp(1.9rem, 3.2vw, 2.45rem);letter-spacing:-.02em;line-height:1.15}
-    .subtitle{margin:10px 0 0;color:var(--muted);max-width:92ch}
-
-    main{padding:22px 0 52px}
-    .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
-    .meta span{background:var(--chip);border:1px solid var(--border);color:#374151;font-weight:900;font-size:.82rem;border-radius:999px;padding:5px 9px}
-
-    .article{margin-top:16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
-    .cover{width:100%;aspect-ratio:16/6;background:#0b1220}
-    .cover img{width:100%;height:100%;object-fit:cover;display:block}
-    .body{padding:18px}
-
-    h2{margin:22px 0 10px;font-size:1.25rem;letter-spacing:-.01em}
-    p{margin:10px 0}
-    .callout{margin-top:14px;border:1px solid var(--border);background:var(--bg2);border-radius:14px;padding:14px}
-    pre{margin:12px 0;padding:12px;border-radius:14px;border:1px solid var(--border);background:#0b1220;color:#eaf1ff;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.9rem}
-    .divider{height:1px;background:var(--border);margin:18px 0}
-    .refs{margin-top:18px;border-top:1px solid var(--border);padding-top:14px;color:var(--muted);font-size:.95rem}
-    .refs a{font-weight:800}
-    .footer{border-top:1px solid var(--border);padding:22px 0 18px;color:var(--muted);font-size:.9rem;background:#fff}
-    @media (max-width:560px){.btn{width:100%}.cover{aspect-ratio:16/9}}
+    body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--text);
+      background:radial-gradient(900px 500px at 8% -10%, rgba(59,130,246,.35), transparent 60%),
+               radial-gradient(700px 400px at 95% 10%, rgba(139,92,246,.28), transparent 60%),
+               radial-gradient(500px 300px at 80% 70%, rgba(34,211,238,.15), transparent 60%),
+               linear-gradient(180deg, var(--bg), var(--bg2));line-height:1.7}
+    a{color:inherit;text-decoration:none} img{max-width:100%;display:block}
+    .container{width:min(var(--max), calc(100% - 32px)); margin:0 auto;}
+    .site-header{position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);background:rgba(7,17,38,.75);border-bottom:1px solid rgba(255,255,255,.08)}
+    .nav{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:78px}
+    .nav-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .brand{display:flex;align-items:center;gap:12px;min-width:0}
+    .brand-badge{width:36px;height:36px;border-radius:12px;background:radial-gradient(circle at 30% 30%, #7dd3fc, #3b82f6 45%, #1d4ed8 70%, #1e1b4b);
+      box-shadow:0 8px 24px rgba(59,130,246,.45);border:1px solid rgba(255,255,255,.22);flex:0 0 auto}
+    .brand-text{display:flex;flex-direction:column;min-width:0}
+    .brand-title{font-weight:800;letter-spacing:.01em;font-size:1.05rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .brand-sub{color:var(--muted);font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px}
+    .nav-links{display:flex;align-items:center;gap:20px;flex-wrap:wrap;justify-content:flex-end}
+    .nav-links a{color:#d9e5ff;font-weight:700;opacity:.9}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;border:none;cursor:pointer;border-radius:14px;padding:12px 18px;font-weight:800;transition:.2s ease;white-space:nowrap}
+    .btn-primary{color:white;background:linear-gradient(90deg,var(--violet),var(--blue),var(--cyan));box-shadow:0 10px 30px rgba(59,130,246,.35)}
+    .btn-outline{color:#dfe9ff;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.14)}
+    .mobile-nav-toggle{display:none;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:#ecf4ff;border-radius:12px;padding:10px 12px;font-weight:800;cursor:pointer}
+    .hero{padding:34px 0 18px}
+    .hero-card{border-radius:26px;border:1px solid rgba(255,255,255,.12);background:linear-gradient(135deg, rgba(17,24,39,.85), rgba(9,14,29,.9)),radial-gradient(circle at 15% 20%, rgba(59,130,246,.22), transparent 60%);box-shadow:var(--shadow);padding:26px}
+    .hero-grid{display:grid;grid-template-columns:1.25fr .9fr;gap:22px;align-items:stretch}
+    .eyebrow{display:inline-flex;align-items:center;gap:8px;color:#dbeafe;background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.26);padding:8px 12px;border-radius:999px;font-size:.85rem;font-weight:800;margin-bottom:14px}
+    .eyebrow-dot{width:8px;height:8px;border-radius:999px;background:#60a5fa;box-shadow:0 0 16px rgba(96,165,250,.8)}
+    h1{margin:0 0 12px;font-size:clamp(2rem, 3vw, 3rem);line-height:1.08;letter-spacing:-.02em}
+    .subtitle{margin:0 0 18px;color:var(--muted);font-size:1.03rem;max-width:72ch}
+    .meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px}
+    .meta-pill{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.10);border-radius:999px;padding:8px 12px;color:#d9e6ff;font-size:.86rem;font-weight:700}
+    .hero-image{position:relative;border-radius:18px;min-height:260px;border:1px solid rgba(255,255,255,.12);overflow:hidden;background:#0b1328}
+    .hero-image img{width:100%;height:100%;object-fit:cover;opacity:.95}
+    .hero-image::after{content:"";position:absolute;inset:0;background:linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);background-size:24px 24px;opacity:.20;pointer-events:none}
+    .main-wrap{padding:10px 0 70px}
+    .content-grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:22px;align-items:start}
+    .panel{background:var(--panel);border:1px solid var(--panel-border);border-radius:20px;box-shadow:var(--shadow)}
+    .article-panel{padding:24px}
+    .article-panel h2{font-size:1.45rem;margin:28px 0 10px;line-height:1.2;letter-spacing:-.01em}
+    .article-panel h3{font-size:1.1rem;margin:22px 0 8px;line-height:1.25;color:#edf3ff}
+    .article-panel p{margin:0 0 14px;color:#dde7ff}
+    .callout{margin:18px 0;padding:14px;border-radius:14px;border:1px solid rgba(34,211,238,.22);background:rgba(34,211,238,.07)}
+    .callout strong{display:block;margin-bottom:6px}
+    pre{margin:14px 0;padding:14px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.35);overflow:auto;color:#eaf1ff;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.92rem;line-height:1.55}
+    .note-card{margin:18px 0;padding:16px;border-radius:14px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#dde7ff}
+    .article-footer{margin-top:26px;padding-top:18px;border-top:1px solid rgba(255,255,255,.1);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+    .tags{display:flex;flex-wrap:wrap;gap:8px}
+    .tag{padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#dbe8ff;font-size:.82rem;font-weight:700}
+    .sidebar{display:grid;gap:16px;position:sticky;top:92px}
+    .side-card{padding:16px;border-radius:18px;background:var(--panel);border:1px solid var(--panel-border);box-shadow:var(--shadow)}
+    .side-card h4{margin:0 0 10px;font-size:1rem;line-height:1.2}
+    .side-card p{margin:0 0 10px;color:var(--muted);font-size:.94rem}
+    .toc{display:grid;gap:8px}
+    .toc a{color:#dce8ff;font-size:.92rem;padding:8px 10px;border-radius:10px;border:1px solid transparent;background:rgba(255,255,255,.02);opacity:.95}
+    .toc a:hover{border-color:rgba(255,255,255,.1);background:rgba(255,255,255,.04);opacity:1}
+    .contact-box{background:radial-gradient(220px 140px at 15% 10%, rgba(59,130,246,.22), transparent 70%),radial-gradient(220px 140px at 100% 100%, rgba(139,92,246,.2), transparent 70%),rgba(255,255,255,.04)}
+    .small-muted{color:var(--muted2);font-size:.88rem}
+    .refs{margin-top:22px;padding-top:14px;border-top:1px solid rgba(255,255,255,.10)}
+    .refs h3{margin:0 0 10px}
+    .refs a{color:#dbeafe;text-decoration:underline}
+    .footer{border-top:1px solid rgba(255,255,255,.08);padding:20px 0 36px;color:var(--muted)}
+    .footer-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;font-size:.92rem}
+    @media (max-width: 980px){.hero-grid{grid-template-columns:1fr}.content-grid{grid-template-columns:1fr}.sidebar{position:static}}
+    @media (max-width: 780px){
+      .nav{align-items:flex-start;flex-direction:column;padding:12px 0}
+      .nav-top{width:100%}
+      .mobile-nav-toggle{display:inline-flex}
+      .nav-links{width:100%;display:none;flex-direction:column;align-items:flex-start;gap:12px;padding:6px 0 6px}
+      .nav-links.show{display:flex}
+      .nav-links .btn{width:100%;justify-content:center}
+      .hero-card{padding:18px}.article-panel{padding:18px}
+    }
   </style>
 </head>
 
 <body>
-  <header class="header">
-    <div class="container">
-      <nav class="nav">
-        <a class="brand" href="/index.html">
-          <div class="brand-badge" aria-hidden="true"></div>
+  <header class="site-header">
+    <div class="container nav">
+      <div class="nav-top">
+        <a href="../index.html" class="brand" aria-label="Sentinel Identity home">
+          <div class="brand-badge"></div>
           <div class="brand-text">
-            <strong>Sentinel Identity</strong>
-            <span>Entra ID & Microsoft 365 consulting</span>
+            <div class="brand-title">Sentinel Identity</div>
+            <div class="brand-sub">Entra Identity & Access Management consulting</div>
           </div>
         </a>
-        <a class="btn btn-primary" href="/index.html#contact">Request an Assessment</a>
+        <button class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Toggle menu">Menu</button>
+      </div>
+
+      <nav class="nav-links" id="navLinks" aria-label="Primary navigation">
+        <a href="../index.html#who-we-help">Who we help</a>
+        <a href="../index.html#services">Services</a>
+        <a href="../blog.html">Blog</a>
+        <a href="../index.html#contact">Contact</a>
+        <a class="btn btn-primary" href="../index.html#contact">Request an Assessment</a>
       </nav>
     </div>
   </header>
 
   <section class="hero">
-    <div class="container hero-inner">
-      <div class="kicker"><span class="dot"></span> Exchange Online · Outlook</div>
-      <h1>You don’t have permission to send messages from this mailbox</h1>
-      <p class="subtitle">
-        This is a permission evaluation failure somewhere between Outlook, Exchange delegation, and directory replication. The correct fix is to verify which sender identity Outlook is using, which permission model is required (Send As vs Send on Behalf), and whether the client is operating with stale cached permissions.
-      </p>
-      <div class="meta">
-        <span>2026-03-03</span><span>10 min read</span><span>Delegation</span><span>Send As</span>
+    <div class="container">
+      <div class="hero-card">
+        <div class="hero-grid">
+          <div>
+            <div class="eyebrow"><span class="eyebrow-dot"></span><span>EXCHANGE ONLINE · OUTLOOK</span></div>
+            <h1>You don’t have permission to send from this mailbox</h1>
+            <p class="subtitle">
+              This error usually means Outlook is attempting a Send As operation without Send As rights, or the client is using stale cached permission state.
+            </p>
+            <div class="meta-row">
+              <span class="meta-pill">2026-03-07</span>
+              <span class="meta-pill">10 min read</span>
+              <span class="meta-pill">Exchange Online</span>
+              <span class="meta-pill">Outlook</span>
+            </div>
+            <a class="btn btn-outline" href="../blog.html">← Back to Blog</a>
+          </div>
+
+          <div class="hero-image" aria-label="Topic banner">
+            <img
+              src="data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%271200%27%20height%3D%27675%27%20viewBox%3D%270%200%201200%20675%27%3E%3Cdefs%3E%3ClinearGradient%20id%3D%27g%27%20x1%3D%270%27%20x2%3D%271%27%3E%3Cstop%20offset%3D%270%27%20stop-color%3D%27%232563eb%27/%3E%3Cstop%20offset%3D%270.55%27%20stop-color%3D%27%237c3aed%27/%3E%3Cstop%20offset%3D%271%27%20stop-color%3D%27%2306b6d4%27/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%271200%27%20height%3D%27675%27%20fill%3D%27%230b1220%27/%3E%3Ccircle%20cx%3D%27230%27%20cy%3D%27160%27%20r%3D%27260%27%20fill%3D%27url(%2523g)%27%20opacity%3D%270.2%27/%3E%3Crect%20x%3D%27160%27%20y%3D%27220%27%20width%3D%27740%27%20height%3D%27300%27%20rx%3D%2724%27%20fill%3D%27%230f1a2f%27%20stroke%3D%27rgba(255%2C255%2C255%2C0.18)%27/%3E%3Cpath%20d%3D%27M200%20280h660v180H200z%27%20fill%3D%27rgba(255%2C255%2C255%2C0.06)%27/%3E%3Cpath%20d%3D%27M200%20280l330%20160%20330-160%27%20fill%3D%27none%27%20stroke%3D%27rgba(255%2C255%2C255%2C0.25)%27%20stroke-width%3D%2710%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27/%3E%3Crect%20x%3D%27920%27%20y%3D%27280%27%20width%3D%27180%27%20height%3D%27220%27%20rx%3D%2722%27%20fill%3D%27rgba(255%2C255%2C255%2C0.08)%27%20stroke%3D%27rgba(255%2C255%2C255%2C0.18)%27/%3E%3Crect%20x%3D%27965%27%20y%3D%27400%27%20width%3D%2790%27%20height%3D%2770%27%20rx%3D%2714%27%20fill%3D%27url(%2523g)%27/%3E%3Ctext%20x%3D%27160%27%20y%3D%27140%27%20fill%3D%27rgba(255%2C255%2C255%2C0.85)%27%20font-family%3D%27Segoe%20UI%2C%20Arial%27%20font-size%3D%2734%27%20font-weight%3D%27700%27%3EOutlook%20%E2%80%A2%20Send%20Permission%3C/text%3E%3C/svg%3E"
+              alt="Outlook send permission banner"
+            />
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
-  <main>
+  <main class="main-wrap">
     <div class="container">
-      <article class="article">
-        <div class="cover">
-          <img alt="" src="data:image/svg+xml;charset=UTF-8,<?xml version='1.0'?><svg xmlns='http://www.w3.org/2000/svg' width='1200' height='675' viewBox='0 0 1200 675'><defs><linearGradient id='g' x1='0' x2='1'><stop offset='0' stop-color='%232563eb'/><stop offset='0.55' stop-color='%237c3aed'/><stop offset='1' stop-color='%2306b6d4'/></linearGradient></defs><rect width='1200' height='675' fill='%230b1220'/><circle cx='230' cy='160' r='260' fill='url(%23g)' opacity='0.2'/><rect x='160' y='220' width='740' height='300' rx='24' fill='%230f1a2f' stroke='rgba(255,255,255,0.18)'/><path d='M200 280h660v180H200z' fill='rgba(255,255,255,0.06)'/><path d='M200 280l330 160 330-160' fill='none' stroke='rgba(255,255,255,0.25)' stroke-width='10' stroke-linecap='round' stroke-linejoin='round'/><rect x='920' y='280' width='180' height='220' rx='22' fill='rgba(255,255,255,0.08)' stroke='rgba(255,255,255,0.18)'/><path d='M1010 330c-28 0-50 22-50 50v20h100v-20c0-28-22-50-50-50z' fill='rgba(255,255,255,0.18)'/><rect x='965' y='400' width='90' height='70' rx='14' fill='url(%23g)'/><text x='160' y='140' fill='rgba(255,255,255,0.85)' font-family='Segoe UI, Arial' font-size='34' font-weight='700'>Outlook %E2%80%A2 Send Permission</text></svg>">
-        </div>
+      <div class="content-grid">
 
-        <div class="body">
+        <article class="panel article-panel" id="article">
+          <p>
+            You see this error when Outlook attempts to send a message using a From address that Exchange won’t allow.
+            Most of the time, the mailbox has <strong>Full Access</strong> but the user does not have the required send permission.
+          </p>
+
           <div class="callout">
-            Key point: Full Access allows mailbox access. It does not grant send rights. “I can open the mailbox” is not evidence you can send as it.
+            <strong>Key concept</strong>
+            Full Access lets the user open the mailbox. It does not grant Send As or Send on Behalf.
           </div>
 
-          <h2>How Exchange evaluates the sender</h2>
+          <h2 id="understand">Understand the permission type</h2>
           <p>
-            When you send email from a shared mailbox, Exchange evaluates the sender identity and the permission type. Send As means the message appears to originate from the shared mailbox and requires Send As permission. Send on Behalf means the message is sent by a user on behalf of the mailbox and requires the mailbox’s on-behalf delegation.
-          </p>
-          <p>
-            Many incidents come from a mismatch: the helpdesk assigns Full Access and expects Send As, or assigns Send on Behalf but the user selects the shared mailbox address in From, which triggers a Send As evaluation instead.
-          </p>
-
-          <h2>Why Outlook fails when OWA works</h2>
-          <p>
-            Outlook desktop caches connection state and authorization metadata. If permissions were recently changed, the mailbox was auto-mapped, or the user has multiple profiles/accounts, Outlook can operate with stale authorization data for longer than expected. In those cases, OWA succeeds (server-side evaluation with fresh state) while Outlook fails (cached state).
+            Exchange evaluates the sender based on the From address and the delegation type:
+            <strong>Send As</strong> sends as the mailbox identity.
+            <strong>Send on Behalf</strong> sends as the user, on behalf of the mailbox.
+            If the user selects the shared mailbox address in the From field, Exchange usually evaluates it as Send As.
           </p>
 
-          <h2>Validation workflow (what to prove)</h2>
+          <h2 id="fix">Fix: assign the correct send permission</h2>
           <p>
-            First, confirm which From address the client is using. That determines whether you need Send As or Send on Behalf. Second, validate the permission exists at the directory level. Third, validate propagation and client state by testing in OWA. This isolates whether you have a server-side permission gap or a client-side cache/profile issue.
+            Decide which behavior you want and configure it consistently. If you want messages to appear from the shared mailbox,
+            use Send As. If you want messages to show the user on behalf of the mailbox, use Send on Behalf.
           </p>
 
-          <h2>PowerShell verification (Exchange Online)</h2>
+          <h3 id="validate-permissions">Validate current permissions</h3>
+          <p>Use Exchange Online PowerShell to confirm what is assigned.</p>
+
           <pre># Connect-ExchangeOnline
 
 $SharedMailbox = "shared@domain.com"
 $User = "user@domain.com"
 
-"Full Access (mailbox access)"
+# Full Access
 Get-MailboxPermission -Identity $SharedMailbox |
   Where-Object { $_.User -like "*$User*" } |
   Format-Table User,AccessRights,IsInherited -Auto
 
-"Send As (sender identity)"
+# Send As
 Get-RecipientPermission -Identity $SharedMailbox |
   Where-Object { $_.Trustee -like "*$User*" } |
   Format-Table Trustee,AccessRights,IsInherited -Auto
 
-"Send on Behalf (delegation)"
+# Send on Behalf
 (Get-Mailbox -Identity $SharedMailbox).GrantSendOnBehalfTo</pre>
 
-          <h2>Remediation patterns (choose one and standardize)</h2>
+          <h3 id="assign-send-as">Assign Send As</h3>
+          <pre>Add-RecipientPermission -Identity $SharedMailbox -Trustee $User -AccessRights SendAs -Confirm:$false</pre>
+
+          <h3 id="assign-on-behalf">Assign Send on Behalf</h3>
+          <pre>Set-Mailbox -Identity $SharedMailbox -GrantSendOnBehalfTo @{Add=$User}</pre>
+
+          <h2 id="verify">Verify</h2>
           <p>
-            From an operational perspective, the right move is to standardize your delegation pattern. Decide whether your org uses Send As (preferred for shared identity) or Send on Behalf (preferred when individual attribution is desired), and then configure consistently. Mixing patterns creates user confusion and intermittent failures.
+            First test in Outlook on the web (OWA). OWA uses server-side evaluation and is a good way to confirm the permission is correct.
+            Then test Outlook desktop.
           </p>
 
-          <h2>Assigning the permission (Exchange Online PowerShell)</h2>
-          <pre># Send As
-Add-RecipientPermission -Identity $SharedMailbox -Trustee $User -AccessRights SendAs -Confirm:$false
-
-# Send on Behalf
-Set-Mailbox -Identity $SharedMailbox -GrantSendOnBehalfTo @{Add=$User}</pre>
-
-          <h2>Client stabilization (when it’s Outlook cache)</h2>
+          <h2 id="still-fails">If the issue continues</h2>
           <p>
-            If OWA works but Outlook fails after permissions are confirmed, treat Outlook as a cache problem. The most reliable fix is to create a new Outlook profile. This forces the client to rebuild mappings and tokens. This is not “turn it off and on,” it is forcing a clean state in a client that is designed to cache aggressively.
+            If OWA works but Outlook desktop fails, treat it as a client state problem. Outlook can cache mailbox mappings and permission state.
+            The most reliable fix is to create a new Outlook profile, then re-add the account and the shared mailbox.
           </p>
 
-          <div class="divider"></div>
-
-          <div class="refs">
-            <strong>Microsoft references</strong>
-            <ul>
-              <li><a href="https://learn.microsoft.com/en-us/exchange/collaboration-exo/shared-mailboxes" target="_blank" rel="noopener">Shared mailboxes in Exchange Online</a></li>
-              <li><a href="https://learn.microsoft.com/en-us/exchange/recipients-in-exchange-online/manage-permissions-for-recipients" target="_blank" rel="noopener">Manage permissions for recipients (Full Access, Send As, Send on Behalf)</a></li>
-              <li><a href="https://learn.microsoft.com/en-us/microsoft-365/admin/email/about-shared-mailboxes?view=o365-worldwide" target="_blank" rel="noopener">About shared mailboxes (Microsoft 365 admin)</a></li>
-            </ul>
+          <div class="note-card">
+            <strong>Tip</strong>
+            When this happens across many mailboxes, standardize the model. Mixed Send As and Send on Behalf patterns create repeat incidents.
           </div>
 
-          <div class="callout">
-            If this is recurring across multiple shared mailboxes, the issue is governance, not one mailbox. Standardize the delegation model, document “how to send” for users, and align client configuration.
+          <section class="refs">
+            <h3>References</h3>
+            <p>
+              <a href="https://learn.microsoft.com/en-us/exchange/collaboration-exo/shared-mailboxes" target="_blank" rel="noopener">
+                Shared mailboxes in Exchange Online
+              </a>
+            </p>
+            <p>
+              <a href="https://learn.microsoft.com/en-us/exchange/recipients-in-exchange-online/manage-permissions-for-recipients" target="_blank" rel="noopener">
+                Manage permissions for recipients (Full Access, Send As, Send on Behalf)
+              </a>
+            </p>
+          </section>
+
+          <div class="article-footer">
+            <div class="tags">
+              <span class="tag">Exchange Online</span>
+              <span class="tag">Shared mailbox</span>
+              <span class="tag">Permissions</span>
+            </div>
+            <a class="btn btn-primary" href="../index.html#contact">Request an Assessment</a>
           </div>
-        </div>
-      </article>
+        </article>
+
+        <aside class="sidebar">
+          <div class="side-card">
+            <h4>In this article</h4>
+            <div class="toc">
+              <a href="#understand">Permission type</a>
+              <a href="#fix">Fix</a>
+              <a href="#validate-permissions">Validate</a>
+              <a href="#verify">Verify</a>
+              <a href="#still-fails">If it still fails</a>
+            </div>
+          </div>
+
+          <div class="side-card contact-box">
+            <h4>Need help?</h4>
+            <p>Include the mailbox address, the user, and whether you want Send As or Send on Behalf.</p>
+            <a class="btn btn-primary" href="../index.html#contact" style="width:100%;">Request an Assessment</a>
+            <p class="small-muted" style="margin-top:10px;">Email: info@sentinelidentity.ca</p>
+          </div>
+        </aside>
+
+      </div>
     </div>
   </main>
 
   <footer class="footer">
-    <div class="container">© 2026 Sentinel Identity · <a href="/blog.html">Blog</a></div>
+    <div class="container footer-row">
+      <div>© <span id="year"></span> Sentinel Identity</div>
+      <div>Entra IAM consulting · Worldwide remote</div>
+    </div>
   </footer>
+
+  <script>
+    const mobileNavToggle = document.getElementById('mobileNavToggle');
+    const navLinks = document.getElementById('navLinks');
+    if (mobileNavToggle && navLinks) mobileNavToggle.addEventListener('click', () => navLinks.classList.toggle('show'));
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>
