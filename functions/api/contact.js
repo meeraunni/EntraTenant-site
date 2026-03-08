@@ -1,96 +1,97 @@
-// functions/api/contact.js
+// /functions/api/contact.js
 export async function onRequest(context) {
   const { request, env } = context;
 
-  // ----- Config -----
+  // ---- Config (set these in Cloudflare Pages > Settings > Environment variables) ----
   const TO_EMAIL = env.TO_EMAIL || "info@sentinelidentity.ca";
   const FROM_EMAIL = env.FROM_EMAIL || "noreply@sentinelidentity.ca";
 
-  // Allow both apex + www (and optionally preview domains if you add them)
-  const allowedOrigins = new Set(
-    (env.ALLOWED_ORIGINS || "https://sentinelidentity.ca,https://www.sentinelidentity.ca")
-      .split(",")
-      .map(s => s.trim())
-      .filter(Boolean)
-  );
+  // MailChannels Email API (required now)
+  const MAILCHANNELS_API_KEY = env.MAILCHANNELS_API_KEY; // REQUIRED
 
-  const origin = request.headers.get("Origin") || "";
+  // Allow multiple origins (because browsers send Origin; direct tests may not)
+  const ALLOWED_ORIGINS = (env.ALLOWED_ORIGINS || "https://sentinelidentity.ca,https://www.sentinelidentity.ca")
+    .split(",")
+    .map(s => s.trim())
+    .filter(Boolean);
 
-  const corsHeaders = {
-    "Access-Control-Allow-Origin": allowedOrigins.has(origin) ? origin : "https://sentinelidentity.ca",
+  const corsHeaders = (origin) => ({
+    "Access-Control-Allow-Origin": origin || ALLOWED_ORIGINS[0] || "https://sentinelidentity.ca",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
-    "Content-Type": "application/json; charset=utf-8",
-    "Cache-Control": "no-store",
-  };
+    "Content-Type": "application/json",
+  });
 
-  // ----- Preflight -----
+  // Preflight
   if (request.method === "OPTIONS") {
-    return new Response(null, { status: 204, headers: corsHeaders });
+    const origin = request.headers.get("Origin") || "";
+    return new Response(null, { status: 204, headers: corsHeaders(origin) });
   }
 
-  // ----- Method guard -----
   if (request.method !== "POST") {
-    return json({ ok: false, error: "Method not allowed" }, 405, corsHeaders);
+    const origin = request.headers.get("Origin") || "";
+    return new Response(JSON.stringify({ ok: false, error: "Method not allowed" }), {
+      status: 405,
+      headers: corsHeaders(origin),
+    });
   }
 
-  // ----- Origin guard (basic CSRF protection) -----
-  // If no Origin header (server-to-server), allow it.
-  if (origin && !allowedOrigins.has(origin)) {
-    return json({ ok: false, error: "Origin not allowed" }, 403, corsHeaders);
+  const origin = request.headers.get("Origin") || "";
+  // Only enforce if Origin header exists (browser). If empty (curl/server), allow.
+  if (origin && ALLOWED_ORIGINS.length && !ALLOWED_ORIGINS.includes(origin)) {
+    return new Response(JSON.stringify({ ok: false, error: "Origin not allowed" }), {
+      status: 403,
+      headers: corsHeaders(origin),
+    });
   }
 
-  // ----- Parse body -----
-  const ct = request.headers.get("content-type") || "";
-  if (!ct.includes("application/json")) {
-    return json({ ok: false, error: "Invalid content type. Expected application/json." }, 415, corsHeaders);
+  if (!MAILCHANNELS_API_KEY) {
+    return new Response(JSON.stringify({
+      ok: false,
+      error: "Server not configured: missing MAILCHANNELS_API_KEY",
+    }), { status: 500, headers: corsHeaders(origin) });
   }
 
   let body;
   try {
     body = await request.json();
   } catch {
-    return json({ ok: false, error: "Invalid JSON body" }, 400, corsHeaders);
+    return new Response(JSON.stringify({ ok: false, error: "Invalid JSON body" }), {
+      status: 400,
+      headers: corsHeaders(origin),
+    });
   }
 
-  // ----- Honeypot -----
-  if (safe(body.company_site)) {
-    // Bot filled hidden field. Pretend success.
-    return json({ ok: true }, 200, corsHeaders);
-  }
+  const {
+    name = "",
+    email = "",
+    company = "",
+    userCount = "",
+    primaryFocus = "",
+    problemSummary = "",
+    sourcePage = "",
+  } = body || {};
 
-  // ----- Accept both naming schemes (so frontend changes won't break backend) -----
-  const name = safe(body.name);
-  const email = safe(body.email);
-
-  const company = safe(body.company || body.org);
-  const userCount = safe(body.userCount);
-  const primaryFocus = safe(body.primaryFocus || body.topic);
-
-  // Important: accept both 'problemSummary' and 'message'
-  const problemSummary = safe(body.problemSummary || body.message);
-
-  const sourcePage = safe(body.sourcePage);
-
-  // ----- Validation -----
-  if (!name || !email || !problemSummary) {
-    return json(
-      { ok: false, error: "Name, email, and issue summary are required." },
-      400,
-      corsHeaders
-    );
+  if (!name.trim() || !email.trim() || !problemSummary.trim()) {
+    return new Response(JSON.stringify({
+      ok: false,
+      error: "Name, email, and issue summary are required.",
+    }), { status: 400, headers: corsHeaders(origin) });
   }
 
   if (!isValidEmail(email)) {
-    return json({ ok: false, error: "Invalid email address." }, 400, corsHeaders);
+    return new Response(JSON.stringify({ ok: false, error: "Invalid email address." }), {
+      status: 400,
+      headers: corsHeaders(origin),
+    });
   }
 
-  // ----- Build email content -----
   const submittedAt = new Date().toISOString();
 
-  const adminSubject = `New Sentinel Identity Assessment Request - ${company || name}`;
+  // Email to you
+  const adminSubject = `New assessment request - ${company || name}`;
   const adminText = [
-    "New assessment request received",
+    "New assessment request from sentinelidentity.ca",
     "",
     `Name: ${name}`,
     `Email: ${email}`,
@@ -104,117 +105,90 @@ export async function onRequest(context) {
     problemSummary,
   ].join("\n");
 
-  const adminHtml = `
-    <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #111827;">
-      <h2 style="margin: 0 0 12px;">New assessment request</h2>
-      <table style="border-collapse: collapse; width: 100%; max-width: 720px;">
-        <tr><td style="padding: 8px; border: 1px solid #e5e7eb;"><strong>Name</strong></td><td style="padding: 8px; border: 1px solid #e5e7eb;">${escapeHtml(name)}</td></tr>
-        <tr><td style="padding: 8px; border: 1px solid #e5e7eb;"><strong>Email</strong></td><td style="padding: 8px; border: 1px solid #e5e7eb;">${escapeHtml(email)}</td></tr>
-        <tr><td style="padding: 8px; border: 1px solid #e5e7eb;"><strong>Company</strong></td><td style="padding: 8px; border: 1px solid #e5e7eb;">${escapeHtml(company || "N/A")}</td></tr>
-        <tr><td style="padding: 8px; border: 1px solid #e5e7eb;"><strong>User Count</strong></td><td style="padding: 8px; border: 1px solid #e5e7eb;">${escapeHtml(userCount || "N/A")}</td></tr>
-        <tr><td style="padding: 8px; border: 1px solid #e5e7eb;"><strong>Primary Focus</strong></td><td style="padding: 8px; border: 1px solid #e5e7eb;">${escapeHtml(primaryFocus || "N/A")}</td></tr>
-        <tr><td style="padding: 8px; border: 1px solid #e5e7eb;"><strong>Submitted (UTC)</strong></td><td style="padding: 8px; border: 1px solid #e5e7eb;">${escapeHtml(submittedAt)}</td></tr>
-        <tr><td style="padding: 8px; border: 1px solid #e5e7eb;"><strong>Source Page</strong></td><td style="padding: 8px; border: 1px solid #e5e7eb;">${escapeHtml(sourcePage || "N/A")}</td></tr>
-      </table>
-
-      <h3 style="margin: 18px 0 8px;">Issue summary</h3>
-      <div style="white-space: pre-wrap; border: 1px solid #e5e7eb; background: #f9fafb; padding: 12px; border-radius: 8px;">
-        ${escapeHtml(problemSummary)}
-      </div>
-      <p style="margin-top: 14px; color: #6b7280;">Reply to this email to respond directly to the sender.</p>
-    </div>
-  `;
-
-  // Minimal and human confirmation email (no robotic fluff)
-  const customerSubject = "We received your assessment request";
+  // Confirmation to prospect
+  const customerSubject = "We received your request";
   const customerText = [
     `Hi ${name},`,
     "",
-    "We received your request and will review it.",
+    "Thanks for reaching out to Sentinel Identity.",
+    "We received your request and will review the details you submitted.",
     "",
-    "If this is urgent, email info@sentinelidentity.ca",
+    "If your issue is urgent, email info@sentinelidentity.ca",
     "",
     "Sentinel Identity",
   ].join("\n");
 
-  const customerHtml = `
-    <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111827; max-width: 680px;">
-      <h2 style="margin: 0 0 12px;">Request received</h2>
-      <p>Hi ${escapeHtml(name)},</p>
-      <p>We received your request and will review it.</p>
-      <p>If this is urgent, email <a href="mailto:info@sentinelidentity.ca">info@sentinelidentity.ca</a>.</p>
-      <p style="margin-top: 18px;">Sentinel Identity</p>
-    </div>
-  `;
+  try {
+    const adminSend = await sendViaMailChannels({
+      apiKey: MAILCHANNELS_API_KEY,
+      from: FROM_EMAIL,
+      to: TO_EMAIL,
+      subject: adminSubject,
+      text: adminText,
+      replyTo: email,
+    });
 
-  // ----- Send emails -----
-  // 1) Admin notification
-  const adminSend = await sendViaMailChannels({
-    from: FROM_EMAIL,
-    to: TO_EMAIL,
-    subject: adminSubject,
-    text: adminText,
-    html: adminHtml,
-    replyTo: email,
-  });
+    if (!adminSend.ok) {
+      return new Response(JSON.stringify({
+        ok: false,
+        error: "Failed to send notification email.",
+        details: adminSend.error || "Unknown MailChannels error",
+      }), { status: 500, headers: corsHeaders(origin) });
+    }
 
-  if (!adminSend.ok) {
-    return json(
-      { ok: false, error: "Failed to send notification email.", details: adminSend.error },
-      502,
-      corsHeaders
-    );
+    // Try confirmation (do not fail request if this one fails)
+    const customerSend = await sendViaMailChannels({
+      apiKey: MAILCHANNELS_API_KEY,
+      from: FROM_EMAIL,
+      to: email,
+      subject: customerSubject,
+      text: customerText,
+      replyTo: "info@sentinelidentity.ca",
+    });
+
+    if (!customerSend.ok) {
+      return new Response(JSON.stringify({
+        ok: true,
+        warning: "Submitted, but confirmation email could not be sent to the user.",
+      }), { status: 200, headers: corsHeaders(origin) });
+    }
+
+    return new Response(JSON.stringify({ ok: true, message: "Submitted." }), {
+      status: 200,
+      headers: corsHeaders(origin),
+    });
+
+  } catch (err) {
+    return new Response(JSON.stringify({
+      ok: false,
+      error: "Unexpected server error",
+      details: err?.message || "Unknown error",
+    }), { status: 500, headers: corsHeaders(origin) });
   }
-
-  // 2) Customer confirmation (non-blocking)
-  const customerSend = await sendViaMailChannels({
-    from: FROM_EMAIL,
-    to: email,
-    subject: customerSubject,
-    text: customerText,
-    html: customerHtml,
-    replyTo: "info@sentinelidentity.ca",
-  });
-
-  if (!customerSend.ok) {
-    return json(
-      { ok: true, warning: "Submitted, but confirmation email could not be sent.", details: customerSend.error },
-      200,
-      corsHeaders
-    );
-  }
-
-  return json({ ok: true, message: "Submitted successfully." }, 200, corsHeaders);
 }
 
-/**
- * MailChannels send (Cloudflare Workers/Pages compatible)
- * Keep it simple: no DKIM placeholders unless you actually manage DKIM keys.
- */
-async function sendViaMailChannels({ from, to, subject, text, html, replyTo }) {
+async function sendViaMailChannels({ apiKey, from, to, subject, text, replyTo }) {
   try {
+    // MailChannels Email API uses X-Api-Key now. :contentReference[oaicite:3]{index=3}
     const payload = {
-      personalizations: [{ to: [{ email: to }] }],
       from: { email: from, name: "Sentinel Identity" },
-      reply_to: replyTo ? { email: replyTo } : undefined,
+      personalizations: [{ to: [{ email: to }] }],
       subject,
-      content: [
-        { type: "text/plain", value: text || "" },
-        { type: "text/html", value: html || "" },
-      ],
+      reply_to: replyTo ? { email: replyTo } : undefined,
+      content: [{ type: "text/plain", value: text || "" }],
     };
 
     const res = await fetch("https://api.mailchannels.net/tx/v1/send", {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: {
+        "content-type": "application/json",
+        "X-Api-Key": apiKey,
+      },
       body: JSON.stringify(payload),
     });
 
-    const responseText = await res.text().catch(() => "");
-
-    if (!res.ok) {
-      return { ok: false, error: `MailChannels ${res.status}: ${responseText}` };
-    }
+    const responseText = await res.text();
+    if (!res.ok) return { ok: false, error: `MailChannels ${res.status}: ${responseText}` };
 
     return { ok: true };
   } catch (e) {
@@ -222,24 +196,6 @@ async function sendViaMailChannels({ from, to, subject, text, html, replyTo }) {
   }
 }
 
-function json(obj, status, headers) {
-  return new Response(JSON.stringify(obj), { status, headers });
-}
-
-function safe(v) {
-  const s = (v === undefined || v === null) ? "" : String(v);
-  return s.replace(/\r/g, "").trim();
-}
-
 function isValidEmail(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value).trim());
-}
-
-function escapeHtml(value) {
-  return String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
 }
