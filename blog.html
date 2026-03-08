@@ -4,60 +4,72 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Blog | Sentinel Identity</title>
-  <meta name="description" content="Sentinel Identity Blog: Entra ID and Microsoft 365 troubleshooting, simplified." />
-  <meta name="theme-color" content="#ffffff" />
+  <meta name="description" content="Sentinel Identity blog: Entra ID and Microsoft 365 admin fixes, written for real-world environments." />
+  <meta name="theme-color" content="#071126" />
 
   <style>
     :root{
-      --bg:#ffffff;
-      --bg2:#f6f7fb;
-      --card:#ffffff;
-      --border:#e6e8ef;
-      --text:#111827;
-      --muted:#6b7280;
-      --link:#2563eb;
-      --chip:#f3f4f6;
-      --chipText:#111827;
-      --chipActiveBg:#e8f0ff;
-      --chipActiveBorder:#b7d0ff;
-      --shadow: 0 10px 25px rgba(17,24,39,.06);
-      --max:1200px;
-      --radius:16px;
+      --bg:#071126;
+      --bg2:#0c1834;
+      --panel:rgba(255,255,255,0.06);
+      --panel2:rgba(255,255,255,0.04);
+      --panel-border:rgba(255,255,255,0.12);
+      --text:#e8efff;
+      --muted:#b8c5ea;
+      --muted2:#93a6d6;
+      --blue:#3b82f6;
+      --cyan:#22d3ee;
+      --violet:#8b5cf6;
+      --shadow:0 20px 60px rgba(0,0,0,.35);
+      --radius:20px;
+      --max:1180px;
     }
 
-    *{ box-sizing:border-box; }
-    html, body{ margin:0; padding:0; }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
     body{
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      color: var(--text);
-      background: var(--bg);
-      line-height: 1.55;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(900px 500px at 8% -10%, rgba(59,130,246,.35), transparent 60%),
+        radial-gradient(700px 400px at 95% 10%, rgba(139,92,246,.28), transparent 60%),
+        radial-gradient(500px 300px at 80% 70%, rgba(34,211,238,.15), transparent 60%),
+        linear-gradient(180deg, var(--bg), var(--bg2));
+      line-height:1.6;
     }
 
-    a{ color: inherit; text-decoration: none; }
-    a:hover{ color: var(--link); }
+    a{color:inherit;text-decoration:none}
+    img{max-width:100%;display:block}
 
     .container{
-      width: min(var(--max), calc(100% - 32px));
-      margin: 0 auto;
+      width:min(var(--max), calc(100% - 32px));
+      margin:0 auto;
     }
 
     /* Header */
-    .header{
-      position: sticky;
+    .site-header{
+      position:sticky;
       top:0;
       z-index:50;
-      background: rgba(255,255,255,.9);
       backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--border);
+      background:rgba(7,17,38,.75);
+      border-bottom:1px solid rgba(255,255,255,.08);
     }
 
     .nav{
-      min-height:72px;
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:16px;
+      min-height:78px;
+    }
+
+    .nav-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      width:auto;
     }
 
     .brand{
@@ -68,476 +80,426 @@
     }
 
     .brand-badge{
-      width:34px;
-      height:34px;
-      border-radius:10px;
-      background: linear-gradient(135deg, #2563eb 0%, #7c3aed 60%, #06b6d4 100%);
-      box-shadow: 0 0 0 1px rgba(0,0,0,.06) inset;
+      width:36px;
+      height:36px;
+      border-radius:12px;
+      background:
+        radial-gradient(circle at 30% 30%, #7dd3fc, #3b82f6 45%, #1d4ed8 70%, #1e1b4b);
+      box-shadow: 0 8px 24px rgba(59,130,246,.45);
+      border:1px solid rgba(255,255,255,.22);
       flex:0 0 auto;
     }
 
-    .brand-text strong{
-      display:block;
-      font-size: 0.98rem;
-      letter-spacing: .01em;
+    .brand-text{
+      display:flex;
+      flex-direction:column;
+      min-width:0;
     }
-    .brand-text span{
-      display:block;
-      font-size: .82rem;
-      color: var(--muted);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 420px;
+
+    .brand-title{
+      font-weight:800;
+      letter-spacing:.01em;
+      font-size:1.05rem;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .brand-sub{
+      color:var(--muted);
+      font-size:.82rem;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width:520px;
     }
 
     .nav-links{
       display:flex;
       align-items:center;
-      gap:10px;
+      gap:18px;
       flex-wrap:wrap;
+      justify-content:flex-end;
     }
 
     .nav-links a{
-      font-size:.92rem;
+      color:#d9e5ff;
       font-weight:700;
-      padding:10px 10px;
-      border-radius:10px;
-      color:#111827;
+      opacity:.9;
     }
-
-    .nav-links a.active{
-      background: var(--bg2);
-      border: 1px solid var(--border);
-    }
+    .nav-links a:hover{opacity:1}
 
     .btn{
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      gap:8px;
-      padding:11px 14px;
-      border-radius:12px;
-      border:1px solid var(--border);
-      background:#fff;
-      font-weight:800;
-      font-size:.92rem;
+      gap:10px;
+      border:none;
       cursor:pointer;
-      transition: transform .15s ease, box-shadow .15s ease;
-    }
-
-    .btn:hover{
-      transform: translateY(-1px);
-      box-shadow: var(--shadow);
+      border-radius:14px;
+      padding:12px 18px;
+      font-weight:800;
+      transition:.2s ease;
+      text-decoration:none;
+      white-space:nowrap;
     }
 
     .btn-primary{
-      border: 0;
-      background: linear-gradient(90deg, #2563eb 0%, #7c3aed 60%, #06b6d4 100%);
-      color:#fff;
+      color:white;
+      background:linear-gradient(90deg, var(--violet), var(--blue), var(--cyan));
+      box-shadow: 0 10px 30px rgba(59,130,246,.35);
+    }
+    .btn-primary:hover{transform:translateY(-1px)}
+
+    .btn-outline{
+      color:#dfe9ff;
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.14);
     }
 
-    .mobile-menu-btn{
+    .mobile-nav-toggle{
       display:none;
-      width:44px;
-      height:44px;
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.12);
+      color:#ecf4ff;
       border-radius:12px;
-      border:1px solid var(--border);
-      background:#fff;
-      font-size:1.2rem;
+      padding:10px 12px;
+      font-weight:800;
       cursor:pointer;
-    }
-
-    .mobile-panel{
-      display:none;
-      padding: 12px 0 16px;
-      border-top:1px solid var(--border);
-    }
-
-    .mobile-panel a{
-      display:block;
-      padding: 12px 10px;
-      border-radius:10px;
-      font-weight:700;
-      color:#111827;
-    }
-
-    .mobile-panel a:hover{
-      background: var(--bg2);
-    }
-
-    .mobile-panel .btn{
-      width:100%;
-      margin-top: 10px;
     }
 
     /* Hero */
     .hero{
-      background: linear-gradient(180deg, #ffffff 0%, #f7f8fc 100%);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .hero-inner{
-      padding: 42px 0 26px;
-      display:grid;
-      grid-template-columns: 1.2fr .8fr;
-      gap: 20px;
-      align-items:center;
-    }
-
-    .hero h1{
-      margin:0;
-      font-size: clamp(2rem, 3.5vw, 2.8rem);
-      letter-spacing: -0.02em;
-      line-height:1.08;
-    }
-
-    .hero p{
-      margin: 10px 0 0;
-      color: var(--muted);
-      font-size: 1.02rem;
-      max-width: 70ch;
-    }
-
-    .hero-right{
-      display:flex;
-      justify-content:flex-end;
+      padding:34px 0 14px;
     }
 
     .hero-card{
-      width:100%;
-      max-width: 420px;
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px;
-      box-shadow: var(--shadow);
+      border-radius:26px;
+      border:1px solid rgba(255,255,255,.12);
+      background:
+        linear-gradient(135deg, rgba(17,24,39,.85), rgba(9,14,29,.9)),
+        radial-gradient(circle at 15% 20%, rgba(59,130,246,.22), transparent 60%);
+      box-shadow:var(--shadow);
+      padding:24px;
     }
 
-    .hero-card h3{
-      margin:0;
-      font-size: 1rem;
-    }
-    .hero-card p{
-      margin: 8px 0 0;
-      font-size: .92rem;
-      color: var(--muted);
+    .hero-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
     }
 
-    /* Layout */
-    main{
-      padding: 26px 0 52px;
-      background: #fff;
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      color:#dbeafe;
+      background:rgba(59,130,246,.12);
+      border:1px solid rgba(59,130,246,.26);
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:.85rem;
+      font-weight:800;
+      margin-bottom:12px;
     }
+    .eyebrow-dot{width:8px;height:8px;border-radius:999px;background:#60a5fa;box-shadow:0 0 16px rgba(96,165,250,.8);}
 
-    .layout{
-      display:grid;
-      grid-template-columns: 1fr 320px;
-      gap: 18px;
-      align-items:start;
-    }
-
-    .section-title{
+    .hero h1{
       margin:0 0 10px;
-      font-size:1.35rem;
-      letter-spacing:-.01em;
+      font-size:clamp(2rem, 3vw, 2.7rem);
+      line-height:1.08;
+      letter-spacing:-.02em;
+    }
+
+    .hero p{
+      margin:0;
+      color:var(--muted);
+      max-width:78ch;
+      font-size:1.02rem;
     }
 
     /* Controls */
     .controls{
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 14px;
-      box-shadow: var(--shadow);
-      margin-bottom: 12px;
+      margin-top:14px;
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:center;
     }
 
     .search{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-top:10px;
-    }
-
-    .search input{
       flex: 1 1 280px;
-      width:100%;
-      padding: 12px 12px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: #fff;
-      outline:none;
-      font-size: .95rem;
+      min-width: 220px;
     }
+    .search input{
+      width:100%;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.04);
+      color:var(--text);
+      outline:none;
+      font-size:.95rem;
+    }
+    .search input::placeholder{color:rgba(184,197,234,.9)}
 
     .chips{
       display:flex;
       flex-wrap:wrap;
       gap:8px;
-      margin-top: 10px;
     }
 
     .chip{
-      border: 1px solid var(--border);
-      background: var(--chip);
-      color: var(--chipText);
-      border-radius: 999px;
-      padding: 7px 10px;
-      font-weight: 800;
-      font-size: .82rem;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.04);
+      color:#dbe8ff;
+      border-radius:999px;
+      padding:8px 10px;
+      font-weight:800;
+      font-size:.82rem;
       cursor:pointer;
-      transition: .15s ease;
+      transition:.15s ease;
     }
-
-    .chip:hover{
-      border-color: #cbd5e1;
-      background: #eef2ff;
-    }
-
+    .chip:hover{background:rgba(255,255,255,.06)}
     .chip.active{
-      background: var(--chipActiveBg);
-      border-color: var(--chipActiveBorder);
-      color: #0b3aa8;
+      background:rgba(59,130,246,.18);
+      border-color:rgba(59,130,246,.35);
+      color:#eaf2ff;
+    }
+
+    /* Layout */
+    main{padding: 14px 0 70px;}
+
+    .layout{
+      display:grid;
+      grid-template-columns: minmax(0,1fr) 320px;
+      gap: 20px;
+      align-items:start;
+    }
+
+    .panel{
+      background:var(--panel);
+      border:1px solid var(--panel-border);
+      border-radius:20px;
+      box-shadow:var(--shadow);
     }
 
     /* Feed */
     .feed{
       display:grid;
-      gap: 12px;
+      gap: 14px;
     }
 
     .post{
       display:grid;
-      grid-template-columns: 220px 1fr;
+      grid-template-columns: 260px 1fr;
       gap: 0;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
       overflow:hidden;
-      background: var(--card);
-      box-shadow: var(--shadow);
-      transition: transform .15s ease, box-shadow .15s ease;
-      min-height: 150px;
+      border-radius:20px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.04);
+      transition:.18s ease;
     }
 
     .post:hover{
       transform: translateY(-2px);
-      box-shadow: 0 14px 35px rgba(17,24,39,.08);
+      border-color: rgba(59,130,246,.35);
+      background: rgba(255,255,255,.055);
     }
 
     .post-img{
-      background: #e5e7eb;
-      position: relative;
+      background:#0b1328;
+      position:relative;
+      min-height: 170px;
     }
-
     .post-img img{
       width:100%;
       height:100%;
-      object-fit: cover;
-      display:block;
+      object-fit:cover;
+      opacity:.96;
     }
 
     .post-body{
-      padding: 14px 14px 16px;
+      padding: 14px 16px 16px;
     }
 
-    .meta{
+    .post-meta{
       display:flex;
       flex-wrap:wrap;
       gap:8px;
-      color: var(--muted);
-      font-size: .82rem;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
 
-    .meta span{
-      background: #f3f4f6;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      padding: 4px 8px;
-      color: #374151;
+    .pill{
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:999px;
+      padding:6px 10px;
+      color:#d9e6ff;
+      font-size:.82rem;
       font-weight:700;
     }
 
-    .post h3{
-      margin: 6px 0 0;
-      font-size: 1.06rem;
-      line-height: 1.25;
-      letter-spacing: -0.01em;
+    .post-title{
+      margin:0;
+      font-size:1.08rem;
+      line-height:1.25;
+      letter-spacing:-.01em;
+      color:#f1f6ff;
     }
 
-    .post p{
-      margin: 8px 0 0;
-      color: var(--muted);
-      font-size: .94rem;
+    .post-excerpt{
+      margin:8px 0 0;
+      color:var(--muted);
+      font-size:.95rem;
+      line-height:1.5;
       max-width: 95ch;
     }
 
     .read{
-      margin-top: 10px;
       display:inline-flex;
       align-items:center;
       gap:8px;
-      color: var(--link);
-      font-weight: 900;
-      font-size: .92rem;
+      margin-top: 10px;
+      color:#cfe3ff;
+      font-weight:900;
+      font-size:.92rem;
     }
+    .read span{opacity:.9}
+    .post:hover .read span{opacity:1}
 
     .empty{
-      border: 1px dashed #cbd5e1;
-      background: #f8fafc;
-      border-radius: var(--radius);
-      padding: 14px;
-      color: var(--muted);
+      padding:16px;
+      color:var(--muted);
+      border-radius:20px;
+      border:1px dashed rgba(255,255,255,.16);
+      background:rgba(255,255,255,.03);
     }
 
     /* Sidebar */
-    .side{
-      position: sticky;
-      top: 92px;
+    .sidebar{
       display:grid;
-      gap: 12px;
+      gap:16px;
+      position:sticky;
+      top:92px;
     }
 
     .side-card{
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      background: #fff;
-      padding: 14px;
-      box-shadow: var(--shadow);
+      padding:16px;
+      border-radius:18px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow:var(--shadow);
     }
 
     .side-card h3{
-      margin:0;
-      font-size:1rem;
+      margin:0 0 10px;
+      font-size:1.02rem;
     }
 
     .side-card p{
-      margin: 8px 0 0;
-      color: var(--muted);
-      font-size: .92rem;
+      margin:0 0 10px;
+      color:var(--muted);
+      font-size:.94rem;
+    }
+
+    .contact-box{
+      background:
+        radial-gradient(220px 140px at 15% 10%, rgba(59,130,246,.22), transparent 70%),
+        radial-gradient(220px 140px at 100% 100%, rgba(139,92,246,.2), transparent 70%),
+        rgba(255,255,255,.04);
     }
 
     /* Footer */
     .footer{
-      border-top: 1px solid var(--border);
-      background: #fff;
-      padding: 26px 0 18px;
-      color: var(--muted);
-      font-size: .9rem;
+      border-top:1px solid rgba(255,255,255,.08);
+      padding:20px 0 36px;
+      color:var(--muted);
     }
-
-    .footer-grid{
-      display:grid;
-      grid-template-columns: 1.4fr 1fr 1fr 1fr;
-      gap: 18px;
-    }
-
-    .footer h4{
-      margin:0 0 10px;
-      color:#111827;
-      font-size:.95rem;
-    }
-
-    .footer ul{
-      list-style:none;
-      margin:0;
-      padding:0;
-      display:grid;
-      gap:8px;
-    }
-
-    .footer a{ color: var(--muted); }
-    .footer a:hover{ color: var(--link); }
-
-    .footer-bottom{
-      margin-top:18px;
-      padding-top:12px;
-      border-top:1px solid var(--border);
+    .footer-row{
       display:flex;
+      flex-wrap:wrap;
+      align-items:center;
       justify-content:space-between;
       gap:10px;
-      flex-wrap:wrap;
+      font-size:.92rem;
     }
 
-    @media (max-width: 1100px){
-      .nav-links{ display:none; }
-      .mobile-menu-btn{ display:block; }
-      .hero-inner{ grid-template-columns: 1fr; }
-      .hero-right{ justify-content:flex-start; }
-      .layout{ grid-template-columns: 1fr; }
-      .side{ position: static; }
-      .footer-grid{ grid-template-columns: 1.2fr 1fr 1fr; }
+    @media (max-width: 980px){
+      .layout{grid-template-columns:1fr;}
+      .sidebar{position:static}
+      .post{grid-template-columns:1fr;}
+      .post-img{min-height:200px}
     }
 
-    @media (max-width: 860px){
-      .post{ grid-template-columns: 1fr; }
-      .post-img{ aspect-ratio: 16/9; }
-      .footer-grid{ grid-template-columns: 1fr 1fr; }
-      .brand-text span{ max-width: 220px; }
-    }
-
-    @media (max-width: 560px){
-      .container{ width: min(var(--max), calc(100% - 20px)); }
-      .nav{ min-height: 66px; }
-      .btn{ width:100%; }
-      .footer-grid{ grid-template-columns: 1fr; }
-      .footer-bottom{ flex-direction:column; align-items:flex-start; }
+    @media (max-width: 780px){
+      .nav{align-items:flex-start;flex-direction:column;padding:12px 0;}
+      .nav-top{width:100%}
+      .mobile-nav-toggle{display:inline-flex}
+      .nav-links{
+        width:100%;
+        display:none;
+        flex-direction:column;
+        align-items:flex-start;
+        gap:12px;
+        padding:6px 0 6px;
+      }
+      .nav-links.show{display:flex}
+      .nav-links .btn{width:100%;justify-content:center}
+      .hero-card{padding:18px}
     }
   </style>
 </head>
 
 <body>
-
-  <header class="header">
-    <div class="container">
-      <nav class="nav" aria-label="Main navigation">
-        <a class="brand" href="index.html" aria-label="Sentinel Identity home">
-          <div class="brand-badge" aria-hidden="true"></div>
+  <header class="site-header">
+    <div class="container nav">
+      <div class="nav-top">
+        <a href="index.html" class="brand" aria-label="Sentinel Identity home">
+          <div class="brand-badge"></div>
           <div class="brand-text">
-            <strong>Sentinel Identity</strong>
-            <span>Entra ID & Microsoft 365 consulting</span>
+            <div class="brand-title">Sentinel Identity</div>
+            <div class="brand-sub">Entra Identity & Access Management consulting</div>
           </div>
         </a>
+        <button class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Toggle menu">Menu</button>
+      </div>
 
-        <div class="nav-links" role="menubar" aria-label="Desktop menu">
-          <a href="index.html#who-we-help">Who we help</a>
-          <a href="index.html#services">Services</a>
-          <a href="index.html#how-we-work">How we work</a>
-          <a href="index.html#why-sentinel">Why Sentinel Identity</a>
-          <a class="active" href="blog.html">Blog</a>
-          <a href="index.html#contact">Contact</a>
-        </div>
-
-        <a class="btn btn-primary" href="index.html#contact">Request an Assessment</a>
-
-        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="mobilePanel">☰</button>
-      </nav>
-
-      <div class="mobile-panel" id="mobilePanel" aria-label="Mobile menu">
+      <nav class="nav-links" id="navLinks" aria-label="Primary navigation">
         <a href="index.html#who-we-help">Who we help</a>
         <a href="index.html#services">Services</a>
-        <a href="index.html#how-we-work">How we work</a>
-        <a href="index.html#why-sentinel">Why Sentinel Identity</a>
-        <a class="active" href="blog.html">Blog</a>
+        <a href="blog.html">Blog</a>
         <a href="index.html#contact">Contact</a>
         <a class="btn btn-primary" href="index.html#contact">Request an Assessment</a>
-      </div>
+      </nav>
     </div>
   </header>
 
-  <section class="hero" aria-label="Blog hero">
+  <section class="hero">
     <div class="container">
-      <div class="hero-inner">
-        <div>
-          <h1>Sentinel Identity Blog</h1>
-          <p>Entra ID and Microsoft 365 admin fixes, written like an engineer.</p>
+      <div class="hero-card">
+        <div class="eyebrow"><span class="eyebrow-dot"></span><span>ARTICLES · SENTINEL IDENTITY</span></div>
+        <div class="hero-top">
+          <div>
+            <h1>Blog</h1>
+            <p>Entra ID and Microsoft 365 admin fixes. Short, specific, and written for production environments.</p>
+          </div>
+          <a class="btn btn-primary" href="index.html#contact">Request an Assessment</a>
         </div>
 
-        <div class="hero-right">
-          <div class="hero-card">
-            <h3>What you’ll find here</h3>
-            <p>Identity and messaging issues explained with root cause, validation, and remediation patterns.</p>
+        <div class="controls">
+          <div class="search">
+            <input id="searchInput" type="text" placeholder="Search (AADSTS, shared mailbox, Defender, Send As)" />
+          </div>
+
+          <div class="chips" aria-label="Topic filters">
+            <button class="chip active" type="button" data-filter-tag="All">All</button>
+            <button class="chip" type="button" data-filter-tag="Entra ID">Entra ID</button>
+            <button class="chip" type="button" data-filter-tag="Exchange Online">Exchange Online</button>
+            <button class="chip" type="button" data-filter-tag="Microsoft Defender">Microsoft Defender</button>
+            <button class="chip" type="button" data-filter-tag="Outlook">Outlook</button>
           </div>
         </div>
       </div>
@@ -547,151 +509,69 @@
   <main>
     <div class="container">
       <div class="layout">
+
         <div>
-          <h2 class="section-title">Recent posts</h2>
-
-          <div class="controls" aria-label="Blog controls">
-            <div class="search">
-              <input id="searchInput" type="text" placeholder="Search posts (e.g., AADSTS76026, Send As, Explorer, Sent Items)" />
-            </div>
-
-            <div class="chips" aria-label="Topic filters">
-              <button class="chip active" type="button" data-filter-tag="All">All</button>
-              <button class="chip" type="button" data-filter-tag="Entra ID">Entra ID</button>
-              <button class="chip" type="button" data-filter-tag="Exchange Online">Exchange Online</button>
-              <button class="chip" type="button" data-filter-tag="Microsoft Defender">Microsoft Defender</button>
-              <button class="chip" type="button" data-filter-tag="Outlook">Outlook</button>
-            </div>
-          </div>
-
           <div id="feed" class="feed" aria-label="Blog feed"></div>
         </div>
 
-        <aside class="side" aria-label="Sidebar">
+        <aside class="sidebar">
           <div class="side-card">
-            <h3>Topics</h3>
-            <p>Entra ID, Exchange Online, Defender, Outlook, and identity-related admin fixes.</p>
+            <h3>What you’ll find here</h3>
+            <p>Identity (Entra), messaging (Exchange/Outlook), and security operations (Defender). Fixes you can validate.</p>
+            <p class="small-muted">New posts are added as standalone HTML files under /blog/.</p>
           </div>
 
-          <div class="side-card">
-            <h3>Need help?</h3>
-            <p>Use the assessment form on the main page for clear next steps.</p>
-            <div style="display:grid; gap:10px; margin-top:10px;">
-              <a class="btn btn-primary" href="index.html#contact">Request an Assessment</a>
-              <a class="btn" href="mailto:info@sentinelidentity.ca">Email info@sentinelidentity.ca</a>
-            </div>
+          <div class="side-card contact-box">
+            <h3>Need help with Entra IAM?</h3>
+            <p>Use the assessment form and include the symptom, user impact, and the time of the failure.</p>
+            <a class="btn btn-primary" href="index.html#contact" style="width:100%;">Request an Assessment</a>
+            <p class="small-muted" style="margin-top:10px;">Email: info@sentinelidentity.ca</p>
           </div>
         </aside>
+
       </div>
     </div>
   </main>
 
-  <footer class="footer" aria-label="Footer">
-    <div class="container">
-      <div class="footer-grid">
-        <div>
-          <div class="brand" style="margin-bottom:10px;">
-            <div class="brand-badge" aria-hidden="true"></div>
-            <div class="brand-text">
-              <strong>Sentinel Identity</strong>
-              <span>Entra ID & Microsoft 365 consulting</span>
-            </div>
-          </div>
-          <div style="color:var(--muted); font-size:.92rem;">
-            Practical identity and admin guidance.
-          </div>
-        </div>
-
-        <div>
-          <h4>Site</h4>
-          <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="index.html#services">Services</a></li>
-            <li><a href="blog.html">Blog</a></li>
-            <li><a href="index.html#contact">Contact</a></li>
-          </ul>
-        </div>
-
-        <div>
-          <h4>Topics</h4>
-          <ul>
-            <li><a href="blog.html">Entra ID</a></li>
-            <li><a href="blog.html">Exchange Online</a></li>
-            <li><a href="blog.html">Microsoft Defender</a></li>
-            <li><a href="blog.html">Outlook</a></li>
-          </ul>
-        </div>
-
-        <div>
-          <h4>Contact</h4>
-          <ul>
-            <li><a href="mailto:info@sentinelidentity.ca">info@sentinelidentity.ca</a></li>
-            <li>Worldwide remote consulting</li>
-            <li><a href="index.html#contact">Request an assessment</a></li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="footer-bottom">
-        <div>© 2026 Sentinel Identity. All rights reserved.</div>
-        <div>sentinelidentity.ca</div>
-      </div>
+  <footer class="footer">
+    <div class="container footer-row">
+      <div>© <span id="year"></span> Sentinel Identity</div>
+      <div>Entra IAM consulting · Worldwide remote</div>
     </div>
   </footer>
 
   <script>
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-    const mobilePanel = document.getElementById('mobilePanel');
-
-    if (mobileMenuBtn && mobilePanel) {
-      mobileMenuBtn.addEventListener('click', () => {
-        const isOpen = mobilePanel.style.display === 'block';
-        mobilePanel.style.display = isOpen ? 'none' : 'block';
-        mobileMenuBtn.setAttribute('aria-expanded', String(!isOpen));
-      });
-
-      mobilePanel.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', () => {
-          mobilePanel.style.display = 'none';
-          mobileMenuBtn.setAttribute('aria-expanded', 'false');
-        });
-      });
+    // Mobile nav
+    const mobileNavToggle = document.getElementById('mobileNavToggle');
+    const navLinks = document.getElementById('navLinks');
+    if (mobileNavToggle && navLinks) {
+      mobileNavToggle.addEventListener('click', () => navLinks.classList.toggle('show'));
     }
+
+    document.getElementById('year').textContent = new Date().getFullYear();
 
     // Topic-matched SVG banners (self-contained)
     const svgAADSTS = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
-        <defs>
-          <linearGradient id="g" x1="0" x2="1">
-            <stop offset="0" stop-color="#2563eb"/>
-            <stop offset="0.55" stop-color="#7c3aed"/>
-            <stop offset="1" stop-color="#06b6d4"/>
-          </linearGradient>
-        </defs>
+        <defs><linearGradient id="g" x1="0" x2="1">
+          <stop offset="0" stop-color="#2563eb"/><stop offset="0.55" stop-color="#7c3aed"/><stop offset="1" stop-color="#06b6d4"/>
+        </linearGradient></defs>
         <rect width="1200" height="675" fill="#0b1220"/>
         <circle cx="230" cy="150" r="260" fill="url(#g)" opacity="0.25"/>
         <circle cx="1080" cy="560" r="320" fill="url(#g)" opacity="0.18"/>
         <rect x="120" y="170" width="520" height="340" rx="24" fill="#0f1a2f" stroke="rgba(255,255,255,0.18)"/>
-        <rect x="120" y="170" width="520" height="60" rx="24" fill="#0f1a2f"/>
         <circle cx="165" cy="200" r="8" fill="#ff5f57"/><circle cx="195" cy="200" r="8" fill="#febc2e"/><circle cx="225" cy="200" r="8" fill="#28c840"/>
-        <rect x="170" y="270" width="360" height="44" rx="12" fill="rgba(255,255,255,0.08)"/>
-        <rect x="170" y="334" width="320" height="44" rx="12" fill="rgba(255,255,255,0.08)"/>
-        <rect x="170" y="408" width="220" height="44" rx="12" fill="url(#g)"/>
         <path d="M860 210c-96 0-174 78-174 174 0 116 98 214 174 240 76-26 174-124 174-240 0-96-78-174-174-174z" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.18)"/>
         <path d="M860 285l78 34v64c0 58-42 114-78 130-36-16-78-72-78-130v-64l78-34z" fill="url(#g)" opacity="0.9"/>
-        <text x="120" y="120" fill="rgba(255,255,255,0.85)" font-family="Segoe UI, Arial" font-size="34" font-weight="700">SAML SSO • Request Expired</text>
+        <text x="120" y="120" fill="rgba(255,255,255,0.85)" font-family="Segoe UI, Arial" font-size="34" font-weight="700">SAML SSO · Request Expired</text>
       </svg>
     `);
 
     const svgDefender = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
-        <defs>
-          <linearGradient id="g" x1="0" x2="1">
-            <stop offset="0" stop-color="#2563eb"/>
-            <stop offset="0.55" stop-color="#7c3aed"/>
-            <stop offset="1" stop-color="#06b6d4"/>
-          </linearGradient>
-        </defs>
+        <defs><linearGradient id="g" x1="0" x2="1">
+          <stop offset="0" stop-color="#2563eb"/><stop offset="0.55" stop-color="#7c3aed"/><stop offset="1" stop-color="#06b6d4"/>
+        </linearGradient></defs>
         <rect width="1200" height="675" fill="#0b1220"/>
         <circle cx="260" cy="520" r="300" fill="url(#g)" opacity="0.22"/>
         <circle cx="980" cy="160" r="260" fill="url(#g)" opacity="0.16"/>
@@ -700,118 +580,99 @@
         <path d="M220 270l290 170L800 270" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
         <path d="M880 240c-86 0-156 70-156 156 0 104 88 192 156 216 68-24 156-112 156-216 0-86-70-156-156-156z" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.18)"/>
         <path d="M880 305l70 30v58c0 52-38 102-70 116-32-14-70-64-70-116v-58l70-30z" fill="url(#g)" opacity="0.9"/>
-        <text x="180" y="140" fill="rgba(255,255,255,0.85)" font-family="Segoe UI, Arial" font-size="34" font-weight="700">Defender • Email Remediation</text>
+        <text x="180" y="140" fill="rgba(255,255,255,0.85)" font-family="Segoe UI, Arial" font-size="34" font-weight="700">Defender · Email Remediation</text>
       </svg>
     `);
 
     const svgSendPerm = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
-        <defs>
-          <linearGradient id="g" x1="0" x2="1">
-            <stop offset="0" stop-color="#2563eb"/>
-            <stop offset="0.55" stop-color="#7c3aed"/>
-            <stop offset="1" stop-color="#06b6d4"/>
-          </linearGradient>
-        </defs>
+        <defs><linearGradient id="g" x1="0" x2="1">
+          <stop offset="0" stop-color="#2563eb"/><stop offset="0.55" stop-color="#7c3aed"/><stop offset="1" stop-color="#06b6d4"/>
+        </linearGradient></defs>
         <rect width="1200" height="675" fill="#0b1220"/>
         <circle cx="230" cy="160" r="260" fill="url(#g)" opacity="0.2"/>
         <rect x="160" y="220" width="740" height="300" rx="24" fill="#0f1a2f" stroke="rgba(255,255,255,0.18)"/>
         <path d="M200 280h660v180H200z" fill="rgba(255,255,255,0.06)"/>
         <path d="M200 280l330 160 330-160" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
         <rect x="920" y="280" width="180" height="220" rx="22" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.18)"/>
-        <path d="M1010 330c-28 0-50 22-50 50v20h100v-20c0-28-22-50-50-50z" fill="rgba(255,255,255,0.18)"/>
         <rect x="965" y="400" width="90" height="70" rx="14" fill="url(#g)"/>
-        <text x="160" y="140" fill="rgba(255,255,255,0.85)" font-family="Segoe UI, Arial" font-size="34" font-weight="700">Outlook • Send Permission</text>
+        <text x="160" y="140" fill="rgba(255,255,255,0.85)" font-family="Segoe UI, Arial" font-size="34" font-weight="700">Outlook · Send Permission</text>
       </svg>
     `);
 
     const svgDLvsShared = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
-        <defs>
-          <linearGradient id="g" x1="0" x2="1">
-            <stop offset="0" stop-color="#2563eb"/>
-            <stop offset="0.55" stop-color="#7c3aed"/>
-            <stop offset="1" stop-color="#06b6d4"/>
-          </linearGradient>
-        </defs>
+        <defs><linearGradient id="g" x1="0" x2="1">
+          <stop offset="0" stop-color="#2563eb"/><stop offset="0.55" stop-color="#7c3aed"/><stop offset="1" stop-color="#06b6d4"/>
+        </linearGradient></defs>
         <rect width="1200" height="675" fill="#0b1220"/>
         <circle cx="1040" cy="520" r="320" fill="url(#g)" opacity="0.2"/>
         <rect x="140" y="210" width="520" height="320" rx="24" fill="#0f1a2f" stroke="rgba(255,255,255,0.18)"/>
-        <text x="170" y="260" fill="rgba(255,255,255,0.8)" font-family="Segoe UI, Arial" font-size="20" font-weight="700">Distribution List</text>
-        <circle cx="220" cy="330" r="34" fill="rgba(255,255,255,0.10)"/><circle cx="320" cy="330" r="34" fill="rgba(255,255,255,0.10)"/><circle cx="420" cy="330" r="34" fill="rgba(255,255,255,0.10)"/>
-        <rect x="190" y="380" width="300" height="14" rx="8" fill="rgba(255,255,255,0.12)"/>
         <rect x="720" y="210" width="340" height="320" rx="24" fill="#0f1a2f" stroke="rgba(255,255,255,0.18)"/>
-        <text x="750" y="260" fill="rgba(255,255,255,0.8)" font-family="Segoe UI, Arial" font-size="20" font-weight="700">Shared Mailbox</text>
-        <rect x="760" y="300" width="260" height="170" rx="18" fill="rgba(255,255,255,0.06)"/>
-        <path d="M780 332h220M780 370h200M780 408h180" stroke="rgba(255,255,255,0.25)" stroke-width="10" stroke-linecap="round"/>
-        <text x="140" y="140" fill="rgba(255,255,255,0.85)" font-family="Segoe UI, Arial" font-size="34" font-weight="700">Mail Objects • DL vs Shared</text>
+        <text x="170" y="260" fill="rgba(255,255,255,0.8)" font-family="Segoe UI, Arial" font-size="20" font-weight="700">Distribution list</text>
+        <text x="750" y="260" fill="rgba(255,255,255,0.8)" font-family="Segoe UI, Arial" font-size="20" font-weight="700">Shared mailbox</text>
+        <text x="140" y="140" fill="rgba(255,255,255,0.85)" font-family="Segoe UI, Arial" font-size="34" font-weight="700">DL vs Shared Mailbox</text>
       </svg>
     `);
 
     const svgSentItems = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
-        <defs>
-          <linearGradient id="g" x1="0" x2="1">
-            <stop offset="0" stop-color="#2563eb"/>
-            <stop offset="0.55" stop-color="#7c3aed"/>
-            <stop offset="1" stop-color="#06b6d4"/>
-          </linearGradient>
-        </defs>
+        <defs><linearGradient id="g" x1="0" x2="1">
+          <stop offset="0" stop-color="#2563eb"/><stop offset="0.55" stop-color="#7c3aed"/><stop offset="1" stop-color="#06b6d4"/>
+        </linearGradient></defs>
         <rect width="1200" height="675" fill="#0b1220"/>
         <circle cx="240" cy="520" r="300" fill="url(#g)" opacity="0.18"/>
         <rect x="160" y="220" width="720" height="300" rx="24" fill="#0f1a2f" stroke="rgba(255,255,255,0.18)"/>
-        <path d="M240 420l520-140-180 220-40-92z" fill="url(#g)" opacity="0.9"/>
         <rect x="920" y="240" width="220" height="260" rx="22" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.18)"/>
         <text x="950" y="290" fill="rgba(255,255,255,0.75)" font-family="Segoe UI, Arial" font-size="18" font-weight="700">Sent Items</text>
-        <path d="M950 330h160M950 368h160M950 406h130" stroke="rgba(255,255,255,0.25)" stroke-width="10" stroke-linecap="round"/>
-        <text x="160" y="140" fill="rgba(255,255,255,0.85)" font-family="Segoe UI, Arial" font-size="34" font-weight="700">Shared Mailbox • Sent Items</text>
+        <text x="160" y="140" fill="rgba(255,255,255,0.85)" font-family="Segoe UI, Arial" font-size="34" font-weight="700">Shared Mailbox · Sent Items</text>
       </svg>
     `);
 
     const posts = [
       {
-        title: "AADSTS76026: The request has expired. Try to submit new request.",
+        title: "AADSTS76026: The request has expired",
         slug: "aadsts76026-request-expired.html",
-        date: "2026-03-03",
-        tags: ["Entra ID", "SAML SSO"],
-        excerpt: "Why it happens in SAML, how to prove it in logs, and how Sign-on URL fixes IdP-initiated launches.",
+        date: "2026-03-07",
         minutes: 8,
+        tags: ["Entra ID", "SAML"],
+        excerpt: "Fix for SAML apps that fail from My Apps. Set the Sign-on URL so the app generates a fresh request, then verify in sign-in logs.",
         image: svgAADSTS
       },
       {
-        title: "How to recall a message using Microsoft Defender",
+        title: "Remove an email using Microsoft Defender",
         slug: "recall-message-microsoft-defender.html",
-        date: "2026-03-03",
-        tags: ["Microsoft Defender", "M365"],
-        excerpt: "A remediation workflow: locate, scope, execute removal, approve AIR actions, and validate outcomes.",
+        date: "2026-03-07",
         minutes: 9,
+        tags: ["Microsoft Defender", "Email"],
+        excerpt: "Use Explorer to scope the message, run a remediation action, review AIR approvals, and confirm the message is removed.",
         image: svgDefender
       },
       {
-        title: "You don’t have permission to send messages from this mailbox (Outlook app)",
+        title: "No permission to send from this mailbox (Outlook)",
         slug: "no-permission-send-from-mailbox-outlook.html",
-        date: "2026-03-03",
-        tags: ["Exchange Online", "Outlook"],
-        excerpt: "A permission model breakdown: Full Access vs Send As vs Send on Behalf, plus client caching behavior.",
+        date: "2026-03-07",
         minutes: 10,
+        tags: ["Exchange Online", "Outlook"],
+        excerpt: "Most cases are missing Send As/Send on Behalf, or Outlook using cached permission state. Validate in PowerShell and test in OWA first.",
         image: svgSendPerm
       },
       {
-        title: "Key differences between Distribution List and Shared Mailbox",
+        title: "Distribution list vs shared mailbox",
         slug: "distribution-list-vs-shared-mailbox.html",
-        date: "2026-03-03",
-        tags: ["Exchange Online", "Mail Flow"],
-        excerpt: "An architecture decision: message routing vs shared workflow, governance implications, and operational pitfalls.",
+        date: "2026-03-07",
         minutes: 10,
+        tags: ["Exchange Online", "Mail objects"],
+        excerpt: "Choose based on workflow. DL delivers copies to people. Shared mailbox creates a shared queue with shared history and delegation.",
         image: svgDLvsShared
       },
       {
-        title: "Shared mailbox sent mail appears in personal Sent Items",
+        title: "Shared mailbox sent mail in personal Sent Items",
         slug: "shared-mailbox-sent-items-personal.html",
-        date: "2026-03-03",
-        tags: ["Exchange Online", "Outlook"],
-        excerpt: "Why Sent Items diverges with delegation and how to enforce mailbox-side message copy controls reliably.",
+        date: "2026-03-07",
         minutes: 8,
+        tags: ["Exchange Online", "Shared mailbox"],
+        excerpt: "Enable mailbox copy settings so a sent copy is saved in the shared mailbox Sent Items folder for delegated sends.",
         image: svgSentItems
       }
     ];
@@ -823,25 +684,6 @@
     const chips = Array.from(document.querySelectorAll(".chip"));
     let activeTag = "All";
 
-    function setActiveChip(tag) {
-      activeTag = tag;
-      chips.forEach(c => c.classList.toggle("active", c.dataset.filterTag === tag));
-      render();
-    }
-
-    chips.forEach(chip => chip.addEventListener("click", () => setActiveChip(chip.dataset.filterTag)));
-    if (searchInput) searchInput.addEventListener("input", () => render());
-
-    function matchesFilter(post, q) {
-      const query = (q || "").trim().toLowerCase();
-      const text = `${post.title} ${post.excerpt} ${(post.tags || []).join(" ")}`.toLowerCase();
-      const tagOk =
-        activeTag === "All" ||
-        (post.tags || []).some(t => t.toLowerCase() === activeTag.toLowerCase());
-      const searchOk = !query || text.includes(query);
-      return tagOk && searchOk;
-    }
-
     function escapeHtml(str) {
       return String(str || "")
         .replaceAll("&", "&amp;")
@@ -851,22 +693,41 @@
         .replaceAll("'", "&#039;");
     }
 
-    function postHtml(p) {
-      const tagsHtml = (p.tags || []).slice(0, 3).map(t => `<span>${escapeHtml(t)}</span>`).join("");
+    function setActiveChip(tag) {
+      activeTag = tag;
+      chips.forEach(c => c.classList.toggle("active", c.dataset.filterTag === tag));
+      render();
+    }
+
+    chips.forEach(chip => chip.addEventListener("click", () => setActiveChip(chip.dataset.filterTag)));
+    if (searchInput) searchInput.addEventListener("input", () => render());
+
+    function matches(post, q) {
+      const query = (q || "").trim().toLowerCase();
+      const hay = `${post.title} ${post.excerpt} ${(post.tags || []).join(" ")}`.toLowerCase();
+
+      const tagOk = activeTag === "All" || (post.tags || []).some(t => t.toLowerCase() === activeTag.toLowerCase());
+      const searchOk = !query || hay.includes(query);
+
+      return tagOk && searchOk;
+    }
+
+    function postCard(p) {
+      const tags = (p.tags || []).slice(0, 2).map(t => `<span class="pill">${escapeHtml(t)}</span>`).join("");
       return `
         <a class="post" href="blog/${escapeHtml(p.slug)}" aria-label="Read post: ${escapeHtml(p.title)}">
           <div class="post-img">
             <img src="${p.image}" alt="" />
           </div>
           <div class="post-body">
-            <div class="meta">
-              <span>${escapeHtml(p.date)}</span>
-              <span>${escapeHtml(p.minutes)} min</span>
-              ${tagsHtml}
+            <div class="post-meta">
+              <span class="pill">${escapeHtml(p.date)}</span>
+              <span class="pill">${escapeHtml(p.minutes)} min</span>
+              ${tags}
             </div>
-            <h3>${escapeHtml(p.title)}</h3>
-            <p>${escapeHtml(p.excerpt)}</p>
-            <span class="read">Read post →</span>
+            <h3 class="post-title">${escapeHtml(p.title)}</h3>
+            <p class="post-excerpt">${escapeHtml(p.excerpt)}</p>
+            <div class="read"><span>Read</span> →</div>
           </div>
         </a>
       `;
@@ -874,12 +735,12 @@
 
     function render() {
       const q = searchInput ? searchInput.value : "";
-      const filtered = posts.filter(p => matchesFilter(p, q));
+      const filtered = posts.filter(p => matches(p, q));
       if (!filtered.length) {
         feed.innerHTML = `<div class="empty">No posts found. Try a different keyword or click “All”.</div>`;
         return;
       }
-      feed.innerHTML = filtered.map(postHtml).join("");
+      feed.innerHTML = filtered.map(postCard).join("");
     }
 
     render();
