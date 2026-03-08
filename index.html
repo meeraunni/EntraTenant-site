@@ -3,259 +3,686 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sent mail from a shared mailbox appears in personal Sent Items | Sentinel Identity</title>
-  <meta name="description" content="Engineer-level explanation and fix: why delegated sends from a shared mailbox land in the sender’s Sent Items and how to enable shared mailbox sent copy settings deterministically." />
-  <meta name="theme-color" content="#ffffff" />
+  <title>Sentinel Identity | Entra Identity & Access Management Consulting</title>
+  <meta name="description" content="Premium Entra Identity & Access Management consulting. Conditional Access baseline, MFA hardening, privileged access, and enterprise app governance." />
+  <meta name="theme-color" content="#071126" />
 
   <style>
     :root{
-      --bg:#ffffff;
-      --bg2:#f6f8fb;
-      --text:#0f172a;
-      --muted:#475569;
-      --muted2:#64748b;
-      --border:rgba(15,23,42,.10);
-      --panel:#ffffff;
-      --shadow:0 10px 26px rgba(15,23,42,.08);
-      --blue:#2563eb;
-      --cyan:#0891b2;
-      --violet:#7c3aed;
+      --bg:#071126;
+      --bg2:#0c1834;
+
+      --panel:rgba(255,255,255,.06);
+      --panel2:rgba(255,255,255,.04);
+      --border:rgba(255,255,255,.12);
+
+      --text:#e8efff;
+      --muted:#b8c5ea;
+      --muted2:#93a6d6;
+
+      --blue:#3b82f6;
+      --cyan:#22d3ee;
+      --violet:#8b5cf6;
+
+      --shadow:0 22px 70px rgba(0,0,0,.38);
+      --radius:22px;
       --max:1180px;
-      --radius:16px;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
     }
+
     *{box-sizing:border-box}
     html,body{margin:0;padding:0}
     body{
-      font-family:"Segoe UI", Inter, system-ui, -apple-system, Roboto, Arial, sans-serif;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       color:var(--text);
-      background: linear-gradient(180deg, var(--bg), var(--bg2));
-      line-height:1.7;
+      background:
+        radial-gradient(900px 520px at 8% -10%, rgba(59,130,246,.35), transparent 60%),
+        radial-gradient(780px 440px at 95% 8%, rgba(139,92,246,.26), transparent 60%),
+        radial-gradient(520px 320px at 80% 70%, rgba(34,211,238,.14), transparent 60%),
+        linear-gradient(180deg, var(--bg), var(--bg2));
+      line-height:1.6;
     }
-    a{color:var(--blue);text-decoration:none}
-    a:hover{text-decoration:underline}
+
+    a{color:inherit;text-decoration:none}
+    a:hover{opacity:1}
+    img{max-width:100%;display:block}
+
     .container{width:min(var(--max), calc(100% - 32px)); margin:0 auto;}
 
-    header{
+    /* Header */
+    .header{
       position:sticky; top:0; z-index:50;
-      backdrop-filter: blur(8px);
-      background: rgba(255,255,255,.86);
-      border-bottom:1px solid var(--border);
+      backdrop-filter: blur(12px);
+      background: rgba(7,17,38,.78);
+      border-bottom: 1px solid rgba(255,255,255,.08);
     }
-    .nav{min-height:64px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-    .brand{display:flex;align-items:center;gap:10px;min-width:0}
-    .logo{
-      width:34px;height:34px;border-radius:10px;
-      background: radial-gradient(circle at 30% 30%, #93c5fd, #2563eb 60%, #1d4ed8 90%);
-      border:1px solid var(--border);
-      box-shadow: 0 10px 20px rgba(37,99,235,.18);
-      flex:0 0 auto;
+
+    .nav{
+      min-height:78px;
+      display:flex; align-items:center; justify-content:space-between; gap:14px;
     }
-    .brand strong{font-weight:800;white-space:nowrap}
-    .brand span{color:var(--muted2);font-size:.86rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px}
-    .navlinks{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
-    .navlinks a{color:var(--text);font-weight:700;padding:8px 10px;border-radius:10px}
-    .navlinks a:hover{background:rgba(15,23,42,.04);text-decoration:none}
+
+    .brand{display:flex;align-items:center;gap:12px;min-width:0}
+    .badge{
+      width:38px;height:38px;border-radius:12px;flex:0 0 auto;
+      background: radial-gradient(circle at 30% 30%, #7dd3fc, #3b82f6 45%, #1d4ed8 70%, #1e1b4b);
+      box-shadow:0 10px 28px rgba(59,130,246,.45);
+      border:1px solid rgba(255,255,255,.22);
+    }
+    .brand-text{display:flex;flex-direction:column;min-width:0}
+    .brand-text strong{font-weight:900;letter-spacing:.01em;font-size:1.06rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .brand-text span{color:var(--muted);font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px}
+
+    .links{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:flex-end}
+    .links a{
+      color:#d9e5ff; font-weight:800; opacity:.92;
+      padding:10px 10px; border-radius:12px;
+    }
+    .links a:hover{background:rgba(255,255,255,.05); opacity:1}
+
     .btn{
-      display:inline-flex;align-items:center;justify-content:center;
-      padding:10px 14px;border-radius:12px;font-weight:800;
-      border:1px solid var(--border); background:#fff; color:var(--text);
+      display:inline-flex; align-items:center; justify-content:center; gap:10px;
+      border:none; cursor:pointer; border-radius:14px;
+      padding:12px 18px; font-weight:900; white-space:nowrap;
+      transition:transform .15s ease, box-shadow .15s ease;
     }
-    .btn.primary{
-      border:none;color:#fff;
-      background: linear-gradient(90deg, var(--violet), var(--blue), var(--cyan));
+    .btn:hover{transform:translateY(-1px)}
+    .btn-primary{
+      color:#fff;
+      background:linear-gradient(90deg, var(--violet), var(--blue), var(--cyan));
+      box-shadow: 0 12px 34px rgba(59,130,246,.35);
     }
-
-    .titlebar{padding:22px 0 10px}
-    .kicker{
-      display:inline-flex;align-items:center;gap:8px;
-      font-weight:800;font-size:.85rem;color:var(--muted);
-      padding:6px 10px;border-radius:999px;
-      border:1px solid rgba(37,99,235,.18);
-      background: rgba(37,99,235,.06);
-    }
-    .dot{width:8px;height:8px;border-radius:999px;background:var(--blue)}
-    h1{margin:12px 0 8px;font-size:clamp(1.9rem, 2.9vw, 2.6rem);line-height:1.15;letter-spacing:-.02em}
-    .subtitle{margin:0;color:var(--muted);max-width:92ch}
-    .meta{margin-top:10px;display:flex;flex-wrap:wrap;gap:8px}
-    .pill{
-      font-size:.84rem;font-weight:700;color:var(--muted);
-      border:1px solid var(--border); background:rgba(15,23,42,.03);
-      padding:6px 10px;border-radius:999px;
+    .btn-ghost{
+      color:#dfe9ff;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.14);
     }
 
-    main{padding:14px 0 56px}
-    .layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start}
-    .panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
-    article{padding:18px 18px 6px}
-    article h2{margin:22px 0 8px;font-size:1.35rem;letter-spacing:-.01em}
-    article h3{margin:16px 0 6px;font-size:1.05rem}
-    article p{margin:0 0 12px;color:var(--muted)}
-    article ul{margin:0 0 12px 18px;color:var(--muted)}
-    article li{margin:6px 0}
+    .mobile-btn{
+      display:none;
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.12);
+      color:#ecf4ff;
+      border-radius:12px;
+      padding:10px 12px;
+      font-weight:900;
+      cursor:pointer;
+    }
+    .mobile-panel{
+      display:none;
+      padding:10px 0 14px;
+      border-top:1px solid rgba(255,255,255,.08);
+    }
+    .mobile-panel a{display:block;padding:12px 10px;border-radius:12px;font-weight:800;color:#dce8ff}
+    .mobile-panel a:hover{background:rgba(255,255,255,.05)}
+    .mobile-panel .btn{width:100%;margin-top:10px}
 
-    .callout{
-      margin:14px 0;padding:12px;border-radius:14px;
-      border:1px solid rgba(8,145,178,.20);
-      background: rgba(8,145,178,.06);
+    /* Hero */
+    .hero{padding:34px 0 18px}
+    .hero-card{
+      border-radius:28px;
+      border:1px solid rgba(255,255,255,.12);
+      background:
+        linear-gradient(135deg, rgba(17,24,39,.82), rgba(9,14,29,.92)),
+        radial-gradient(circle at 18% 18%, rgba(59,130,246,.20), transparent 55%);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .hero-inner{
+      padding:24px;
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:18px;
+      align-items:stretch;
+    }
+    .eyebrow{
+      display:inline-flex; align-items:center; gap:8px;
+      color:#dbeafe;
+      background:rgba(59,130,246,.12);
+      border:1px solid rgba(59,130,246,.26);
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:.85rem;
+      font-weight:900;
+      margin-bottom:14px;
+      letter-spacing:.02em;
+      width:fit-content;
+    }
+    .dot{width:8px;height:8px;border-radius:999px;background:#60a5fa;box-shadow:0 0 16px rgba(96,165,250,.8)}
+
+    h1{
+      margin:0 0 10px;
+      font-size:clamp(2rem, 3.1vw, 2.85rem);
+      letter-spacing:-.03em;
+      line-height:1.08;
+    }
+    .sub{
+      margin:0 0 16px;
+      color:var(--muted);
+      max-width:74ch;
+      font-size:1.03rem;
+    }
+
+    .hero-actions{display:flex;gap:10px;flex-wrap:wrap}
+
+    .hero-visual{
+      border-left:1px solid rgba(255,255,255,.10);
+      padding-left:18px;
+      display:grid;
+      align-content:start;
+      gap:12px;
+    }
+
+    .visual-card{
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.12);
+      background:#0b1328;
+      overflow:hidden;
+      min-height:240px;
+      position:relative;
+      box-shadow: 0 18px 46px rgba(0,0,0,.35);
+    }
+    .visual-card img{width:100%;height:100%;object-fit:cover;opacity:.96}
+    .visual-card::after{
+      content:"";
+      position:absolute; inset:0;
+      background:
+        linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+      background-size: 26px 26px;
+      opacity:.14;
+      pointer-events:none;
+    }
+
+    .mini-metrics{display:grid;gap:10px}
+    .metric{
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:18px;
+      padding:12px;
+    }
+    .metric strong{display:block;font-size:.95rem}
+    .metric span{display:block;color:var(--muted);font-size:.9rem;margin-top:4px}
+
+    /* Sections */
+    section{padding:22px 0}
+    .section-head{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:12px;
+    }
+    .section-head h2{
+      margin:0;
+      font-size:1.45rem;
+      letter-spacing:-.02em;
+      line-height:1.15;
+    }
+    .section-head p{margin:0;color:var(--muted);max-width:78ch}
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap:14px;
+    }
+
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.04));
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:22px;
+      box-shadow: var(--shadow);
+      padding:16px;
+      transition:transform .15s ease, border-color .15s ease;
+    }
+    .card:hover{transform:translateY(-2px); border-color: rgba(34,211,238,.26);}
+    .icon{
+      width:44px;height:44px;border-radius:14px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.04);
+      display:grid;place-items:center;
+      margin-bottom:10px;
+    }
+    .card h3{margin:0 0 8px;font-size:1.05rem;letter-spacing:-.01em}
+    .card p{margin:0;color:var(--muted);font-size:.95rem;line-height:1.5}
+
+    .two-col{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:14px;
+    }
+
+    /* Contact */
+    .form-wrap{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:14px;
+      align-items:start;
+    }
+    .panel{
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.04));
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:22px;
+      box-shadow: var(--shadow);
+      padding:16px;
+    }
+    form{display:grid;gap:10px}
+    label{font-weight:900;color:#dbe8ff;font-size:.9rem}
+    input, textarea, select{
+      width:100%;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.04);
       color:var(--text);
+      outline:none;
+      font-size:.95rem;
     }
-    .callout strong{display:block;margin-bottom:6px}
+    textarea{min-height:130px;resize:vertical}
+    input::placeholder, textarea::placeholder{color:rgba(184,197,234,.9)}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 
-    pre{
-      margin:12px 0;padding:12px;border-radius:14px;border:1px solid rgba(15,23,42,.12);
-      background:#0b1220;color:#e8efff;overflow:auto;font-family:var(--mono);font-size:.92rem;line-height:1.55;
+    .status{
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.04);
+      padding:12px;
+      color:var(--muted);
+      font-size:.93rem;
+      display:none;
     }
-    .inline{
-      font-family:var(--mono);
-      background:rgba(15,23,42,.06);
-      border:1px solid rgba(15,23,42,.10);
-      padding:2px 6px;border-radius:8px;
-      color:#0f172a;
+    .status.ok{border-color:rgba(34,211,238,.25); background:rgba(34,211,238,.08); color:#dffbff;}
+    .status.err{border-color:rgba(239,68,68,.25); background:rgba(239,68,68,.08); color:#ffe4e4;}
+    .muted{color:var(--muted);font-size:.92rem}
+
+    /* Footer */
+    .footer{
+      border-top:1px solid rgba(255,255,255,.08);
+      padding:20px 0 34px;
+      color:var(--muted);
+      margin-top:10px;
+    }
+    .footer-row{
+      display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;
       font-size:.92rem;
     }
 
-    aside{position:sticky;top:86px;display:grid;gap:12px}
-    .side{padding:14px}
-    .side h4{margin:0 0 10px;font-size:1rem}
-    .toc{display:grid;gap:8px}
-    .toc a{
-      display:block;padding:10px 10px;border-radius:12px;
-      border:1px solid rgba(15,23,42,.08);
-      background: rgba(15,23,42,.03);
-      color:var(--text);font-weight:700;font-size:.92rem;text-decoration:none;
-    }
-    .toc a:hover{background:rgba(37,99,235,.06);border-color:rgba(37,99,235,.18)}
-    .cta{width:100%;text-align:center}
-
-    footer{border-top:1px solid var(--border);padding:18px 0 30px;color:var(--muted2);background:#fff}
-    .foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;font-size:.92rem}
-
     @media (max-width: 980px){
-      .layout{grid-template-columns:1fr}
-      aside{position:static}
+      .hero-inner{grid-template-columns:1fr}
+      .hero-visual{border-left:none;padding-left:0;border-top:1px solid rgba(255,255,255,.10);padding-top:14px}
+      .grid{grid-template-columns:1fr}
+      .two-col{grid-template-columns:1fr}
+      .form-wrap{grid-template-columns:1fr}
+    }
+    @media (max-width: 780px){
+      .links{display:none}
+      .mobile-btn{display:inline-flex}
+      .hero-inner{padding:18px}
+      .form-row{grid-template-columns:1fr}
     }
   </style>
 </head>
 
 <body>
-  <header>
-    <div class="container nav">
-      <a class="brand" href="../index.html">
-        <div class="logo" aria-hidden="true"></div>
-        <div style="min-width:0">
-          <strong>Sentinel Identity</strong><br />
-          <span>Entra Identity & Access Management consulting</span>
-        </div>
-      </a>
-      <nav class="navlinks">
-        <a href="../index.html#services">Services</a>
-        <a href="../blog.html">Blog</a>
-        <a class="btn primary" href="../index.html#contact">Request an Assessment</a>
-      </nav>
+  <header class="header">
+    <div class="container">
+      <div class="nav">
+        <a class="brand" href="#top" aria-label="Sentinel Identity home">
+          <div class="badge" aria-hidden="true"></div>
+          <div class="brand-text">
+            <strong>Sentinel Identity</strong>
+            <span>Entra Identity & Access Management consulting</span>
+          </div>
+        </a>
+
+        <nav class="links" aria-label="Primary navigation">
+          <a href="#services">Services</a>
+          <a href="#approach">Approach</a>
+          <a href="#coverage">Coverage</a>
+          <a href="blog.html">Blog</a>
+          <a href="#contact">Assessment</a>
+        </nav>
+
+        <a class="btn btn-primary" href="#contact">Request an Assessment</a>
+        <button class="mobile-btn" id="mobileBtn" aria-label="Open menu" aria-expanded="false">Menu</button>
+      </div>
+
+      <div class="mobile-panel" id="mobilePanel" aria-label="Mobile menu">
+        <a href="#services">Services</a>
+        <a href="#approach">Approach</a>
+        <a href="#coverage">Coverage</a>
+        <a href="blog.html">Blog</a>
+        <a href="#contact">Assessment</a>
+        <a class="btn btn-primary" href="#contact">Request an Assessment</a>
+      </div>
     </div>
   </header>
 
-  <div class="container titlebar">
-    <div class="kicker"><span class="dot"></span>Exchange Online · Shared mailbox operations</div>
-    <h1>Sent mail from a shared mailbox appears in personal Sent Items</h1>
-    <p class="subtitle">
-      Delegated sends often store the sent copy in the sender’s mailbox by default. If you need continuity and shared visibility,
-      enable the shared mailbox sent copy settings deterministically and verify behavior per send model.
-    </p>
-    <div class="meta">
-      <span class="pill">Updated: 2026-03-07</span>
-      <span class="pill">Applies to: Shared mailbox delegated send</span>
-      <span class="pill">Scope: Exchange Online</span>
-    </div>
-  </div>
+  <main id="top">
+    <section class="hero">
+      <div class="container">
+        <div class="hero-card">
+          <div class="hero-inner">
+            <div>
+              <div class="eyebrow"><span class="dot"></span><span>ENTRA IAM · CONDITIONAL ACCESS · SSO</span></div>
 
-  <main>
-    <div class="container layout">
-      <article class="panel">
-        <div class="callout">
-          <strong>Operational impact</strong>
-          If sent items are stored only in personal mailboxes, shared mailbox continuity breaks: the team cannot see what was sent, when, or by whom,
-          and troubleshooting becomes guesswork.
+              <!-- Short title as requested -->
+              <h1>Entra IAM, engineered.</h1>
+
+              <p class="sub">
+                Baselines and operating models for Conditional Access, MFA methods, privileged access, and enterprise apps.
+                Controlled rollout. Verifiable outcomes.
+              </p>
+
+              <div class="hero-actions">
+                <a class="btn btn-primary" href="#contact">Request an Assessment</a>
+                <a class="btn btn-ghost" href="#services">View services</a>
+              </div>
+            </div>
+
+            <aside class="hero-visual">
+              <div class="visual-card" aria-label="Identity security visual">
+                <img alt=""
+                  src="data:image/svg+xml;charset=UTF-8,<?xml version='1.0'?><svg xmlns='http://www.w3.org/2000/svg' width='1200' height='700' viewBox='0 0 1200 700'><defs><linearGradient id='g' x1='0' x2='1'><stop offset='0' stop-color='%238b5cf6'/><stop offset='0.55' stop-color='%233b82f6'/><stop offset='1' stop-color='%2322d3ee'/></linearGradient></defs><rect width='1200' height='700' fill='%230b1220'/><circle cx='260' cy='170' r='280' fill='url(%23g)' opacity='0.22'/><circle cx='1040' cy='560' r='340' fill='url(%23g)' opacity='0.16'/><path d='M820 170c-130 0-235 105-235 235 0 160 125 292 235 325 110-33 235-165 235-325 0-130-105-235-235-235z' fill='rgba(255,255,255,0.08)' stroke='rgba(255,255,255,0.18)'/><path d='M820 270l106 46v90c0 82-56 162-106 184-50-22-106-102-106-184v-90l106-46z' fill='url(%23g)' opacity='0.92'/><rect x='120' y='290' width='420' height='240' rx='22' fill='rgba(255,255,255,0.06)' stroke='rgba(255,255,255,0.16)'/><path d='M150 340h360M150 382h300M150 424h320M150 466h260' stroke='rgba(255,255,255,0.22)' stroke-width='10' stroke-linecap='round'/><text x='120' y='220' fill='rgba(255,255,255,0.88)' font-family='Segoe UI, Arial' font-size='34' font-weight='700'>Identity baseline · Risk reduction</text></svg>" />
+              </div>
+
+              <div class="mini-metrics">
+                <div class="metric">
+                  <strong>Baseline first</strong>
+                  <span>Pilot. Measure. Expand.</span>
+                </div>
+                <div class="metric">
+                  <strong>Method hardening</strong>
+                  <span>Less drift. Fewer lockouts.</span>
+                </div>
+              </div>
+            </aside>
+          </div>
         </div>
+      </div>
+    </section>
 
-        <h2 id="why">Why this happens</h2>
-        <p>
-          When a user sends as/on behalf of a shared mailbox, the message originates from a delegated context. Depending on the client and the permission model,
-          Exchange Online can store the sent copy in the sender’s mailbox by default. This is not a bug; it is default behavior unless configured otherwise.
-        </p>
-
-        <h2 id="models">Understand the send model</h2>
-        <ul>
-          <li><strong>Send As</strong>: message appears from the shared mailbox identity.</li>
-          <li><strong>Send on Behalf</strong>: message appears as “User on behalf of Mailbox”.</li>
-        </ul>
-        <p>
-          You should enable sent item copy settings for both models if your operations require shared visibility.
-        </p>
-
-        <h2 id="fix">Deterministic fix</h2>
-        <p>
-          Enable these mailbox properties on the shared mailbox:
-        </p>
-        <pre># Connect-ExchangeOnline
-
-$SharedMailbox = "shared@domain.com"
-
-Set-Mailbox -Identity $SharedMailbox `
-  -MessageCopyForSentAsEnabled $true `
-  -MessageCopyForSendOnBehalfEnabled $true</pre>
-
-        <h2 id="verify">Verification</h2>
-        <ol>
-          <li>Send a test message using <strong>Send As</strong> from the shared mailbox.</li>
-          <li>Send a test message using <strong>Send on Behalf</strong> (if used in your org).</li>
-          <li>Confirm a copy appears in the <strong>shared mailbox Sent Items</strong> folder.</li>
-        </ol>
-
-        <h2 id="still">If it still does not behave as expected</h2>
-        <ul>
-          <li>Confirm the send model used matches the setting you enabled (Send As vs Send on Behalf).</li>
-          <li>Test in Outlook on the web to reduce client-side variability.</li>
-          <li>Confirm the user is actually sending with the shared mailbox identity, not their own address.</li>
-          <li>Check whether additional mailbox-level policies or add-ins are altering send behavior.</li>
-        </ul>
-
-        <h2 id="references">References</h2>
-        <ul>
-          <li><a href="https://learn.microsoft.com/en-us/exchange/collaboration-exo/shared-mailboxes" target="_blank" rel="noopener">Shared mailboxes in Exchange Online</a></li>
-        </ul>
-
-        <div style="padding:12px 18px 18px; border-top:1px solid var(--border); margin-top:10px;">
-          <a class="btn" href="../blog.html">Back to Blog</a>
-        </div>
-      </article>
-
-      <aside>
-        <div class="panel side">
-          <h4>In this article</h4>
-          <div class="toc">
-            <a href="#why">Why this happens</a>
-            <a href="#models">Send model</a>
-            <a href="#fix">Fix</a>
-            <a href="#verify">Verify</a>
-            <a href="#still">If it still does not work</a>
-            <a href="#references">References</a>
+    <section id="services">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>Services</h2>
+            <p>Focused Entra Identity & Access Management workstreams.</p>
           </div>
         </div>
 
-        <a class="btn primary cta" href="../index.html#contact">Request an Assessment</a>
-      </aside>
-    </div>
+        <div class="grid">
+          <div class="card">
+            <div class="icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 3l7 3v6c0 4.4-2.8 7.9-7 9-4.2-1.1-7-4.6-7-9V6l7-3z"></path>
+                <path d="M9 12l2 2 4-4"></path>
+              </svg>
+            </div>
+            <h3>Conditional Access baseline</h3>
+            <p>Minimum effective controls, staged rollout, and support-ready documentation.</p>
+          </div>
+
+          <div class="card">
+            <div class="icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2l4 4-4 4-4-4 4-4z"></path>
+                <path d="M20 12l-4 4-4-4 4-4 4 4z"></path>
+                <path d="M12 22l-4-4 4-4 4 4-4 4z"></path>
+                <path d="M4 12l4-4 4 4-4 4-4-4z"></path>
+              </svg>
+            </div>
+            <h3>MFA & methods</h3>
+            <p>Standardize methods, clean up unusable registrations, reduce lockout noise.</p>
+          </div>
+
+          <div class="card">
+            <div class="icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 11V7a4 4 0 10-8 0v4"></path>
+                <rect x="6" y="11" width="12" height="10" rx="2"></rect>
+              </svg>
+            </div>
+            <h3>Privileged access</h3>
+            <p>Role design, least privilege, access reviews, clear admin accountability.</p>
+          </div>
+
+          <div class="card">
+            <div class="icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a4 4 0 01-4 4H7a4 4 0 010-8 5 5 0 019.6-1.2A4 4 0 0121 15z"></path>
+              </svg>
+            </div>
+            <h3>SSO & enterprise apps</h3>
+            <p>Consistent SAML/OIDC config, safe defaults, ownership, inventory hygiene.</p>
+          </div>
+
+          <div class="card">
+            <div class="icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 3v18h18"></path>
+                <path d="M7 14l4-4 3 3 5-6"></path>
+              </svg>
+            </div>
+            <h3>Monitoring</h3>
+            <p>Operational signals from sign-in logs. Triage patterns and response steps.</p>
+          </div>
+
+          <div class="card">
+            <div class="icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 4h16v12H4z"></path>
+                <path d="M22 20H2"></path>
+                <path d="M7 8h10"></path>
+                <path d="M7 12h6"></path>
+              </svg>
+            </div>
+            <h3>Messaging patterns</h3>
+            <p>Shared mailbox governance, send permissions, remediation workflows.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="approach">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>Approach</h2>
+            <p>Prove current state. Implement safely. Verify outcomes.</p>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="panel">
+            <h3 style="margin:0 0 8px;">Assessment</h3>
+            <p class="muted" style="margin:0;">Scope, risks, and the smallest change that improves security without breaking ops.</p>
+          </div>
+          <div class="panel">
+            <h3 style="margin:0 0 8px;">Delivery</h3>
+            <p class="muted" style="margin:0;">Pilot-first rollout, monitoring, rollback notes, and handover documentation.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="coverage">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>Coverage</h2>
+            <p>Remote consulting, worldwide.</p>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="panel">
+            <h3 style="margin:0 0 8px;">Good fit</h3>
+            <p class="muted" style="margin:0;">SMBs and mid-sized orgs with M365, hybrid identity, or growing enterprise app footprints.</p>
+          </div>
+          <div class="panel">
+            <h3 style="margin:0 0 8px;">What to include</h3>
+            <p class="muted" style="margin:0;">Symptom, impact, affected users/apps, timestamps, error codes.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>Assessment</h2>
+            <p>Short form. Direct details.</p>
+          </div>
+        </div>
+
+        <div class="form-wrap">
+          <div class="panel">
+            <div id="formStatus" class="status" role="status" aria-live="polite"></div>
+
+            <form id="assessmentForm" autocomplete="on">
+              <input type="text" name="company_site" tabindex="-1" autocomplete="off"
+                     style="position:absolute;left:-9999px;top:-9999px" aria-hidden="true" />
+
+              <div class="form-row">
+                <div>
+                  <label for="name">Name</label>
+                  <input id="name" name="name" type="text" placeholder="Your name" required />
+                </div>
+                <div>
+                  <label for="email">Email</label>
+                  <input id="email" name="email" type="email" placeholder="you@company.com" required />
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div>
+                  <label for="org">Organization</label>
+                  <input id="org" name="org" type="text" placeholder="Company or team name" />
+                </div>
+                <div>
+                  <label for="topic">Primary area</label>
+                  <select id="topic" name="topic" required>
+                    <option value="Entra IAM">Entra IAM</option>
+                    <option value="Conditional Access">Conditional Access</option>
+                    <option value="MFA / Auth Methods">MFA / Auth Methods</option>
+                    <option value="Admin Roles / Privileged Access">Admin roles / Privileged access</option>
+                    <option value="SSO / Enterprise Apps">SSO / Enterprise apps</option>
+                    <option value="Exchange / Messaging">Exchange / Messaging</option>
+                    <option value="Defender for Office 365">Defender for Office 365</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label for="message">Issue summary</label>
+                <textarea id="message" name="message" placeholder="What broke, who it affects, when it started. Include error codes." required></textarea>
+              </div>
+
+              <button class="btn btn-primary" type="submit" id="submitBtn">Send</button>
+              <div class="muted">Or email: info@sentinelidentity.ca</div>
+            </form>
+          </div>
+
+          <div class="panel">
+            <h3 style="margin:0 0 8px;">What you get</h3>
+            <p class="muted" style="margin:0 0 12px;">A response with a first action and what to verify in logs.</p>
+            <a class="btn btn-ghost" href="blog.html" style="width:100%;">Read the blog</a>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 
-  <footer>
-    <div class="container foot">
+  <footer class="footer">
+    <div class="container footer-row">
       <div>© <span id="year"></span> Sentinel Identity</div>
       <div>Entra IAM consulting · Worldwide remote</div>
     </div>
   </footer>
 
-  <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Mobile menu
+    const mobileBtn = document.getElementById('mobileBtn');
+    const mobilePanel = document.getElementById('mobilePanel');
+    if (mobileBtn && mobilePanel) {
+      mobileBtn.addEventListener('click', () => {
+        const open = mobilePanel.style.display === 'block';
+        mobilePanel.style.display = open ? 'none' : 'block';
+        mobileBtn.setAttribute('aria-expanded', String(!open));
+      });
+      mobilePanel.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+        mobilePanel.style.display = 'none';
+        mobileBtn.setAttribute('aria-expanded', 'false');
+      }));
+    }
+
+    // Form submit -> /api/contact (functions/api/contact.js)
+    const form = document.getElementById('assessmentForm');
+    const statusEl = document.getElementById('formStatus');
+    const submitBtn = document.getElementById('submitBtn');
+
+    function showStatus(type, msg){
+      statusEl.className = 'status ' + (type || '');
+      statusEl.textContent = msg;
+      statusEl.style.display = 'block';
+    }
+
+    if (form) {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const fd = new FormData(form);
+        const payload = Object.fromEntries(fd.entries());
+
+        // honeypot
+        if (payload.company_site && String(payload.company_site).trim() !== "") {
+          showStatus('ok', 'Sent.');
+          form.reset();
+          return;
+        }
+
+        showStatus('', 'Sending…');
+        submitBtn.disabled = true;
+
+        try {
+          // Map fields to what your API expects
+          const res = await fetch("/api/contact", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: payload.name,
+              email: payload.email,
+              company: payload.org || "",
+              userCount: payload.userCount || "",
+              primaryFocus: payload.topic || "",
+              problemSummary: payload.message || "",
+              sourcePage: window.location.href
+            })
+          });
+
+          const data = await res.json().catch(() => ({}));
+
+          if (!res.ok) {
+            const msg = (data && (data.error || data.details)) ? (data.error || data.details) : "Failed to send.";
+            showStatus('err', msg);
+            submitBtn.disabled = false;
+            return;
+          }
+
+          showStatus('ok', 'Sent. Check your inbox.');
+          form.reset();
+          submitBtn.disabled = false;
+
+        } catch (err) {
+          showStatus('err', 'Failed to send. Missing /api/contact or network error.');
+          submitBtn.disabled = false;
+        }
+      });
+    }
+  </script>
 </body>
 </html>
