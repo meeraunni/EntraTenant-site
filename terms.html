@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Terms of Use | Sentinel Identity</title>
+  <meta name="description" content="Terms of Use for Sentinel Identity." />
+  <meta name="theme-color" content="#070b16" />
+  <style>
+    :root{
+      --bg:#070b16; --bg2:#0b1227;
+      --text:#eef3ff; --muted:#b9c6e4;
+      --border:rgba(255,255,255,.12);
+      --panel:rgba(255,255,255,.06);
+      --max:980px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      color:var(--text);
+      background: linear-gradient(180deg,var(--bg),var(--bg2));
+      line-height:1.7;
+    }
+    a{color:#7dd3fc;text-decoration:none}
+    a:hover{text-decoration:underline}
+    .container{width:min(var(--max), calc(100% - 32px)); margin:0 auto; padding:28px 0 50px}
+    header{
+      padding:18px 0;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      background:rgba(7,11,22,.6);
+      position:sticky; top:0; backdrop-filter: blur(10px);
+    }
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .brand{font-weight:900;letter-spacing:.01em}
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;
+      padding:10px 14px;border-radius:12px;
+      border:1px solid var(--border); background:var(--panel);
+      color:var(--text); font-weight:800;
+    }
+    h1{margin:20px 0 8px; font-size:2rem; letter-spacing:-.02em}
+    p{margin:0 0 12px; color:var(--muted)}
+    h2{margin:22px 0 8px; font-size:1.2rem}
+    ul{margin:0 0 12px 18px; color:var(--muted)}
+    .box{
+      border:1px solid var(--border);
+      background:var(--panel);
+      border-radius:16px;
+      padding:14px;
+      margin:16px 0;
+    }
+    footer{
+      margin-top:26px;
+      padding-top:16px;
+      border-top:1px solid rgba(255,255,255,.08);
+      color:var(--muted);
+      font-size:.92rem;
+    }
+    .small{font-size:.92rem;color:var(--muted)}
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="container" style="padding:0; width:min(980px, calc(100% - 32px));">
+    <div class="topbar">
+      <div class="brand">Sentinel Identity</div>
+      <a class="btn" href="index.html">Home</a>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  <h1>Terms of Use</h1>
+  <p class="small"><strong>Last updated:</strong> <span id="updated"></span></p>
+
+  <div class="box">
+    <p>
+      These Terms govern your use of <strong>sentinelidentity.ca</strong>.
+      By using this site, you agree to these Terms.
+    </p>
+  </div>
+
+  <h2>Educational content</h2>
+  <p>
+    Content on this site is provided for general informational purposes. It is not a substitute for professional advice
+    specific to your environment. You are responsible for validating changes in a test/pilot context before production.
+  </p>
+
+  <h2>No warranties</h2>
+  <p>
+    The site and content are provided “as is” without warranties of any kind. We do not guarantee that the site will be
+    error-free or uninterrupted.
+  </p>
+
+  <h2>Limitation of liability</h2>
+  <p>
+    To the maximum extent permitted by law, Sentinel Identity will not be liable for any damages arising from use of this
+    site or reliance on its content.
+  </p>
+
+  <h2>External links</h2>
+  <p>
+    The site may link to third-party websites. We are not responsible for third-party content or practices.
+  </p>
+
+  <h2>Contact</h2>
+  <p>Email: <a href="mailto:info@sentinelidentity.ca">info@sentinelidentity.ca</a></p>
+
+  <footer>
+    <div>© <span id="year"></span> Sentinel Identity</div>
+  </footer>
+</main>
+
+<script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+  document.getElementById("updated").textContent = new Date().toISOString().slice(0,10);
+</script>
+
+</body>
+</html>
