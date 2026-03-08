@@ -3,155 +3,397 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Remove an email using Microsoft Defender | Sentinel Identity</title>
-  <meta name="description" content="Use Microsoft Defender for Office 365 to remove a delivered message across mailboxes. Scope in Explorer, run remediation, review AIR approvals, and verify results." />
-  <meta name="theme-color" content="#f6f8fb" />
+  <title>You don’t have permission to send messages from this mailbox (Outlook) | Sentinel Identity</title>
+  <meta name="description" content="Engineer-level root cause analysis and deterministic fixes for Outlook/Exchange 'You don’t have permission to send messages from this mailbox'. Includes Send As vs Send on Behalf, propagation, Outlook cache behavior, and verification steps." />
+  <meta name="theme-color" content="#ffffff" />
 
   <style>
-    /* Same light blog CSS as AADSTS page */
-    :root{--bg:#f6f8fb;--bg2:#ffffff;--panel:#ffffff;--panel-border:rgba(15,23,42,.10);--text:#0f172a;--muted:#475569;--muted2:#64748b;--blue:#2563eb;--cyan:#0891b2;--violet:#7c3aed;--shadow:0 12px 30px rgba(15,23,42,.08);--max:1180px}
-    *{box-sizing:border-box} html,body{margin:0;padding:0}
-    body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--text);
-      background:radial-gradient(900px 520px at 8% -10%, rgba(37,99,235,.10), transparent 60%),radial-gradient(780px 440px at 95% 8%, rgba(124,58,237,.08), transparent 60%),radial-gradient(520px 320px at 80% 70%, rgba(8,145,178,.06), transparent 60%),linear-gradient(180deg, var(--bg), var(--bg2));line-height:1.7}
-    a{color:inherit;text-decoration:none} img{max-width:100%;display:block}
+    :root{
+      --bg:#ffffff;
+      --bg2:#f6f8fb;
+      --text:#0f172a;
+      --muted:#475569;
+      --muted2:#64748b;
+      --border:rgba(15,23,42,.10);
+      --panel:#ffffff;
+      --shadow:0 10px 26px rgba(15,23,42,.08);
+      --blue:#2563eb;
+      --cyan:#0891b2;
+      --violet:#7c3aed;
+      --max:1180px;
+      --radius:16px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{
+      font-family:"Segoe UI", Inter, system-ui, -apple-system, Roboto, Arial, sans-serif;
+      color:var(--text);
+      background: linear-gradient(180deg, var(--bg), var(--bg2));
+      line-height:1.7;
+    }
+
+    a{color:var(--blue);text-decoration:none}
+    a:hover{text-decoration:underline}
     .container{width:min(var(--max), calc(100% - 32px)); margin:0 auto;}
-    .site-header{position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);background:rgba(255,255,255,.85);border-bottom:1px solid rgba(15,23,42,.10)}
-    .nav{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:72px}
-    .brand{display:flex;align-items:center;gap:12px;min-width:0}
-    .brand-badge{width:36px;height:36px;border-radius:12px;flex:0 0 auto;background:radial-gradient(circle at 30% 30%, #93c5fd, #2563eb 55%, #1d4ed8 85%);box-shadow:0 10px 28px rgba(37,99,235,.25);border:1px solid rgba(15,23,42,.10)}
-    .brand-title{font-weight:900;font-size:1.02rem} .brand-sub{color:var(--muted2);font-size:.82rem;max-width:520px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .nav-links{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:flex-end}
-    .nav-links a{color:#0f172a;font-weight:800;padding:10px 10px;border-radius:12px}
-    .nav-links a:hover{background:rgba(15,23,42,.04)}
-    .btn{display:inline-flex;align-items:center;justify-content:center;border:none;cursor:pointer;border-radius:14px;padding:12px 16px;font-weight:900;transition:transform .15s ease;white-space:nowrap}
-    .btn:hover{transform:translateY(-1px)}
-    .btn-primary{color:#fff;background:linear-gradient(90deg, var(--violet), var(--blue), var(--cyan));}
-    .btn-outline{color:#0f172a;background:#fff;border:1px solid rgba(15,23,42,.12)}
-    .hero{padding:26px 0 10px}
-    .hero-card{background:#fff;border:1px solid rgba(15,23,42,.10);border-radius:22px;box-shadow:var(--shadow);overflow:hidden}
-    .hero-inner{padding:18px;display:grid;grid-template-columns:1.2fr .8fr;gap:14px;align-items:stretch}
-    .eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(37,99,235,.08);border:1px solid rgba(37,99,235,.18);color:#0f172a;padding:8px 12px;border-radius:999px;font-size:.85rem;font-weight:900;width:fit-content;margin-bottom:12px}
-    .dot{width:8px;height:8px;border-radius:999px;background:#2563eb}
-    h1{margin:0 0 10px;font-size:clamp(1.9rem, 3vw, 2.5rem);line-height:1.1;letter-spacing:-.02em}
-    .subtitle{margin:0 0 14px;color:var(--muted);max-width:78ch}
-    .meta{display:flex;flex-wrap:wrap;gap:8px}
-    .pill{border:1px solid rgba(15,23,42,.10);background:rgba(15,23,42,.03);border-radius:999px;padding:6px 10px;font-weight:800;font-size:.82rem;color:#0f172a}
-    .banner{border:1px solid rgba(15,23,42,.10);border-radius:18px;overflow:hidden;background:#0b1220;min-height:180px;position:relative}
-    .banner img{width:100%;height:100%;object-fit:cover}
-    main{padding:10px 0 60px}
+
+    header{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter: blur(8px);
+      background: rgba(255,255,255,.86);
+      border-bottom:1px solid var(--border);
+    }
+    .nav{
+      min-height:64px;
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+    }
+    .brand{display:flex;align-items:center;gap:10px;min-width:0}
+    .logo{
+      width:34px;height:34px;border-radius:10px;
+      background: radial-gradient(circle at 30% 30%, #93c5fd, #2563eb 60%, #1d4ed8 90%);
+      border:1px solid var(--border);
+      box-shadow: 0 10px 20px rgba(37,99,235,.18);
+      flex:0 0 auto;
+    }
+    .brand strong{font-weight:800;white-space:nowrap}
+    .brand span{color:var(--muted2);font-size:.86rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px}
+    .navlinks{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+    .navlinks a{
+      color:var(--text);
+      font-weight:700;
+      padding:8px 10px;
+      border-radius:10px;
+    }
+    .navlinks a:hover{background:rgba(15,23,42,.04);text-decoration:none}
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;
+      padding:10px 14px;border-radius:12px;font-weight:800;
+      border:1px solid var(--border); background:#fff; color:var(--text);
+    }
+    .btn.primary{
+      border:none;
+      color:#fff;
+      background: linear-gradient(90deg, var(--violet), var(--blue), var(--cyan));
+    }
+
+    .titlebar{padding:22px 0 10px}
+    .kicker{
+      display:inline-flex;align-items:center;gap:8px;
+      font-weight:800;font-size:.85rem;color:var(--muted);
+      padding:6px 10px;border-radius:999px;
+      border:1px solid rgba(37,99,235,.18);
+      background: rgba(37,99,235,.06);
+    }
+    .dot{width:8px;height:8px;border-radius:999px;background:var(--blue)}
+    h1{margin:12px 0 8px;font-size:clamp(1.9rem, 2.9vw, 2.6rem);line-height:1.15;letter-spacing:-.02em}
+    .subtitle{margin:0;color:var(--muted);max-width:92ch}
+    .meta{margin-top:10px;display:flex;flex-wrap:wrap;gap:8px}
+    .pill{
+      font-size:.84rem;font-weight:700;color:var(--muted);
+      border:1px solid var(--border); background:rgba(15,23,42,.03);
+      padding:6px 10px;border-radius:999px;
+    }
+
+    main{padding:14px 0 56px}
     .layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start}
-    .panel{background:#fff;border:1px solid rgba(15,23,42,.10);border-radius:18px;box-shadow:var(--shadow)}
-    .article{padding:18px}
-    .article h2{margin:22px 0 8px;font-size:1.35rem}
-    .article p{margin:0 0 12px;color:var(--muted)}
-    .callout{margin:14px 0;padding:12px;border-radius:14px;border:1px solid rgba(8,145,178,.22);background:rgba(8,145,178,.06);color:#0f172a}
+    .panel{
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+    article{padding:18px 18px 6px}
+    article h2{margin:22px 0 8px;font-size:1.35rem;letter-spacing:-.01em}
+    article h3{margin:16px 0 6px;font-size:1.05rem}
+    article p{margin:0 0 12px;color:var(--muted)}
+    article ul{margin:0 0 12px 18px;color:var(--muted)}
+    article li{margin:6px 0}
+    article ol{margin:0 0 12px 18px;color:var(--muted)}
+    .callout{
+      margin:14px 0;
+      padding:12px;
+      border-radius:14px;
+      border:1px solid rgba(8,145,178,.20);
+      background: rgba(8,145,178,.06);
+      color:var(--text);
+    }
     .callout strong{display:block;margin-bottom:6px}
-    .note{margin:14px 0;padding:12px;border-radius:14px;border:1px solid rgba(15,23,42,.10);background:rgba(15,23,42,.03);color:var(--muted)}
-    .refs{margin-top:16px;padding-top:12px;border-top:1px solid rgba(15,23,42,.10)}
-    .refs a{color:#2563eb;text-decoration:underline}
-    .sidebar{display:grid;gap:12px;position:sticky;top:88px}
-    .side-card{padding:14px}
+    .warning{
+      border-color: rgba(220,38,38,.22);
+      background: rgba(220,38,38,.06);
+    }
+
+    pre{
+      margin:12px 0;
+      padding:12px;
+      border-radius:14px;
+      border:1px solid rgba(15,23,42,.12);
+      background:#0b1220;
+      color:#e8efff;
+      overflow:auto;
+      font-family:var(--mono);
+      font-size:.92rem;
+      line-height:1.55;
+    }
+    .inline{
+      font-family:var(--mono);
+      background:rgba(15,23,42,.06);
+      border:1px solid rgba(15,23,42,.10);
+      padding:2px 6px;border-radius:8px;
+      color:#0f172a;
+      font-size:.92rem;
+    }
+
+    aside{position:sticky;top:86px;display:grid;gap:12px}
+    .side{padding:14px}
+    .side h4{margin:0 0 10px;font-size:1rem}
     .toc{display:grid;gap:8px}
-    .toc a{padding:10px 10px;border-radius:12px;border:1px solid rgba(15,23,42,.08);background:rgba(15,23,42,.03);color:#0f172a;font-weight:800;font-size:.92rem}
-    .cta-btn{width:100%;text-align:center}
-    .footer{border-top:1px solid rgba(15,23,42,.10);padding:18px 0 30px;color:var(--muted2)}
-    .footer-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;font-size:.92rem}
-    @media (max-width: 980px){.hero-inner{grid-template-columns:1fr}.layout{grid-template-columns:1fr}.sidebar{position:static}}
+    .toc a{
+      display:block;
+      padding:10px 10px;
+      border-radius:12px;
+      border:1px solid rgba(15,23,42,.08);
+      background: rgba(15,23,42,.03);
+      color:var(--text);
+      font-weight:700;
+      font-size:.92rem;
+      text-decoration:none;
+    }
+    .toc a:hover{background:rgba(37,99,235,.06);border-color:rgba(37,99,235,.18)}
+    .cta{width:100%;text-align:center}
+
+    footer{
+      border-top:1px solid var(--border);
+      padding:18px 0 30px;
+      color:var(--muted2);
+      background:#fff;
+    }
+    .foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;font-size:.92rem}
+
+    @media (max-width: 980px){
+      .layout{grid-template-columns:1fr}
+      aside{position:static}
+    }
   </style>
 </head>
+
 <body>
-  <header class="site-header">
+  <header>
     <div class="container nav">
-      <a href="../index.html" class="brand">
-        <div class="brand-badge"></div>
-        <div>
-          <div class="brand-title">Sentinel Identity</div>
-          <div class="brand-sub">Entra Identity & Access Management consulting</div>
+      <a class="brand" href="../index.html">
+        <div class="logo" aria-hidden="true"></div>
+        <div style="min-width:0">
+          <strong>Sentinel Identity</strong><br />
+          <span>Entra Identity & Access Management consulting</span>
         </div>
       </a>
-      <nav class="nav-links">
+      <nav class="navlinks">
         <a href="../index.html#services">Services</a>
-        <a href="../index.html#contact">Assessment</a>
         <a href="../blog.html">Blog</a>
-        <a class="btn btn-primary" href="../index.html#contact">Request an Assessment</a>
+        <a class="btn primary" href="../index.html#contact">Request an Assessment</a>
       </nav>
     </div>
   </header>
 
-  <section class="hero">
-    <div class="container">
-      <div class="hero-card">
-        <div class="hero-inner">
-          <div>
-            <div class="eyebrow"><span class="dot"></span><span>MICROSOFT DEFENDER FOR OFFICE 365</span></div>
-            <h1>Remove an email across mailboxes using Microsoft Defender</h1>
-            <p class="subtitle">Use Explorer to scope the message, run remediation, review approvals, and verify removal.</p>
-            <div class="meta">
-              <span class="pill">2026-03-07</span><span class="pill">9 min</span><span class="pill">Defender</span><span class="pill">Email</span>
-            </div>
-            <div style="margin-top:12px"><a class="btn btn-outline" href="../blog.html">Back to Blog</a></div>
-          </div>
-          <div class="banner">
-            <img alt="" src="data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%271200%27%20height%3D%27675%27%20viewBox%3D%270%200%201200%20675%27%3E%3Cdefs%3E%3ClinearGradient%20id%3D%27g%27%20x1%3D%270%27%20x2%3D%271%27%3E%3Cstop%20offset%3D%270%27%20stop-color%3D%27%232563eb%27/%3E%3Cstop%20offset%3D%270.55%27%20stop-color%3D%27%237c3aed%27/%3E%3Cstop%20offset%3D%271%27%20stop-color%3D%27%230891b2%27/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%271200%27%20height%3D%27675%27%20fill%3D%27%230b1220%27/%3E%3Ccircle%20cx%3D%27260%27%20cy%3D%27520%27%20r%3D%27300%27%20fill%3D%27url(%2523g)%27%20opacity%3D%270.20%27/%3E%3Crect%20x%3D%27180%27%20y%3D%27210%27%20width%3D%27660%27%20height%3D%27340%27%20rx%3D%2724%27%20fill%3D%27%230f1a2f%27%20stroke%3D%27rgba(255%2C255%2C255%2C0.18)%27/%3E%3Cpath%20d%3D%27M220%20270h580v220H220z%27%20fill%3D%27rgba(255%2C255%2C255%2C0.06)%27/%3E%3Cpath%20d%3D%27M220%20270l290%20170L800%20270%27%20fill%3D%27none%27%20stroke%3D%27rgba(255%2C255%2C255%2C0.25)%27%20stroke-width%3D%2710%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27/%3E%3Ctext%20x%3D%27180%27%20y%3D%27140%27%20fill%3D%27rgba(255%2C255%2C255%2C0.85)%27%20font-family%3D%27Segoe%20UI%2C%20Arial%27%20font-size%3D%2734%27%20font-weight%3D%27700%27%3EDefender%20%E2%80%A2%20Email%20Remediation%3C/text%3E%3C/svg%3E" />
-          </div>
-        </div>
-      </div>
+  <div class="container titlebar">
+    <div class="kicker"><span class="dot"></span>Exchange Online · Outlook</div>
+    <h1>You don’t have permission to send messages from this mailbox</h1>
+    <p class="subtitle">
+      This error occurs when Exchange Online rejects a delegated send attempt. The root cause is almost always a mismatch between
+      the <strong>From</strong> identity Outlook is using and the actual permission model configured (Send As vs Send on Behalf), or
+      a client using stale cached authorization state after a permission change.
+    </p>
+    <div class="meta">
+      <span class="pill">Updated: 2026-03-07</span>
+      <span class="pill">Applies to: Shared mailboxes and delegated send</span>
+      <span class="pill">Scope: Exchange Online</span>
     </div>
-  </section>
+  </div>
 
   <main>
-    <div class="container">
-      <div class="layout">
-        <article class="panel article">
-          <p>If a message was delivered and needs to be removed across mailboxes, use Defender remediation. Outlook recall is not reliable across clients and recipients.</p>
+    <div class="container layout">
+      <article class="panel">
+        <div class="callout">
+          <strong>Fast triage rule</strong>
+          Test the send action in <strong>Outlook on the web</strong> first. If OWA works but Outlook desktop fails, you are likely dealing with client-side caching.
+          If OWA fails, you have a server-side permission or configuration issue.
+        </div>
 
-          <div class="callout">
-            <strong>Before you start</strong>
-            Collect at least one stable identifier. Internet Message ID is best. If not available, use sender, subject, and a narrow time range.
+        <h2 id="prereqs">Prerequisites</h2>
+        <ul>
+          <li>Exchange Online admin access (or the ability to run Exchange Online PowerShell).</li>
+          <li>A clear target identity: which mailbox the user is attempting to send as/on behalf of.</li>
+          <li>Clarity on intended behavior: <strong>Send As</strong> or <strong>Send on Behalf</strong>.</li>
+        </ul>
+
+        <h2 id="model">Understand the send model</h2>
+        <p>
+          Delegated send is not a single permission. The three commonly confused permissions are:
+        </p>
+        <ul>
+          <li><strong>Full Access</strong>: allows opening the mailbox. Does not grant sending rights.</li>
+          <li><strong>Send As</strong>: the message appears as if it was sent by the mailbox identity.</li>
+          <li><strong>Send on Behalf</strong>: the message appears as “User on behalf of Mailbox”.</li>
+        </ul>
+
+        <div class="callout warning">
+          <strong>Common production mistake</strong>
+          Assigning only Full Access and expecting send to work. Full Access is not send authorization.
+        </div>
+
+        <h2 id="root-cause">Root cause categories</h2>
+
+        <h3 id="missing-permission">1) Missing or incorrect send permission</h3>
+        <p>
+          The user is attempting to send using an identity that Exchange Online will not authorize. This includes:
+        </p>
+        <ul>
+          <li>Send As is required, but only Send on Behalf is configured (or vice versa).</li>
+          <li>Permission is granted to a group that is not supported in the path you are using.</li>
+          <li>Permission exists, but was removed/re-added and the client is still using stale state.</li>
+        </ul>
+
+        <h3 id="propagation">2) Permission propagation delay</h3>
+        <p>
+          Some permission changes can take time to fully propagate. During that window, OWA may behave differently than Outlook desktop.
+          Treat this like configuration drift until verified.
+        </p>
+
+        <h3 id="client-cache">3) Outlook desktop caching and profile state</h3>
+        <p>
+          Outlook desktop caches certain aspects of mailbox access and sender resolution. After permission changes, it can continue to fail
+          until the cached state refreshes. This is why OWA is the correct control test.
+        </p>
+
+        <h2 id="deterministic">Deterministic fix workflow</h2>
+        <p>
+          Use this sequence to eliminate guesswork:
+        </p>
+        <ol>
+          <li><strong>Confirm the intended send behavior</strong> (Send As vs Send on Behalf).</li>
+          <li><strong>Validate server-side permissions</strong> in Exchange Online.</li>
+          <li><strong>Test in OWA</strong> (server-side behavior).</li>
+          <li>If OWA works, remediate <strong>Outlook desktop</strong> caching/profile state.</li>
+        </ol>
+
+        <h2 id="validate">Step 1: Validate permissions (Exchange Online PowerShell)</h2>
+        <p>
+          Replace the values below with your mailbox and user. Run these queries to confirm the effective permissions.
+        </p>
+
+        <pre># Connect-ExchangeOnline
+
+$Mailbox = "shared@domain.com"
+$User    = "user@domain.com"
+
+# Full Access (mailbox open)
+Get-MailboxPermission -Identity $Mailbox |
+  Where-Object { $_.User -like "*$User*" -and $_.IsInherited -eq $false } |
+  Format-Table User,AccessRights,Deny,IsInherited
+
+# Send As (recipient permission model)
+Get-RecipientPermission -Identity $Mailbox |
+  Where-Object { $_.Trustee -like "*$User*" } |
+  Format-Table Trustee,AccessRights,IsInherited
+
+# Send on Behalf (mailbox property)
+(Get-Mailbox -Identity $Mailbox).GrantSendOnBehalfTo</pre>
+
+        <h2 id="assign">Step 2: Assign the correct permission</h2>
+
+        <h3 id="sendas">Option A: Send As</h3>
+        <p>
+          Use Send As when you want the message to appear from the shared mailbox identity only.
+        </p>
+        <pre>Add-RecipientPermission -Identity $Mailbox -Trustee $User -AccessRights SendAs -Confirm:$false</pre>
+
+        <h3 id="sob">Option B: Send on Behalf</h3>
+        <p>
+          Use Send on Behalf when you want attribution visible (“User on behalf of Mailbox”).
+        </p>
+        <pre>Set-Mailbox -Identity $Mailbox -GrantSendOnBehalfTo @{Add=$User}</pre>
+
+        <h2 id="verify-owa">Step 3: Verify in Outlook on the web (OWA)</h2>
+        <p>
+          OWA is the cleanest verification step because it minimizes client caching variables:
+        </p>
+        <ol>
+          <li>Sign in to OWA.</li>
+          <li>Open the shared mailbox (Open another mailbox or direct URL if you use it).</li>
+          <li>Compose a message and set the From to the shared mailbox.</li>
+          <li>Send to an internal test recipient.</li>
+        </ol>
+        <p>
+          If OWA fails with the same error, the issue is still server-side. Re-check permission assignment and intended send mode.
+        </p>
+
+        <h2 id="verify-outlook">Step 4: Outlook desktop remediation (if OWA works)</h2>
+        <p>
+          If OWA works but Outlook desktop fails, address the client state:
+        </p>
+        <ol>
+          <li>Close Outlook completely.</li>
+          <li>Wait a short period (permission propagation and token refresh).</li>
+          <li>Reopen Outlook and test again.</li>
+          <li>If still failing: remove and re-add the shared mailbox (or create a new Outlook profile for deterministic cache reset).</li>
+        </ol>
+
+        <div class="callout">
+          <strong>Engineering note</strong>
+          Outlook desktop can hold onto outdated sender resolution and access tokens. A new profile forces a clean resolution path.
+        </div>
+
+        <h2 id="still-fails">If it still fails</h2>
+        <ul>
+          <li>Confirm the user is selecting the correct From identity (not a similarly named contact or alias).</li>
+          <li>Confirm there are no transport rules or policy restrictions affecting send.</li>
+          <li>Check if the shared mailbox is hidden or represented by a different address in the client.</li>
+          <li>Validate that your organization is not mixing on-premises Exchange delegation with Exchange Online in an inconsistent manner.</li>
+        </ul>
+
+        <h2 id="references">References</h2>
+        <ul>
+          <li><a href="https://learn.microsoft.com/en-us/exchange/collaboration-exo/shared-mailboxes" target="_blank" rel="noopener">Shared mailboxes in Exchange Online</a></li>
+          <li><a href="https://learn.microsoft.com/en-us/exchange/recipients-in-exchange-online/manage-permissions-for-recipients" target="_blank" rel="noopener">Manage permissions for recipients</a></li>
+        </ul>
+
+        <div style="padding:12px 18px 18px; border-top:1px solid var(--border); margin-top:10px;">
+          <a class="btn" href="../blog.html">Back to Blog</a>
+        </div>
+      </article>
+
+      <aside>
+        <div class="panel side">
+          <h4>In this article</h4>
+          <div class="toc">
+            <a href="#prereqs">Prerequisites</a>
+            <a href="#model">Send model</a>
+            <a href="#root-cause">Root causes</a>
+            <a href="#deterministic">Fix workflow</a>
+            <a href="#validate">Validate permissions</a>
+            <a href="#assign">Assign permission</a>
+            <a href="#verify-owa">Verify in OWA</a>
+            <a href="#verify-outlook">Outlook desktop remediation</a>
+            <a href="#still-fails">If it still fails</a>
+            <a href="#references">References</a>
           </div>
+        </div>
 
-          <h2 id="scope">Scope the message in Explorer</h2>
-          <p>Use Explorer to locate the message and confirm delivery details: recipients, folder, and any user interaction signals.</p>
-
-          <h2 id="action">Run a remediation action</h2>
-          <p>Select the message and run the appropriate action. For confirmed malicious content, remove it. For investigation, choose a less destructive action and continue review.</p>
-
-          <h2 id="air">Review approvals (AIR)</h2>
-          <p>If Automated Investigation and Response is enabled, actions may be pending approval. Remediation is not complete until the status shows completed successfully.</p>
-
-          <h2 id="verify">Verify</h2>
-          <p>Verify in Defender action status and in Explorer results. If the message remains, confirm you targeted the correct artifact and recipients before repeating actions.</p>
-
-          <div class="refs">
-            <h3>References</h3>
-            <p><a href="https://learn.microsoft.com/en-us/defender-office-365/remediate-malicious-email-delivered-office-365" target="_blank" rel="noopener">Remediate malicious email that was delivered</a></p>
-            <p><a href="https://learn.microsoft.com/en-us/defender-office-365/air-review-approve-pending-completed-actions" target="_blank" rel="noopener">Review and approve AIR actions</a></p>
-            <p><a href="https://learn.microsoft.com/en-us/defender-office-365/alert-policies-defender-portal" target="_blank" rel="noopener">Alert policies in Defender portal</a></p>
-          </div>
-        </article>
-
-        <aside class="sidebar">
-          <div class="panel side-card">
-            <h4>In this article</h4>
-            <div class="toc">
-              <a href="#scope">Scope in Explorer</a>
-              <a href="#action">Run remediation</a>
-              <a href="#air">Approvals</a>
-              <a href="#verify">Verify</a>
-            </div>
-          </div>
-          <a class="btn btn-primary cta-btn" href="../index.html#contact">Request an Assessment</a>
-        </aside>
-      </div>
+        <a class="btn primary cta" href="../index.html#contact">Request an Assessment</a>
+      </aside>
     </div>
   </main>
 
-  <footer class="footer">
-    <div class="container footer-row">
+  <footer>
+    <div class="container foot">
       <div>© <span id="year"></span> Sentinel Identity</div>
       <div>Entra IAM consulting · Worldwide remote</div>
     </div>
   </footer>
-  <script>document.getElementById('year').textContent=new Date().getFullYear();</script>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>
