@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9915553948229076"
-     crossorigin="anonymous"></script>
+  <!-- AdSense (keep for verification; do NOT place ads on homepage) -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9915553948229076"
+    crossorigin="anonymous"></script>
+
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sentinel Identity | Entra IAM Consulting</title>
@@ -14,27 +16,27 @@
       --bg:#070b16;
       --bg2:#0b1227;
 
-      --panel: rgba(255,255,255,.06);
-      --panel2: rgba(255,255,255,.035);
-      --border: rgba(255,255,255,.12);
-
       --text:#eef3ff;
       --muted:#b9c6e4;
       --muted2:#93a6d6;
+
+      --panel: rgba(255,255,255,.06);
+      --panel2: rgba(255,255,255,.035);
+      --border: rgba(255,255,255,.10);
 
       --blue:#3b82f6;
       --cyan:#22d3ee;
       --violet:#8b5cf6;
 
       --shadow: 0 28px 90px rgba(0,0,0,.44);
-      --shadow2: 0 14px 40px rgba(0,0,0,.28);
+      --shadow2: 0 14px 40px rgba(0,0,0,.26);
 
       --radius: 22px;
-      --radius2: 18px;
-      --max: 1200px;
+      --radius2: 16px;
+      --max: 1180px;
 
-      --h1: clamp(2.2rem, 3.8vw, 3.2rem);
-      --h2: clamp(1.35rem, 2.1vw, 1.7rem);
+      --h1: clamp(2.1rem, 3.4vw, 3rem);
+      --h2: clamp(1.3rem, 2.0vw, 1.65rem);
       --p: 1.03rem;
     }
 
@@ -45,17 +47,16 @@
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
       color:var(--text);
       background:
-        radial-gradient(920px 560px at 10% -10%, rgba(59,130,246,.32), transparent 60%),
-        radial-gradient(860px 520px at 95% 10%, rgba(139,92,246,.26), transparent 62%),
-        radial-gradient(560px 380px at 80% 78%, rgba(34,211,238,.12), transparent 62%),
+        radial-gradient(920px 560px at 10% -10%, rgba(59,130,246,.30), transparent 60%),
+        radial-gradient(860px 520px at 95% 10%, rgba(139,92,246,.24), transparent 62%),
+        radial-gradient(560px 380px at 80% 78%, rgba(34,211,238,.11), transparent 62%),
         linear-gradient(180deg, var(--bg), var(--bg2));
       line-height:1.55;
-      letter-spacing: .005em;
+      letter-spacing:.005em;
     }
 
     a{color:inherit;text-decoration:none}
     a:hover{opacity:1}
-    img{max-width:100%;display:block}
     .container{width:min(var(--max), calc(100% - 32px)); margin:0 auto;}
 
     /* Header */
@@ -66,22 +67,21 @@
       border-bottom: 1px solid rgba(255,255,255,.07);
     }
     .nav{
-      min-height:78px;
+      min-height:76px;
       display:flex; align-items:center; justify-content:space-between; gap:14px;
     }
-
     .brand{display:flex;align-items:center;gap:12px;min-width:0}
     .badge{
       width:38px;height:38px;border-radius:12px;flex:0 0 auto;
       background:
-        radial-gradient(circle at 30% 30%, rgba(255,255,255,.75), rgba(255,255,255,.08) 38%),
+        radial-gradient(circle at 30% 30%, rgba(255,255,255,.72), rgba(255,255,255,.06) 38%),
         linear-gradient(135deg, #22d3ee 0%, #3b82f6 45%, #8b5cf6 100%);
-      box-shadow:0 14px 34px rgba(59,130,246,.35);
+      box-shadow:0 14px 34px rgba(59,130,246,.32);
       border:1px solid rgba(255,255,255,.18);
     }
     .brand-text{display:flex;flex-direction:column;min-width:0}
-    .brand-text strong{font-weight:900;font-size:1.06rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .brand-text span{color:var(--muted);font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:560px}
+    .brand-text strong{font-weight:900;font-size:1.04rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .brand-text span{color:var(--muted);font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px}
 
     .links{
       display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;
@@ -103,7 +103,7 @@
     .btn-primary{
       color:#fff;
       background:linear-gradient(90deg, var(--violet), var(--blue), var(--cyan));
-      box-shadow: 0 12px 34px rgba(59,130,246,.30);
+      box-shadow: 0 12px 34px rgba(59,130,246,.26);
     }
     .btn-secondary{
       color:#eaf1ff;
@@ -131,30 +131,31 @@
     .mobile-panel .btn{width:100%;margin-top:10px}
 
     /* Hero */
-    .hero{padding:54px 0 22px}
-    .hero-card{
-      border-radius:28px;
-      border:1px solid rgba(255,255,255,.12);
-      background:
-        radial-gradient(900px 420px at 10% 0%, rgba(34,211,238,.12), transparent 60%),
-        radial-gradient(900px 520px at 95% 20%, rgba(139,92,246,.14), transparent 60%),
-        linear-gradient(135deg, rgba(17,24,39,.80), rgba(9,14,29,.92));
-      box-shadow: var(--shadow);
-      overflow:hidden;
-      position:relative;
-    }
-    .hero-inner{
-      padding:30px;
+    .hero{padding:56px 0 22px}
+    .hero-wrap{
       display:grid;
-      grid-template-columns: 1.05fr .95fr;
+      grid-template-columns: 1.1fr .9fr;
       gap:18px;
       align-items:stretch;
+    }
+
+    .hero-left{
+      border-radius:28px;
+      border:1px solid rgba(255,255,255,.10);
+      background:
+        radial-gradient(900px 420px at 12% 0%, rgba(34,211,238,.10), transparent 60%),
+        radial-gradient(900px 520px at 95% 20%, rgba(139,92,246,.12), transparent 60%),
+        linear-gradient(135deg, rgba(17,24,39,.78), rgba(9,14,29,.92));
+      box-shadow: var(--shadow);
+      padding:30px;
+      position:relative;
+      overflow:hidden;
     }
 
     .eyebrow{
       display:inline-flex;align-items:center;gap:10px;
       color:#eaf2ff;
-      border:1px solid rgba(255,255,255,.18);
+      border:1px solid rgba(255,255,255,.16);
       background: rgba(255,255,255,.06);
       border-radius:999px;
       padding:8px 13px;
@@ -169,67 +170,54 @@
       box-shadow:0 0 0 4px rgba(34,211,238,.12);
     }
 
-    .hero h1{
+    .hero-left h1{
       margin:0 0 10px;
       font-size:var(--h1);
       letter-spacing:-.04em;
       line-height:1.03;
     }
-    .hero p{
-      margin:0 0 16px;
+    .hero-left p{
+      margin:0 0 18px;
       color:var(--muted);
       font-size:var(--p);
-      max-width:64ch;
+      max-width:62ch;
     }
+    .hero-actions{display:flex;gap:10px;flex-wrap:wrap}
 
-    .hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-
-    .hero-right{
-      border-left:1px solid rgba(255,255,255,.10);
-      padding-left:18px;
-      display:grid;
-      gap:12px;
-      align-content:start;
-    }
-
-    .visual{
-      border-radius:20px;
-      border:1px solid rgba(255,255,255,.12);
-      background:#0b1328;
-      overflow:hidden;
-      min-height:260px;
-      box-shadow: var(--shadow2);
-      position:relative;
-    }
-    .visual img{width:100%;height:100%;object-fit:cover;opacity:.97}
-    .visual::after{
-      content:"";
-      position:absolute; inset:0;
-      background:
-        linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
-      background-size: 28px 28px;
-      opacity:.14;
-      pointer-events:none;
-    }
-
-    .kpi{
-      display:grid;
-      grid-template-columns:1fr 1fr;
+    .hero-strip{
+      margin-top:18px;
+      display:flex;
+      flex-wrap:wrap;
       gap:10px;
+      align-items:center;
     }
-    .kpi .chip{
+    .pill{
+      padding:9px 12px;
+      border-radius:999px;
       border:1px solid rgba(255,255,255,.12);
       background:rgba(255,255,255,.05);
-      border-radius:18px;
-      padding:12px;
-      min-height:82px;
+      color:#dbe8ff;
+      font-size:.88rem;
+      font-weight:800;
     }
-    .kpi strong{display:block;font-size:.95rem}
-    .kpi span{display:block;color:var(--muted);font-size:.9rem;margin-top:4px}
+
+    .hero-right{
+      border-radius:28px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      box-shadow: var(--shadow2);
+      overflow:hidden;
+      position:relative;
+      min-height:320px;
+    }
+    .hero-right .art{
+      width:100%;
+      height:100%;
+      display:block;
+    }
 
     /* Sections */
-    section{padding:26px 0}
+    section{padding:28px 0}
     .section-head{
       display:flex; align-items:flex-end; justify-content:space-between;
       gap:12px; flex-wrap:wrap; margin-bottom:14px;
@@ -247,14 +235,14 @@
       gap:14px;
     }
     .card{
-      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.04));
-      border:1px solid rgba(255,255,255,.12);
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.10);
       border-radius:var(--radius);
       box-shadow: var(--shadow2);
       padding:16px;
       transition:transform .15s ease, border-color .15s ease;
     }
-    .card:hover{transform:translateY(-2px); border-color: rgba(34,211,238,.26);}
+    .card:hover{transform:translateY(-2px); border-color: rgba(34,211,238,.24);}
     .icon{
       width:44px;height:44px;border-radius:14px;
       border:1px solid rgba(255,255,255,.14);
@@ -271,8 +259,8 @@
       gap:14px;
     }
     .panel{
-      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.04));
-      border:1px solid rgba(255,255,255,.12);
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.10);
       border-radius:var(--radius);
       box-shadow: var(--shadow2);
       padding:16px;
@@ -331,8 +319,7 @@
 
     /* Responsive */
     @media (max-width: 980px){
-      .hero-inner{grid-template-columns:1fr}
-      .hero-right{border-left:none;padding-left:0;border-top:1px solid rgba(255,255,255,.10);padding-top:14px}
+      .hero-wrap{grid-template-columns:1fr}
       .grid{grid-template-columns:1fr}
       .two-col{grid-template-columns:1fr}
       .form-wrap{grid-template-columns:1fr}
@@ -340,10 +327,10 @@
     @media (max-width: 780px){
       .links{display:none}
       .mobile-btn{display:inline-flex}
-      .hero-inner{padding:18px}
-      .form-row{grid-template-columns:1fr}
+      .hero-left{padding:18px}
       .btn{width:100%}
       .hero-actions{display:grid}
+      .form-row{grid-template-columns:1fr}
     }
   </style>
 </head>
@@ -386,42 +373,84 @@
   <main id="top">
     <section class="hero">
       <div class="container">
-        <div class="hero-card">
-          <div class="hero-inner">
-            <div>
-              <div class="eyebrow"><span class="dot"></span><span>ENTRA IAM</span></div>
+        <div class="hero-wrap">
 
-              <h1>IAM for production</h1>
+          <div class="hero-left">
+            <div class="eyebrow"><span class="dot"></span><span>ENTRA IAM</span></div>
 
-              <p>
-                Conditional Access baselines, MFA method hardening, privileged access governance, and enterprise app ownership.
-                Built for stable rollout and predictable operations.
-              </p>
+            <h1>IAM for production</h1>
+            <p>
+              Conditional Access, MFA methods, privileged access, and enterprise app ownership.
+              Designed for stable rollout and predictable operations.
+            </p>
 
-              <div class="hero-actions">
-                <a class="btn btn-primary" href="#contact">Request an Assessment</a>
-                <a class="btn btn-secondary" href="#services">See services</a>
-              </div>
+            <div class="hero-actions">
+              <a class="btn btn-primary" href="#contact">Request an Assessment</a>
+              <a class="btn btn-secondary" href="#services">See services</a>
             </div>
 
-            <aside class="hero-right">
-              <div class="visual" aria-label="Identity visual">
-                <img alt=""
-                  src="data:image/svg+xml;charset=UTF-8,<?xml version='1.0'?><svg xmlns='http://www.w3.org/2000/svg' width='1400' height='900' viewBox='0 0 1400 900'><defs><linearGradient id='g' x1='0' x2='1'><stop offset='0' stop-color='%238b5cf6'/><stop offset='0.5' stop-color='%233b82f6'/><stop offset='1' stop-color='%2322d3ee'/></linearGradient></defs><rect width='1400' height='900' fill='%230b1220'/><circle cx='280' cy='210' r='300' fill='url(%23g)' opacity='0.20'/><circle cx='1220' cy='760' r='360' fill='url(%23g)' opacity='0.14'/><rect x='120' y='260' width='640' height='420' rx='26' fill='rgba(255,255,255,0.06)' stroke='rgba(255,255,255,0.18)'/><path d='M165 330h550M165 380h460M165 430h510M165 480h420M165 530h470' stroke='rgba(255,255,255,0.24)' stroke-width='10' stroke-linecap='round'/><path d='M980 240c-150 0-272 122-272 272 0 182 145 333 272 370 127-37 272-188 272-370 0-150-122-272-272-272z' fill='rgba(255,255,255,0.08)' stroke='rgba(255,255,255,0.18)'/><path d='M980 355l122 54v104c0 94-65 185-122 210-57-25-122-116-122-210V409l122-54z' fill='url(%23g)' opacity='0.92'/><text x='120' y='190' fill='rgba(255,255,255,0.88)' font-family='Segoe UI, Arial' font-size='38' font-weight='700'>Baseline · Governance · Visibility</text></svg>">
-              </div>
-
-              <div class="kpi">
-                <div class="chip">
-                  <strong>Baseline</strong>
-                  <span>Pilot-first rollout</span>
-                </div>
-                <div class="chip">
-                  <strong>Governance</strong>
-                  <span>Owners & exceptions</span>
-                </div>
-              </div>
-            </aside>
+            <div class="hero-strip" aria-label="Key themes">
+              <span class="pill">Baseline</span>
+              <span class="pill">Governance</span>
+              <span class="pill">Visibility</span>
+              <span class="pill">SSO hygiene</span>
+            </div>
           </div>
+
+          <aside class="hero-right" aria-label="Identity visual">
+            <!-- Clean illustration (no stock photo) -->
+            <svg class="art" viewBox="0 0 1200 850" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Identity and access management illustration">
+              <defs>
+                <linearGradient id="g1" x1="0" x2="1">
+                  <stop offset="0" stop-color="#8b5cf6"/>
+                  <stop offset="0.5" stop-color="#3b82f6"/>
+                  <stop offset="1" stop-color="#22d3ee"/>
+                </linearGradient>
+                <radialGradient id="r1" cx="30%" cy="20%" r="70%">
+                  <stop offset="0" stop-color="rgba(139,92,246,.45)"/>
+                  <stop offset="1" stop-color="rgba(0,0,0,0)"/>
+                </radialGradient>
+                <radialGradient id="r2" cx="85%" cy="70%" r="70%">
+                  <stop offset="0" stop-color="rgba(34,211,238,.35)"/>
+                  <stop offset="1" stop-color="rgba(0,0,0,0)"/>
+                </radialGradient>
+              </defs>
+
+              <rect width="1200" height="850" fill="#0b1328"/>
+              <rect width="1200" height="850" fill="url(#r1)" opacity="1"/>
+              <rect width="1200" height="850" fill="url(#r2)" opacity="1"/>
+
+              <!-- grid -->
+              <g opacity=".14">
+                <path d="M0 120 H1200 M0 240 H1200 M0 360 H1200 M0 480 H1200 M0 600 H1200 M0 720 H1200"
+                      stroke="rgba(255,255,255,.35)" stroke-width="1"/>
+                <path d="M120 0 V850 M240 0 V850 M360 0 V850 M480 0 V850 M600 0 V850 M720 0 V850 M840 0 V850 M960 0 V850 M1080 0 V850"
+                      stroke="rgba(255,255,255,.35)" stroke-width="1"/>
+              </g>
+
+              <!-- card -->
+              <rect x="90" y="140" rx="28" ry="28" width="680" height="430" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.18)"/>
+              <g opacity=".9">
+                <rect x="140" y="210" width="520" height="16" rx="8" fill="rgba(255,255,255,.20)"/>
+                <rect x="140" y="255" width="420" height="16" rx="8" fill="rgba(255,255,255,.16)"/>
+                <rect x="140" y="300" width="460" height="16" rx="8" fill="rgba(255,255,255,.14)"/>
+                <rect x="140" y="345" width="350" height="16" rx="8" fill="rgba(255,255,255,.12)"/>
+              </g>
+
+              <!-- shield -->
+              <g transform="translate(780 210)">
+                <path d="M210 0c-116 0-210 94-210 210 0 142 112 259 210 288 98-29 210-146 210-288C420 94 326 0 210 0z"
+                      fill="rgba(255,255,255,.08)" stroke="rgba(255,255,255,.18)"/>
+                <path d="M210 85l116 52v100c0 89-61 176-116 200-55-24-116-111-116-200V137l116-52z"
+                      fill="url(#g1)" opacity=".95"/>
+              </g>
+
+              <text x="120" y="110" fill="rgba(255,255,255,.85)" font-family="Segoe UI, Arial" font-size="28" font-weight="700">
+                Baseline · Governance · Visibility
+              </text>
+            </svg>
+          </aside>
+
         </div>
       </div>
     </section>
@@ -520,7 +549,7 @@
         <div class="two-col">
           <div class="panel">
             <h3 style="margin:0 0 8px; font-size:1.02rem;">Assess</h3>
-            <p class="muted" style="margin:0;">Define the failure mode, constraints, and the smallest safe change.</p>
+            <p class="muted" style="margin:0;">Define failure mode, constraints, and the smallest safe change.</p>
           </div>
           <div class="panel">
             <h3 style="margin:0 0 8px; font-size:1.02rem;">Deliver</h3>
@@ -625,8 +654,8 @@
       <div class="footer-links">
         <a href="blog.html">Blog</a>
         <a href="privacy.html">Privacy</a>
-         <a href="terms.html">Terms</a>
-         <a href="cookies.html">Cookies</a>
+        <a href="terms.html">Terms</a>
+        <a href="cookies.html">Cookies</a>
         <a href="mailto:info@sentinelidentity.ca">Email</a>
       </div>
     </div>
@@ -668,7 +697,6 @@
         const fd = new FormData(form);
         const payload = Object.fromEntries(fd.entries());
 
-        // honeypot
         if (payload.company_site && String(payload.company_site).trim() !== "") {
           showStatus('ok', 'Sent.');
           form.reset();
@@ -714,8 +742,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-
