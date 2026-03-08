@@ -5,58 +5,61 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sentinel Identity | Entra IAM Consulting</title>
   <meta name="description" content="Entra Identity & Access Management consulting. Conditional Access, MFA methods, privileged access, and enterprise app governance." />
-  <meta name="theme-color" content="#071126" />
+  <meta name="theme-color" content="#070b16" />
 
   <style>
     :root{
       --bg:#070b16;
       --bg2:#0b1227;
 
-      --panel:rgba(255,255,255,.06);
-      --panel2:rgba(255,255,255,.04);
-      --border:rgba(255,255,255,.12);
+      --panel: rgba(255,255,255,.06);
+      --panel2: rgba(255,255,255,.035);
+      --border: rgba(255,255,255,.12);
 
       --text:#eef3ff;
       --muted:#b9c6e4;
-      --muted2:#97aad6;
+      --muted2:#93a6d6;
 
       --blue:#3b82f6;
       --cyan:#22d3ee;
       --violet:#8b5cf6;
-      --pink:#ec4899;
 
-      --shadow:0 22px 70px rgba(0,0,0,.40);
-      --shadow2:0 10px 30px rgba(0,0,0,.28);
-      --radius:22px;
-      --max:1200px;
+      --shadow: 0 28px 90px rgba(0,0,0,.44);
+      --shadow2: 0 14px 40px rgba(0,0,0,.28);
+
+      --radius: 22px;
+      --radius2: 18px;
+      --max: 1200px;
+
+      --h1: clamp(2.2rem, 3.8vw, 3.2rem);
+      --h2: clamp(1.35rem, 2.1vw, 1.7rem);
+      --p: 1.03rem;
     }
 
     *{box-sizing:border-box}
     html,body{margin:0;padding:0}
+    html{scroll-behavior:smooth}
     body{
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
       color:var(--text);
       background:
-        radial-gradient(900px 520px at 8% -10%, rgba(59,130,246,.34), transparent 60%),
-        radial-gradient(780px 440px at 95% 8%, rgba(139,92,246,.24), transparent 60%),
-        radial-gradient(520px 320px at 80% 70%, rgba(34,211,238,.12), transparent 60%),
+        radial-gradient(920px 560px at 10% -10%, rgba(59,130,246,.32), transparent 60%),
+        radial-gradient(860px 520px at 95% 10%, rgba(139,92,246,.26), transparent 62%),
+        radial-gradient(560px 380px at 80% 78%, rgba(34,211,238,.12), transparent 62%),
         linear-gradient(180deg, var(--bg), var(--bg2));
-      line-height:1.6;
+      line-height:1.55;
+      letter-spacing: .005em;
     }
 
     a{color:inherit;text-decoration:none}
     a:hover{opacity:1}
     img{max-width:100%;display:block}
-
     .container{width:min(var(--max), calc(100% - 32px)); margin:0 auto;}
-    .sr-only{
-      position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;
-    }
 
     /* Header */
     .header{
       position:sticky; top:0; z-index:50;
-      backdrop-filter: blur(12px);
+      backdrop-filter: blur(14px);
       background: rgba(7,11,22,.72);
       border-bottom: 1px solid rgba(255,255,255,.07);
     }
@@ -64,28 +67,25 @@
       min-height:78px;
       display:flex; align-items:center; justify-content:space-between; gap:14px;
     }
+
     .brand{display:flex;align-items:center;gap:12px;min-width:0}
     .badge{
       width:38px;height:38px;border-radius:12px;flex:0 0 auto;
       background:
-        radial-gradient(circle at 30% 30%, rgba(255,255,255,.7), rgba(255,255,255,.08) 38%),
+        radial-gradient(circle at 30% 30%, rgba(255,255,255,.75), rgba(255,255,255,.08) 38%),
         linear-gradient(135deg, #22d3ee 0%, #3b82f6 45%, #8b5cf6 100%);
       box-shadow:0 14px 34px rgba(59,130,246,.35);
       border:1px solid rgba(255,255,255,.18);
     }
     .brand-text{display:flex;flex-direction:column;min-width:0}
-    .brand-text strong{
-      font-weight:900; letter-spacing:.01em; font-size:1.06rem;
-      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-    }
-    .brand-text span{
-      color:var(--muted); font-size:.82rem;
-      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:560px;
-    }
+    .brand-text strong{font-weight:900;font-size:1.06rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .brand-text span{color:var(--muted);font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:560px}
 
-    .links{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .links{
+      display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;
+    }
     .links a{
-      color:#d9e5ff; font-weight:800; opacity:.94;
+      color:#d9e5ff; font-weight:850; opacity:.94;
       padding:10px 10px; border-radius:12px;
       transition: background .15s ease, opacity .15s ease;
     }
@@ -94,14 +94,14 @@
     .btn{
       display:inline-flex; align-items:center; justify-content:center; gap:10px;
       border:none; cursor:pointer; border-radius:14px;
-      padding:12px 18px; font-weight:900; white-space:nowrap;
+      padding:12px 16px; font-weight:900; white-space:nowrap;
       transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
     }
     .btn:hover{transform:translateY(-1px)}
     .btn-primary{
       color:#fff;
       background:linear-gradient(90deg, var(--violet), var(--blue), var(--cyan));
-      box-shadow: 0 12px 34px rgba(59,130,246,.32);
+      box-shadow: 0 12px 34px rgba(59,130,246,.30);
     }
     .btn-secondary{
       color:#eaf1ff;
@@ -124,32 +124,33 @@
       padding:10px 0 14px;
       border-top:1px solid rgba(255,255,255,.07);
     }
-    .mobile-panel a{display:block;padding:12px 10px;border-radius:12px;font-weight:800;color:#dce8ff}
+    .mobile-panel a{display:block;padding:12px 10px;border-radius:12px;font-weight:850;color:#dce8ff}
     .mobile-panel a:hover{background:rgba(255,255,255,.05)}
     .mobile-panel .btn{width:100%;margin-top:10px}
 
     /* Hero */
-    .hero{padding:40px 0 22px}
+    .hero{padding:54px 0 22px}
     .hero-card{
       border-radius:28px;
       border:1px solid rgba(255,255,255,.12);
       background:
-        radial-gradient(900px 360px at 12% 0%, rgba(236,72,153,.12), transparent 60%),
-        radial-gradient(900px 420px at 95% 20%, rgba(34,211,238,.12), transparent 60%),
-        linear-gradient(135deg, rgba(17,24,39,.82), rgba(9,14,29,.92));
+        radial-gradient(900px 420px at 10% 0%, rgba(34,211,238,.12), transparent 60%),
+        radial-gradient(900px 520px at 95% 20%, rgba(139,92,246,.14), transparent 60%),
+        linear-gradient(135deg, rgba(17,24,39,.80), rgba(9,14,29,.92));
       box-shadow: var(--shadow);
       overflow:hidden;
+      position:relative;
     }
     .hero-inner{
-      padding:26px;
+      padding:30px;
       display:grid;
-      grid-template-columns: 1.15fr .85fr;
+      grid-template-columns: 1.05fr .95fr;
       gap:18px;
       align-items:stretch;
     }
 
     .eyebrow{
-      display:inline-flex; align-items:center; gap:10px;
+      display:inline-flex;align-items:center;gap:10px;
       color:#eaf2ff;
       border:1px solid rgba(255,255,255,.18);
       background: rgba(255,255,255,.06);
@@ -166,21 +167,20 @@
       box-shadow:0 0 0 4px rgba(34,211,238,.12);
     }
 
-    h1{
-      margin:0 0 12px;
-      font-size:clamp(2.05rem, 3.4vw, 3.1rem);
-      letter-spacing:-.03em;
-      line-height:1.06;
+    .hero h1{
+      margin:0 0 10px;
+      font-size:var(--h1);
+      letter-spacing:-.04em;
+      line-height:1.03;
     }
-    .sub{
-      margin:0 0 18px;
+    .hero p{
+      margin:0 0 16px;
       color:var(--muted);
-      max-width:74ch;
-      font-size:1.05rem;
+      font-size:var(--p);
+      max-width:64ch;
     }
 
-    .hero-actions{display:flex;gap:10px;flex-wrap:wrap}
-    .hero-actions .btn{padding:12px 16px}
+    .hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
 
     .hero-right{
       border-left:1px solid rgba(255,255,255,.10);
@@ -195,49 +195,47 @@
       border:1px solid rgba(255,255,255,.12);
       background:#0b1328;
       overflow:hidden;
-      min-height:250px;
+      min-height:260px;
       box-shadow: var(--shadow2);
       position:relative;
     }
-    .visual img{width:100%;height:100%;object-fit:cover;opacity:.96}
+    .visual img{width:100%;height:100%;object-fit:cover;opacity:.97}
     .visual::after{
       content:"";
       position:absolute; inset:0;
       background:
         linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
-      background-size: 26px 26px;
-      opacity:.16;
+      background-size: 28px 28px;
+      opacity:.14;
       pointer-events:none;
     }
 
-    .proof{
-      display:grid; gap:10px;
+    .kpi{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
     }
-    .proof .chip{
+    .kpi .chip{
       border:1px solid rgba(255,255,255,.12);
       background:rgba(255,255,255,.05);
       border-radius:18px;
       padding:12px;
+      min-height:82px;
     }
-    .proof .chip strong{display:block;font-size:.95rem}
-    .proof .chip span{display:block;color:var(--muted);font-size:.9rem;margin-top:4px}
+    .kpi strong{display:block;font-size:.95rem}
+    .kpi span{display:block;color:var(--muted);font-size:.9rem;margin-top:4px}
 
     /* Sections */
-    section{padding:22px 0}
+    section{padding:26px 0}
     .section-head{
-      display:flex;
-      align-items:flex-end;
-      justify-content:space-between;
-      gap:12px;
-      flex-wrap:wrap;
-      margin-bottom:12px;
+      display:flex; align-items:flex-end; justify-content:space-between;
+      gap:12px; flex-wrap:wrap; margin-bottom:14px;
     }
     .section-head h2{
       margin:0;
-      font-size:1.55rem;
+      font-size:var(--h2);
       letter-spacing:-.02em;
-      line-height:1.15;
     }
     .section-head p{margin:0;color:var(--muted);max-width:78ch}
 
@@ -249,7 +247,7 @@
     .card{
       background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.04));
       border:1px solid rgba(255,255,255,.12);
-      border-radius:22px;
+      border-radius:var(--radius);
       box-shadow: var(--shadow2);
       padding:16px;
       transition:transform .15s ease, border-color .15s ease;
@@ -262,7 +260,7 @@
       display:grid;place-items:center;
       margin-bottom:10px;
     }
-    .card h3{margin:0 0 8px;font-size:1.05rem;letter-spacing:-.01em}
+    .card h3{margin:0 0 8px;font-size:1.02rem;letter-spacing:-.01em}
     .card p{margin:0;color:var(--muted);font-size:.95rem;line-height:1.5}
 
     .two-col{
@@ -270,11 +268,10 @@
       grid-template-columns: 1fr 1fr;
       gap:14px;
     }
-
     .panel{
       background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.04));
       border:1px solid rgba(255,255,255,.12);
-      border-radius:22px;
+      border-radius:var(--radius);
       box-shadow: var(--shadow2);
       padding:16px;
     }
@@ -282,7 +279,7 @@
     /* Contact */
     .form-wrap{
       display:grid;
-      grid-template-columns: 1.15fr .85fr;
+      grid-template-columns: 1.1fr .9fr;
       gap:14px;
       align-items:start;
     }
@@ -318,15 +315,19 @@
     /* Footer */
     .footer{
       border-top:1px solid rgba(255,255,255,.08);
-      padding:20px 0 34px;
+      padding:22px 0 34px;
       color:var(--muted);
-      margin-top:10px;
+      margin-top:12px;
     }
     .footer-row{
       display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;
       font-size:.92rem;
     }
+    .footer-links{display:flex;gap:12px;flex-wrap:wrap}
+    .footer-links a{color:var(--muted2)}
+    .footer-links a:hover{color:#fff}
 
+    /* Responsive */
     @media (max-width: 980px){
       .hero-inner{grid-template-columns:1fr}
       .hero-right{border-left:none;padding-left:0;border-top:1px solid rgba(255,255,255,.10);padding-top:14px}
@@ -353,13 +354,13 @@
           <div class="badge" aria-hidden="true"></div>
           <div class="brand-text">
             <strong>Sentinel Identity</strong>
-            <span>Entra Identity & Access Management consulting</span>
+            <span>Entra Identity & Access Management</span>
           </div>
         </a>
 
         <nav class="links" aria-label="Primary navigation">
           <a href="#services">Services</a>
-          <a href="#approach">Approach</a>
+          <a href="#work">Work</a>
           <a href="#coverage">Coverage</a>
           <a href="blog.html">Blog</a>
           <a href="#contact">Assessment</a>
@@ -371,7 +372,7 @@
 
       <div class="mobile-panel" id="mobilePanel" aria-label="Mobile menu">
         <a href="#services">Services</a>
-        <a href="#approach">Approach</a>
+        <a href="#work">Work</a>
         <a href="#coverage">Coverage</a>
         <a href="blog.html">Blog</a>
         <a href="#contact">Assessment</a>
@@ -386,35 +387,35 @@
         <div class="hero-card">
           <div class="hero-inner">
             <div>
-              <div class="eyebrow"><span class="dot"></span><span>ENTRA IAM · CONDITIONAL ACCESS · SSO</span></div>
+              <div class="eyebrow"><span class="dot"></span><span>ENTRA IAM</span></div>
 
-              <h1>Identity controls that don’t break production.</h1>
+              <h1>IAM for production</h1>
 
-              <p class="sub">
+              <p>
                 Conditional Access baselines, MFA method hardening, privileged access governance, and enterprise app ownership.
-                Designed for teams that need stability and a clear operating model.
+                Built for stable rollout and predictable operations.
               </p>
 
               <div class="hero-actions">
                 <a class="btn btn-primary" href="#contact">Request an Assessment</a>
-                <a class="btn btn-secondary" href="#services">Explore services</a>
+                <a class="btn btn-secondary" href="#services">See services</a>
               </div>
             </div>
 
             <aside class="hero-right">
-              <div class="visual" aria-label="Identity security visual">
+              <div class="visual" aria-label="Identity visual">
                 <img alt=""
-                  src="data:image/svg+xml;charset=UTF-8,<?xml version='1.0'?><svg xmlns='http://www.w3.org/2000/svg' width='1400' height='900' viewBox='0 0 1400 900'><defs><linearGradient id='g' x1='0' x2='1'><stop offset='0' stop-color='%238b5cf6'/><stop offset='0.5' stop-color='%233b82f6'/><stop offset='1' stop-color='%2322d3ee'/></linearGradient></defs><rect width='1400' height='900' fill='%230b1220'/><circle cx='280' cy='210' r='300' fill='url(%23g)' opacity='0.20'/><circle cx='1220' cy='760' r='360' fill='url(%23g)' opacity='0.14'/><rect x='120' y='260' width='640' height='420' rx='26' fill='rgba(255,255,255,0.06)' stroke='rgba(255,255,255,0.18)'/><path d='M165 330h550M165 380h460M165 430h510M165 480h420M165 530h470' stroke='rgba(255,255,255,0.24)' stroke-width='10' stroke-linecap='round'/><path d='M980 240c-150 0-272 122-272 272 0 182 145 333 272 370 127-37 272-188 272-370 0-150-122-272-272-272z' fill='rgba(255,255,255,0.08)' stroke='rgba(255,255,255,0.18)'/><path d='M980 355l122 54v104c0 94-65 185-122 210-57-25-122-116-122-210V409l122-54z' fill='url(%23g)' opacity='0.92'/><text x='120' y='190' fill='rgba(255,255,255,0.88)' font-family='Segoe UI, Arial' font-size='38' font-weight='700'>Entra IAM · Baseline & Governance</text></svg>">
+                  src="data:image/svg+xml;charset=UTF-8,<?xml version='1.0'?><svg xmlns='http://www.w3.org/2000/svg' width='1400' height='900' viewBox='0 0 1400 900'><defs><linearGradient id='g' x1='0' x2='1'><stop offset='0' stop-color='%238b5cf6'/><stop offset='0.5' stop-color='%233b82f6'/><stop offset='1' stop-color='%2322d3ee'/></linearGradient></defs><rect width='1400' height='900' fill='%230b1220'/><circle cx='280' cy='210' r='300' fill='url(%23g)' opacity='0.20'/><circle cx='1220' cy='760' r='360' fill='url(%23g)' opacity='0.14'/><rect x='120' y='260' width='640' height='420' rx='26' fill='rgba(255,255,255,0.06)' stroke='rgba(255,255,255,0.18)'/><path d='M165 330h550M165 380h460M165 430h510M165 480h420M165 530h470' stroke='rgba(255,255,255,0.24)' stroke-width='10' stroke-linecap='round'/><path d='M980 240c-150 0-272 122-272 272 0 182 145 333 272 370 127-37 272-188 272-370 0-150-122-272-272-272z' fill='rgba(255,255,255,0.08)' stroke='rgba(255,255,255,0.18)'/><path d='M980 355l122 54v104c0 94-65 185-122 210-57-25-122-116-122-210V409l122-54z' fill='url(%23g)' opacity='0.92'/><text x='120' y='190' fill='rgba(255,255,255,0.88)' font-family='Segoe UI, Arial' font-size='38' font-weight='700'>Baseline · Governance · Visibility</text></svg>">
               </div>
 
-              <div class="proof">
+              <div class="kpi">
                 <div class="chip">
-                  <strong>Baseline first</strong>
-                  <span>Pilot, measure, expand. No surprise rollouts.</span>
+                  <strong>Baseline</strong>
+                  <span>Pilot-first rollout</span>
                 </div>
                 <div class="chip">
-                  <strong>Operational clarity</strong>
-                  <span>Owners, exceptions, and rollback notes documented.</span>
+                  <strong>Governance</strong>
+                  <span>Owners & exceptions</span>
                 </div>
               </div>
             </aside>
@@ -428,7 +429,7 @@
         <div class="section-head">
           <div>
             <h2>Services</h2>
-            <p>Focused Entra IAM workstreams. Built to be maintainable after handover.</p>
+            <p>Focused workstreams that hold up after handover.</p>
           </div>
         </div>
 
@@ -440,7 +441,7 @@
                 <path d="M9 12l2 2 4-4"></path>
               </svg>
             </div>
-            <h3>Conditional Access baseline</h3>
+            <h3>Conditional Access</h3>
             <p>Core controls, staged rollout, evidence-based exceptions, rollback notes.</p>
           </div>
 
@@ -453,8 +454,8 @@
                 <path d="M4 12l4-4 4 4-4 4-4-4z"></path>
               </svg>
             </div>
-            <h3>MFA methods hardening</h3>
-            <p>Method standardization, cleanup of unusable methods, reduced lockout noise.</p>
+            <h3>MFA methods</h3>
+            <p>Method standardization, cleanup of unusable methods, fewer lockouts.</p>
           </div>
 
           <div class="card">
@@ -464,7 +465,7 @@
                 <rect x="6" y="11" width="12" height="10" rx="2"></rect>
               </svg>
             </div>
-            <h3>Privileged access governance</h3>
+            <h3>Privileged access</h3>
             <p>Role design, least privilege, access reviews, admin accountability.</p>
           </div>
 
@@ -474,8 +475,8 @@
                 <path d="M21 15a4 4 0 01-4 4H7a4 4 0 010-8 5 5 0 019.6-1.2A4 4 0 0121 15z"></path>
               </svg>
             </div>
-            <h3>SSO and enterprise apps</h3>
-            <p>SAML/OIDC configuration hygiene, safe defaults, ownership, inventory.</p>
+            <h3>SSO & apps</h3>
+            <p>SAML/OIDC hygiene, safe defaults, ownership, inventory control.</p>
           </div>
 
           <div class="card">
@@ -485,8 +486,8 @@
                 <path d="M7 14l4-4 3 3 5-6"></path>
               </svg>
             </div>
-            <h3>Monitoring and triage</h3>
-            <p>Sign-in log patterns, investigation workflow, and support-ready runbooks.</p>
+            <h3>Monitoring</h3>
+            <p>Sign-in log patterns, investigation workflow, support-ready runbooks.</p>
           </div>
 
           <div class="card">
@@ -498,29 +499,29 @@
                 <path d="M7 12h6"></path>
               </svg>
             </div>
-            <h3>Messaging patterns</h3>
-            <p>Shared mailbox governance, send permissions, Defender remediation workflow.</p>
+            <h3>Messaging</h3>
+            <p>Shared mailbox governance, send permissions, Defender remediation.</p>
           </div>
         </div>
       </div>
     </section>
 
-    <section id="approach">
+    <section id="work">
       <div class="container">
         <div class="section-head">
           <div>
-            <h2>Approach</h2>
-            <p>Clarity first. Controlled rollout. Verification in logs and behavior.</p>
+            <h2>How it works</h2>
+            <p>Clear scope. Controlled rollout. Verification in logs and behavior.</p>
           </div>
         </div>
 
         <div class="two-col">
           <div class="panel">
-            <h3 style="margin:0 0 8px;">Assess</h3>
-            <p class="muted" style="margin:0;">Define scope, failure mode, constraints, and the smallest safe change.</p>
+            <h3 style="margin:0 0 8px; font-size:1.02rem;">Assess</h3>
+            <p class="muted" style="margin:0;">Define the failure mode, constraints, and the smallest safe change.</p>
           </div>
           <div class="panel">
-            <h3 style="margin:0 0 8px;">Deliver</h3>
+            <h3 style="margin:0 0 8px; font-size:1.02rem;">Deliver</h3>
             <p class="muted" style="margin:0;">Pilot-first rollout with monitoring and rollback notes.</p>
           </div>
         </div>
@@ -538,12 +539,12 @@
 
         <div class="two-col">
           <div class="panel">
-            <h3 style="margin:0 0 8px;">Good fit</h3>
-            <p class="muted" style="margin:0;">Teams running Microsoft 365 with a growing app footprint and limited IT bandwidth.</p>
+            <h3 style="margin:0 0 8px; font-size:1.02rem;">Good fit</h3>
+            <p class="muted" style="margin:0;">Microsoft 365 orgs with growing apps and limited IT bandwidth.</p>
           </div>
           <div class="panel">
-            <h3 style="margin:0 0 8px;">What to include</h3>
-            <p class="muted" style="margin:0;">Symptom, impact, affected users/apps, timestamps, and error codes.</p>
+            <h3 style="margin:0 0 8px; font-size:1.02rem;">Send details</h3>
+            <p class="muted" style="margin:0;">Symptom, impact, affected users/apps, timestamps, error codes.</p>
           </div>
         </div>
       </div>
@@ -553,8 +554,8 @@
       <div class="container">
         <div class="section-head">
           <div>
-            <h2>Request an assessment</h2>
-            <p>Short form. Useful details. No theatrics.</p>
+            <h2>Assessment</h2>
+            <p>Short form. Useful details.</p>
           </div>
         </div>
 
@@ -607,9 +608,9 @@
           </div>
 
           <div class="panel">
-            <h3 style="margin:0 0 10px;">What happens next</h3>
-            <p class="muted" style="margin:0 0 12px;">You get a confirmation email. Then a response with the first action and what to verify.</p>
-            <a class="btn btn-secondary" href="blog.html" style="width:100%;">Read technical notes</a>
+            <h3 style="margin:0 0 10px; font-size:1.02rem;">Notes</h3>
+            <p class="muted" style="margin:0 0 12px;">Technical write-ups on Entra IAM and Microsoft 365 operations.</p>
+            <a class="btn btn-secondary" href="blog.html" style="width:100%;">Open blog</a>
           </div>
         </div>
       </div>
@@ -619,7 +620,11 @@
   <footer class="footer">
     <div class="container footer-row">
       <div>© <span id="year"></span> Sentinel Identity</div>
-      <div>Entra IAM consulting · Worldwide remote</div>
+      <div class="footer-links">
+        <a href="blog.html">Blog</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="mailto:info@sentinelidentity.ca">Email</a>
+      </div>
     </div>
   </footer>
 
@@ -677,7 +682,6 @@
               name: payload.name,
               email: payload.email,
               company: payload.org || "",
-              userCount: payload.userCount || "",
               primaryFocus: payload.topic || "",
               problemSummary: payload.message || "",
               sourcePage: window.location.href
